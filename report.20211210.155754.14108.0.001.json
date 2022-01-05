@@ -1,0 +1,570 @@
+
+{
+  "header": {
+    "reportVersion": 1,
+    "event": "Allocation failed - JavaScript heap out of memory",
+    "trigger": "FatalError",
+    "filename": "report.20211210.155754.14108.0.001.json",
+    "dumpEventTime": "2021-12-10T15:57:54Z",
+    "dumpEventTimeStamp": "1639169874862",
+    "processId": 14108,
+    "cwd": "G:\\Workspace\\projects\\mowr",
+    "commandLine": [
+      "C:\\nodejs\\node.exe",
+      "C:\\Users\\selfi\\AppData\\Roaming\\npm/node_modules/expo-cli/bin/expo.js",
+      "start"
+    ],
+    "nodejsVersion": "v12.13.1",
+    "wordSize": 64,
+    "arch": "x64",
+    "platform": "win32",
+    "componentVersions": {
+      "node": "12.13.1",
+      "v8": "7.7.299.13-node.16",
+      "uv": "1.33.1",
+      "zlib": "1.2.11",
+      "brotli": "1.0.7",
+      "ares": "1.15.0",
+      "modules": "72",
+      "nghttp2": "1.39.2",
+      "napi": "5",
+      "llhttp": "1.1.4",
+      "http_parser": "2.8.0",
+      "openssl": "1.1.1d",
+      "cldr": "35.1",
+      "icu": "64.2",
+      "tz": "2019c",
+      "unicode": "12.1"
+    },
+    "release": {
+      "name": "node",
+      "lts": "Erbium",
+      "headersUrl": "https://nodejs.org/download/release/v12.13.1/node-v12.13.1-headers.tar.gz",
+      "sourceUrl": "https://nodejs.org/download/release/v12.13.1/node-v12.13.1.tar.gz",
+      "libUrl": "https://nodejs.org/download/release/v12.13.1/win-x64/node.lib"
+    },
+    "osName": "Windows_NT",
+    "osRelease": "10.0.19042",
+    "osVersion": "Windows 10 Home",
+    "osMachine": "x86_64",
+    "cpus": [
+      {
+        "model": "AMD Ryzen 5 5600X 6-Core Processor             ",
+        "speed": 3693,
+        "user": 11216015,
+        "nice": 0,
+        "sys": 27362984,
+        "idle": 682294187,
+        "irq": 8866890
+      },
+      {
+        "model": "AMD Ryzen 5 5600X 6-Core Processor             ",
+        "speed": 3693,
+        "user": 11615546,
+        "nice": 0,
+        "sys": 7434734,
+        "idle": 701822781,
+        "irq": 125343
+      },
+      {
+        "model": "AMD Ryzen 5 5600X 6-Core Processor             ",
+        "speed": 3693,
+        "user": 20420765,
+        "nice": 0,
+        "sys": 16997031,
+        "idle": 683455250,
+        "irq": 179640
+      },
+      {
+        "model": "AMD Ryzen 5 5600X 6-Core Processor             ",
+        "speed": 3693,
+        "user": 16176359,
+        "nice": 0,
+        "sys": 7377687,
+        "idle": 697319000,
+        "irq": 78812
+      },
+      {
+        "model": "AMD Ryzen 5 5600X 6-Core Processor             ",
+        "speed": 3693,
+        "user": 15250687,
+        "nice": 0,
+        "sys": 22691265,
+        "idle": 682931093,
+        "irq": 229421
+      },
+      {
+        "model": "AMD Ryzen 5 5600X 6-Core Processor             ",
+        "speed": 3693,
+        "user": 20218281,
+        "nice": 0,
+        "sys": 27282015,
+        "idle": 673372750,
+        "irq": 204062
+      },
+      {
+        "model": "AMD Ryzen 5 5600X 6-Core Processor             ",
+        "speed": 3693,
+        "user": 16594234,
+        "nice": 0,
+        "sys": 27524937,
+        "idle": 676753875,
+        "irq": 240468
+      },
+      {
+        "model": "AMD Ryzen 5 5600X 6-Core Processor             ",
+        "speed": 3693,
+        "user": 20411453,
+        "nice": 0,
+        "sys": 25955453,
+        "idle": 674506140,
+        "irq": 227093
+      },
+      {
+        "model": "AMD Ryzen 5 5600X 6-Core Processor             ",
+        "speed": 3693,
+        "user": 30861796,
+        "nice": 0,
+        "sys": 32027781,
+        "idle": 657983468,
+        "irq": 256250
+      },
+      {
+        "model": "AMD Ryzen 5 5600X 6-Core Processor             ",
+        "speed": 3693,
+        "user": 31418843,
+        "nice": 0,
+        "sys": 30690453,
+        "idle": 658763750,
+        "irq": 213343
+      },
+      {
+        "model": "AMD Ryzen 5 5600X 6-Core Processor             ",
+        "speed": 3693,
+        "user": 12713515,
+        "nice": 0,
+        "sys": 14976437,
+        "idle": 693183093,
+        "irq": 116953
+      },
+      {
+        "model": "AMD Ryzen 5 5600X 6-Core Processor             ",
+        "speed": 3693,
+        "user": 17145671,
+        "nice": 0,
+        "sys": 10856312,
+        "idle": 692871062,
+        "irq": 69187
+      }
+    ],
+    "networkInterfaces": [
+      {
+        "name": "Local Area Connection",
+        "internal": false,
+        "mac": "00:ff:99:59:43:24",
+        "address": "fe80::a45b:a832:529a:2aa5",
+        "netmask": "ffff:ffff:ffff:ffff::",
+        "family": "IPv6",
+        "scopeid": 23
+      },
+      {
+        "name": "Local Area Connection",
+        "internal": false,
+        "mac": "00:ff:99:59:43:24",
+        "address": "10.7.18.10",
+        "netmask": "255.255.255.0",
+        "family": "IPv4"
+      },
+      {
+        "name": "vEthernet (Default Switch)",
+        "internal": false,
+        "mac": "00:15:5d:2f:67:3e",
+        "address": "fe80::4502:3ce2:4119:3b3f",
+        "netmask": "ffff:ffff:ffff:ffff::",
+        "family": "IPv6",
+        "scopeid": 58
+      },
+      {
+        "name": "vEthernet (Default Switch)",
+        "internal": false,
+        "mac": "00:15:5d:2f:67:3e",
+        "address": "172.27.112.1",
+        "netmask": "255.255.240.0",
+        "family": "IPv4"
+      },
+      {
+        "name": "Ethernet 3",
+        "internal": false,
+        "mac": "f0:2f:74:1d:8b:13",
+        "address": "2601:cd:4005:ec90::3513",
+        "netmask": "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+        "family": "IPv6",
+        "scopeid": 0
+      },
+      {
+        "name": "Ethernet 3",
+        "internal": false,
+        "mac": "f0:2f:74:1d:8b:13",
+        "address": "2601:cd:4005:ec90:6542:5290:35cd:5761",
+        "netmask": "ffff:ffff:ffff:ffff::",
+        "family": "IPv6",
+        "scopeid": 0
+      },
+      {
+        "name": "Ethernet 3",
+        "internal": false,
+        "mac": "f0:2f:74:1d:8b:13",
+        "address": "2601:cd:4005:ec90:8490:5713:caf2:a3ad",
+        "netmask": "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+        "family": "IPv6",
+        "scopeid": 0
+      },
+      {
+        "name": "Ethernet 3",
+        "internal": false,
+        "mac": "f0:2f:74:1d:8b:13",
+        "address": "fe80::6542:5290:35cd:5761",
+        "netmask": "ffff:ffff:ffff:ffff::",
+        "family": "IPv6",
+        "scopeid": 11
+      },
+      {
+        "name": "Ethernet 3",
+        "internal": false,
+        "mac": "f0:2f:74:1d:8b:13",
+        "address": "10.0.0.144",
+        "netmask": "255.255.255.0",
+        "family": "IPv4"
+      },
+      {
+        "name": "Wi-Fi 4",
+        "internal": false,
+        "mac": "00:22:5f:cf:80:75",
+        "address": "2601:cd:4005:ec90:1580:31d1:480d:c43f",
+        "netmask": "ffff:ffff:ffff:ffff::",
+        "family": "IPv6",
+        "scopeid": 0
+      },
+      {
+        "name": "Wi-Fi 4",
+        "internal": false,
+        "mac": "00:22:5f:cf:80:75",
+        "address": "2601:cd:4005:ec90:c80:f70f:c5cd:8c30",
+        "netmask": "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+        "family": "IPv6",
+        "scopeid": 0
+      },
+      {
+        "name": "Wi-Fi 4",
+        "internal": false,
+        "mac": "00:22:5f:cf:80:75",
+        "address": "fe80::1580:31d1:480d:c43f",
+        "netmask": "ffff:ffff:ffff:ffff::",
+        "family": "IPv6",
+        "scopeid": 12
+      },
+      {
+        "name": "Wi-Fi 4",
+        "internal": false,
+        "mac": "00:22:5f:cf:80:75",
+        "address": "10.0.0.149",
+        "netmask": "255.255.255.0",
+        "family": "IPv4"
+      },
+      {
+        "name": "Loopback Pseudo-Interface 1",
+        "internal": true,
+        "mac": "00:00:00:00:00:00",
+        "address": "::1",
+        "netmask": "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+        "family": "IPv6",
+        "scopeid": 0
+      },
+      {
+        "name": "Loopback Pseudo-Interface 1",
+        "internal": true,
+        "mac": "00:00:00:00:00:00",
+        "address": "127.0.0.1",
+        "netmask": "255.0.0.0",
+        "family": "IPv4"
+      },
+      {
+        "name": "vEthernet (BluestacksNetwo)",
+        "internal": false,
+        "mac": "00:15:5d:f0:45:62",
+        "address": "fe80::29fb:95b7:22ce:4b64",
+        "netmask": "ffff:ffff:ffff:ffff::",
+        "family": "IPv6",
+        "scopeid": 66
+      },
+      {
+        "name": "vEthernet (BluestacksNetwo)",
+        "internal": false,
+        "mac": "00:15:5d:f0:45:62",
+        "address": "172.29.64.1",
+        "netmask": "255.255.240.0",
+        "family": "IPv4"
+      }
+    ],
+    "host": "iVV"
+  },
+  "javascriptStack": {
+    "message": "No stack.",
+    "stack": [
+      "Unavailable."
+    ]
+  },
+  "nativeStack": [
+    {
+      "pc": "0x00007ff78d8f1729",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff78d8f5b4c",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff78d8f4b08",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff78d9e369b",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff78e1e82de",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff78e1d0321",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff78e09dbec",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff78e0a5cf1",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff78e09b353",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff78e099b24",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff78e0badf5",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff78de26e19",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff78e61404d",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff78e658f8b",
+      "symbol": ""
+    },
+    {
+      "pc": "0x000001a0193c4bb8",
+      "symbol": ""
+    }
+  ],
+  "javascriptHeap": {
+    "totalMemory": 216772608,
+    "totalCommittedMemory": 216772608,
+    "usedMemory": 200622152,
+    "availableMemory": 1997599328,
+    "memoryLimit": 2197815296,
+    "heapSpaces": {
+      "read_only_space": {
+        "memorySize": 262144,
+        "committedMemory": 262144,
+        "capacity": 261872,
+        "used": 32296,
+        "available": 229576
+      },
+      "new_space": {
+        "memorySize": 1048576,
+        "committedMemory": 1048576,
+        "capacity": 1047488,
+        "used": 1047424,
+        "available": 64
+      },
+      "old_space": {
+        "memorySize": 190427136,
+        "committedMemory": 190427136,
+        "capacity": 190090072,
+        "used": 176179232,
+        "available": 13910840
+      },
+      "code_space": {
+        "memorySize": 3571712,
+        "committedMemory": 3571712,
+        "capacity": 3390048,
+        "used": 2681600,
+        "available": 708448
+      },
+      "map_space": {
+        "memorySize": 2625536,
+        "committedMemory": 2625536,
+        "capacity": 2622544,
+        "used": 1962320,
+        "available": 660224
+      },
+      "large_object_space": {
+        "memorySize": 18788352,
+        "committedMemory": 18788352,
+        "capacity": 18715728,
+        "used": 18715728,
+        "available": 0
+      },
+      "code_large_object_space": {
+        "memorySize": 49152,
+        "committedMemory": 49152,
+        "capacity": 3552,
+        "used": 3552,
+        "available": 0
+      },
+      "new_large_object_space": {
+        "memorySize": 0,
+        "committedMemory": 0,
+        "capacity": 1047488,
+        "used": 0,
+        "available": 1047488
+      }
+    }
+  },
+  "resourceUsage": {
+    "userCpuSeconds": 3968.69,
+    "kernelCpuSeconds": 1638.83,
+    "cpuConsumptionPercent": 2.06922,
+    "maxRss": 438067200,
+    "pageFaults": {
+      "IORequired": 44327183,
+      "IONotRequired": 0
+    },
+    "fsActivity": {
+      "reads": 583254,
+      "writes": 198
+    }
+  },
+  "libuv": [
+  ],
+  "environmentVariables": {
+    "=C:": "C:\\",
+    "=G:": "G:\\Workspace\\projects\\mowr",
+    "ALLUSERSPROFILE": "C:\\ProgramData",
+    "ANDROID_HOME": "C:\\Android\\sdk",
+    "ANDROID_SDK_ROOT": "C:\\Android\\sdk",
+    "API_KEY": "AIzaSyDjyCMJyIpCia5Ny4hhxF5R_hMAgw_oC2k",
+    "APPDATA": "C:\\Users\\selfi\\AppData\\Roaming",
+    "APP_ID": "1:703627199609:android:cdadd7599f0c15fd2bc0a8",
+    "AUTH_DOMAIN": "mower-cc089.firebaseapp.com",
+    "ChocolateyInstall": "C:\\ProgramData\\chocolatey",
+    "ChocolateyLastPathUpdate": "132199834256117804",
+    "CIVIC_API_KEY": "AIzaSyA1czMYsSTRYIHYJxwN3QoC4BcmoqbOUO0",
+    "CommonProgramFiles": "C:\\Program Files\\Common Files",
+    "CommonProgramFiles(x86)": "C:\\Program Files (x86)\\Common Files",
+    "CommonProgramW6432": "C:\\Program Files\\Common Files",
+    "COMPUTERNAME": "IVV",
+    "ComSpec": "C:\\WINDOWS\\system32\\cmd.exe",
+    "DriverData": "C:\\Windows\\System32\\Drivers\\DriverData",
+    "EXPO_METRO_CACHE_KEY_VERSION": "3.4.0",
+    "GameFirstUserPath": "C:\\ProgramData\\ASUS\\GameFirst",
+    "GameTurbo": "C:\\Program Files (x86)\\ASUS\\GameFirst\\",
+    "HOMEDRIVE": "C:",
+    "HOMEPATH": "\\Users\\selfi",
+    "JAVA_HOME": "C:\\Users\\selfi\\AppData\\Local\\jdk-11.0.2",
+    "JDK_HOME": "C:\\Program Files\\Java\\jdk-13.0.2",
+    "LOCALAPPDATA": "C:\\Users\\selfi\\AppData\\Local",
+    "LOGONSERVER": "\\\\IVV",
+    "MAP_API_KEY": "AIzaSyAMupGVraeTXbfZ0HgeM7UrFqMWnbLFHH8",
+    "MESSAGING_SENDER_ID": "000000000000000",
+    "NUMBER_OF_PROCESSORS": "12",
+    "OneDrive": "C:\\Users\\selfi\\OneDrive",
+    "OpenSSL": "C:\\OpenSSL\\x64\\bin",
+    "OS": "Windows_NT",
+    "Path": "C:\\Android\\sdk\\platform-tools;C:\\Android\\sdk;C:\\Android\\sdk\\tools;C:\\Python27\\;C:\\Python27\\Scripts;C:\\Program Files (x86)\\Razer Chroma SDK\\bin;C:\\Program Files\\Razer Chroma SDK\\bin;C:\\Program Files (x86)\\Java\\jre1.8.0_131\\bin;C:\\Windows\\System32;C:\\Windows;C:\\Windows\\System32\\wbem;C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\;C:\\Windows\\System32\\OpenSSH\\;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\WINDOWS\\system32\\config\\systemprofile\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Program Files (x86)\\Plantronics\\Spokes3G\\;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\ProgramData\\chocolatey\\bin;C:\\nodejs\\;C:\\PostgreSQL\\12\\bin;C:\\Program Files (x86)\\Microsoft SQL Server\\150\\DTS\\Binn\\;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Android;C:\\Program Files\\Microsoft SQL Server\\150\\Tools\\Binn\\;C:\\Git\\cmd;C:\\Program Files\\Microsoft SQL Server\\130\\Tools\\Binn\\;C:\\Users\\selfi\\AppData\\Local\\jdk-11.0.2\\bin;C:\\Program Files\\MySQL\\MySQL Shell 8.0\\bin\\;C:\\Users\\selfi\\AppData\\Local\\Programs\\Python\\Python37-32\\Scripts\\;C:\\Users\\selfi\\AppData\\Local\\Programs\\Python\\Python37-32\\;C:\\Users\\selfi\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\selfi\\AppData\\Local\\GitHubDesktop\\bin;C:\\Users\\selfi\\AppData\\Roaming\\npm;C:\\heroku\\bin;C:\\Users\\selfi\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\selfi\\AppData\\Local\\atom\\bin",
+    "PATHEXT": ".COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC;.CPL",
+    "PGDATA": "C:\\PostgreSQL\\12\\data",
+    "PGUSER": "postgres",
+    "POSTGRES_DIR": "C:\\PostgreSQL\\12",
+    "PROCESSOR_ARCHITECTURE": "AMD64",
+    "PROCESSOR_IDENTIFIER": "AMD64 Family 25 Model 33 Stepping 0, AuthenticAMD",
+    "PROCESSOR_LEVEL": "25",
+    "PROCESSOR_REVISION": "2100",
+    "ProgramData": "C:\\ProgramData",
+    "ProgramFiles": "C:\\Program Files",
+    "ProgramFiles(x86)": "C:\\Program Files (x86)",
+    "ProgramW6432": "C:\\Program Files",
+    "PROJECT_ID": "mower-cc089",
+    "PSModulePath": "C:\\Users\\selfi\\Documents\\WindowsPowerShell\\Modules;C:\\Program Files\\WindowsPowerShell\\Modules;C:\\WINDOWS\\system32\\WindowsPowerShell\\v1.0\\Modules",
+    "PUBLIC": "C:\\Users\\Public",
+    "RCT_METRO_PORT": "19000",
+    "STORAGE_BUCKET": "mower-cc089.appspot.com",
+    "SystemDrive": "C:",
+    "SystemRoot": "C:\\WINDOWS",
+    "TEMP": "C:\\Users\\selfi\\AppData\\Local\\Temp",
+    "TMP": "C:\\Users\\selfi\\AppData\\Local\\Temp",
+    "USERDOMAIN": "IVV",
+    "USERDOMAIN_ROAMINGPROFILE": "IVV",
+    "USERNAME": "selfi",
+    "USERPROFILE": "C:\\Users\\selfi",
+    "VBOX_HWVIRTEX_IGNORE_SVM_IN_USE": "1",
+    "windir": "C:\\WINDOWS",
+    "WSLENV": "WT_SESSION::WT_PROFILE_ID",
+    "WT_PROFILE_ID": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
+    "WT_SESSION": "50439068-83eb-4521-9f8f-44ba0f1345e9"
+  },
+  "sharedObjects": [
+    "C:\\nodejs\\node.exe",
+    "C:\\WINDOWS\\SYSTEM32\\ntdll.dll",
+    "C:\\WINDOWS\\System32\\KERNEL32.DLL",
+    "C:\\WINDOWS\\System32\\KERNELBASE.dll",
+    "C:\\WINDOWS\\System32\\WS2_32.dll",
+    "C:\\WINDOWS\\System32\\RPCRT4.dll",
+    "C:\\WINDOWS\\System32\\ADVAPI32.dll",
+    "C:\\WINDOWS\\System32\\msvcrt.dll",
+    "C:\\WINDOWS\\SYSTEM32\\dbghelp.dll",
+    "C:\\WINDOWS\\System32\\sechost.dll",
+    "C:\\WINDOWS\\System32\\ucrtbase.dll",
+    "C:\\WINDOWS\\System32\\USER32.dll",
+    "C:\\WINDOWS\\System32\\win32u.dll",
+    "C:\\WINDOWS\\System32\\GDI32.dll",
+    "C:\\WINDOWS\\System32\\gdi32full.dll",
+    "C:\\WINDOWS\\System32\\msvcp_win.dll",
+    "C:\\WINDOWS\\System32\\PSAPI.DLL",
+    "C:\\WINDOWS\\System32\\CRYPT32.dll",
+    "C:\\WINDOWS\\System32\\bcrypt.dll",
+    "C:\\WINDOWS\\SYSTEM32\\IPHLPAPI.DLL",
+    "C:\\WINDOWS\\SYSTEM32\\USERENV.dll",
+    "C:\\WINDOWS\\SYSTEM32\\WINMM.dll",
+    "C:\\WINDOWS\\System32\\IMM32.DLL",
+    "C:\\WINDOWS\\SYSTEM32\\powrprof.dll",
+    "C:\\WINDOWS\\SYSTEM32\\UMPDC.dll",
+    "C:\\WINDOWS\\SYSTEM32\\CRYPTBASE.DLL",
+    "C:\\WINDOWS\\system32\\uxtheme.dll",
+    "C:\\WINDOWS\\System32\\combase.dll",
+    "C:\\WINDOWS\\system32\\mswsock.dll",
+    "C:\\WINDOWS\\SYSTEM32\\kernel.appcore.dll",
+    "C:\\WINDOWS\\System32\\bcryptprimitives.dll",
+    "C:\\WINDOWS\\system32\\napinsp.dll",
+    "C:\\WINDOWS\\system32\\pnrpnsp.dll",
+    "C:\\WINDOWS\\system32\\wshbth.dll",
+    "C:\\WINDOWS\\system32\\NLAapi.dll",
+    "C:\\WINDOWS\\SYSTEM32\\DNSAPI.dll",
+    "C:\\WINDOWS\\System32\\NSI.dll",
+    "C:\\WINDOWS\\System32\\winrnr.dll",
+    "C:\\WINDOWS\\SYSTEM32\\dhcpcsvc6.DLL",
+    "C:\\WINDOWS\\SYSTEM32\\dhcpcsvc.DLL",
+    "C:\\Windows\\System32\\rasadhlp.dll",
+    "C:\\WINDOWS\\System32\\fwpuclnt.dll"
+  ]
+}
