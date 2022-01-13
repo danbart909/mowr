@@ -5,9 +5,9 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 // import AsyncStorage from '@react-native-async-storage/async-storage'
 import Constants from 'expo-constants';
 import * as SplashScreen from 'expo-splash-screen';
-import * as author from 'firebase/auth'
-import * as database from 'firebase/database'
-import * as dFNS from "date-fns";
+import { signOut, signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth'
+import { collection, doc, setDoc, addDoc, getDoc, Timestamp } from 'firebase/firestore'
+import { parseISO, formatISO, addHours, isPast, addSeconds, addMinutes, compareAsc } from "date-fns";
 import Geocoder from 'react-native-geocoding'
 import { getDistance } from 'geolib';
 // import axios from 'react-native-axios'
@@ -50,7 +50,7 @@ export default class GlobalState extends Component {
 
     let { auth, db } = this.props
 
-    author.onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, (user) => {
       if (user && !this.state.introCheck) {
         this.refresh()
         this.props.setLoggedInStatus(true)
@@ -73,13 +73,13 @@ export default class GlobalState extends Component {
   }
   
   login = async (email, password) => {
-    author.signInWithEmailAndPassword(this.props.auth, email, password)
+    signInWithEmailAndPassword(this.props.auth, email, password)
       .then(x => this.refresh())
       .catch(e => console.log('logging in error', e))
   }
 
   logout = () => {
-    author.signOut(this.props.auth)
+    signOut(this.props.auth)
       .then(() => {
         this.clearData()
         console.log('user signed out')
@@ -92,50 +92,49 @@ export default class GlobalState extends Component {
     console.log('user signed in', user)
     let { job, introCheck } = this.state
     let { db } = this.props
-    let { ref, get, child } = database
     
-    get(child(ref(db), `users/${user.uid}`))
-      .then(x => {
-        let newState = this.state
-        newState = {
-          ...this.state,
-          introCheck: true,
-          user: { ...user, ...x.val() }
-        }
-        this.setState(newState)
-        console.log('user loaded')
-      })
-      .catch(e => {
-        console.log(e)
-        SplashScreen.hideAsync()
-      })
+    // get(child(ref(db), `users/${user.uid}`))
+    //   .then(x => {
+    //     let newState = this.state
+    //     newState = {
+    //       ...this.state,
+    //       introCheck: true,
+    //       user: { ...user, ...x.val() }
+    //     }
+    //     this.setState(newState)
+    //     console.log('user loaded')
+    //   })
+    //   .catch(e => {
+    //     console.log(e)
+    //     SplashScreen.hideAsync()
+    //   })
 
-    user.email &&
-    get(ref(db, 'jobs/'))
-      .then(x => {
-        let keys = Object.keys(x.val())
-        let data = Object.values(x.val())
-        for (let i = 0; i < data.length; i++) { data[i].key = keys[i] }
-        let userJobs = data.filter(y => y.provider === user.uid)
-        // let newjob = userJobs.filter(y => y.key === job.key)
-        // console.log('x', x.val())
-        console.log('userJobs', userJobs)
-        // this.setState({ userJobs: userJobs, job: newjob, busy: false, error: false })
-        if (job.ID) {
-          if (job.ID !== '') {
-            let newjob = userJobs.filter(y => y.key === job.key)
-            console.log('job.ID !== ""', newjob)
-            this.setState({ userJobs: userJobs, job: newjob[0], busy: false, error: false })
-          } else {
-            console.log('job.ID === ""')
-            this.setState({ userJobs: userJobs, busy: false, error: false })
-          }
-        } else {
-          console.log('no job.ID')
-          this.setState({ userJobs: userJobs, busy: false, error: false })
-        }
-      })
-      .catch(e => this.setState({ busy: false, error: true }, () => console.log(e)))
+    // user.email &&
+    // get(ref(db, 'jobs/'))
+    //   .then(x => {
+    //     let keys = Object.keys(x.val())
+    //     let data = Object.values(x.val())
+    //     for (let i = 0; i < data.length; i++) { data[i].key = keys[i] }
+    //     let userJobs = data.filter(y => y.provider === user.uid)
+    //     // let newjob = userJobs.filter(y => y.key === job.key)
+    //     // console.log('x', x.val())
+    //     console.log('userJobs', userJobs)
+    //     // this.setState({ userJobs: userJobs, job: newjob, busy: false, error: false })
+    //     if (job.ID) {
+    //       if (job.ID !== '') {
+    //         let newjob = userJobs.filter(y => y.key === job.key)
+    //         console.log('job.ID !== ""', newjob)
+    //         this.setState({ userJobs: userJobs, job: newjob[0], busy: false, error: false })
+    //       } else {
+    //         console.log('job.ID === ""')
+    //         this.setState({ userJobs: userJobs, busy: false, error: false })
+    //       }
+    //     } else {
+    //       console.log('no job.ID')
+    //       this.setState({ userJobs: userJobs, busy: false, error: false })
+    //     }
+    //   })
+    //   .catch(e => this.setState({ busy: false, error: true }, () => console.log(e)))
   }
 
   refreshJob = () => {
@@ -161,31 +160,46 @@ export default class GlobalState extends Component {
   }
 
   test = async () => {
-    let { db, auth } = this.props
+    let { auth, fire } = this.props
     let { user, jobSearchResults, geo, job } = this.state
-    let { ref, get, child, update, push, query, limitToLast, equalTo, orderByKey, orderByChild, orderByValue } = database
-    let { parseISO, formatISO, addHours, isPast, addSeconds, addMinutes, compareAsc } = dFNS
     let lat = ''
     let lng = ''
     let arr = []
     let geo1 = { lat: 33.9957883, lng: -84.46976629999999 }
     let geo2 = { lat: 34.9957883, lng: -85.46976629999999 }
 
-    console.log('test')
-    console.log(auth)
-    console.log(author)
-    console.log(author.AuthCredential)
+    const docRef = doc(fire, 'users', 'XQb2ICAUlPNtAhw8jwv6')
+    const docSnap = await getDoc(docRef)
 
-    let providerID = 'google.com'
-    let thisEmail = 'p@gmail.com'
-    let method = 'password'
-    let thisPassword = 'pppppppp'
-    
-    let credential = author.EmailAuthProvider.credential(user.email, thisPassword)
+    if (docSnap.exists()) {
+      console.log('user data:', docSnap.data())
+    } else {
+      console.log('Document does not exist!')
+    }
 
-    author.reauthenticateWithCredential(auth.currentUser, credential)
-      .then(() => console.log('reauth success'))
-      .catch(e => console.log('reauth failed', e))
+    // await addDoc(collection(fire, 'users'), {
+      // joinDate: Timestamp.fromDate(new Date()),
+      // email: 'b@gmail.com',
+      // name: 'batman',
+      // address: '',
+      // phone: '',
+    // })
+    //   .then(x => console.log('success', x))
+    //   .catch(e => console.log('error', e))
+
+    // await setDoc(doc(fire, 'users', 'XQb2ICAUlPNtAhw8jwv6'), {
+    //   address: 'some address'
+    // }, { merge: true })
+    //   .then(x => console.log('success', x))
+    //   .catch(e => console.log('error', e))
+
+    // await setDoc(doc(fire, 'users', 'XQb2ICAUlPNtAhw8jwv6'), {
+    //   phone: 'some number'
+    // }, { merge: true })
+    //   .then(x => console.log('success', x))
+    //   .catch(e => console.log('error', e))
+
+    console.log()
   }
   
   render() {
@@ -194,6 +208,7 @@ export default class GlobalState extends Component {
         value={{
           auth: this.props.auth,
           db: this.props.db,
+          fire: this.props.fire,
           navigation: this.props.navigation,
           isFocused: this.props.isFocused,
           user: this.state.user,

@@ -2,9 +2,7 @@ import React, { Component } from 'react'
 import Context from '../context/Context.js'
 import { Box, Button, Center, FlatList, Flex, Heading, Row, ScrollView, Spinner, Stack, Text } from 'native-base'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
-import * as author from 'firebase/auth'
-import * as database from 'firebase/database'
-import * as dFNS from 'date-fns'
+import { format, formatDistance } from 'date-fns'
 
 export default class ManageJobs extends Component {
   constructor(props) {
@@ -108,12 +106,12 @@ export default class ManageJobs extends Component {
               borderBottomWidth='1'
             >
               <Flex alignItems='flex-start'>
-                <Text fontSize='xs'>Created {dFNS.formatDistance(new Date(item.creationDate), new Date(), { addSuffix: true })}</Text>
-                <Text>{dFNS.format(new Date(item.creationDate), 'EEEE, PPP')}</Text>
+                <Text fontSize='xs'>Created {formatDistance(new Date(item.creationDate), new Date(), { addSuffix: true })}</Text>
+                <Text>{format(new Date(item.creationDate), 'EEEE, PPP')}</Text>
               </Flex>
               <Flex alignItems='flex-end'>
-                <Text fontSize='xs'>Ending {dFNS.formatDistance(new Date(item.endDate), new Date(), { addSuffix: true })}</Text>
-                <Text>{dFNS.format(new Date(item.endDate), 'EEEE, PPP')}</Text>
+                <Text fontSize='xs'>Ending {formatDistance(new Date(item.endDate), new Date(), { addSuffix: true })}</Text>
+                <Text>{format(new Date(item.endDate), 'EEEE, PPP')}</Text>
               </Flex>
             </Row>
             <Center>

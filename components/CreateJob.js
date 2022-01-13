@@ -3,9 +3,8 @@ import Context from '../context/Context.js'
 import { Box, Button, Center, FormControl, Heading, Input, Row, ScrollView, Select, Stack, Spinner, TextArea, Text } from 'native-base'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import DateTimePicker from '@react-native-community/datetimepicker'
-import * as author from 'firebase/auth'
-import * as database from 'firebase/database'
-import * as dFNS from 'date-fns'
+// import * as author from 'firebase/auth'
+import { format } from 'date-fns'
 
 export default class CreateJob extends Component {
   constructor(props) {
@@ -49,7 +48,7 @@ export default class CreateJob extends Component {
     let { title, phone, address, description, type, tip, endDate, latitude, longitude } = this.state
     let random = String(Math.random())
     let jobID = random.slice(-14)
-    let creationDate = dFNS.format(new Date(), 'yyyy-MM-dd')
+    let creationDate = format(new Date(), 'yyyy-MM-dd')
 
     if (title === '') {
       alert('Please enter a Title')
@@ -69,44 +68,44 @@ export default class CreateJob extends Component {
       alert('Please select an End Date')
     } else {
       this.setState({ busy: true })
-      push(ref(db, 'jobs/'), {
-        ID: jobID,
-        provider: user.uid,
-        name: user.displayName,
-        title: title,
-        phone: phone,
-        email: user.email,
-        address: address,
-        geo: {
-          lat: latitude,
-          lng: longitude,
-        },
-        description: description,
-        creationDate: creationDate,
-        type: type,
-        tip: parseInt(tip),
-        endDate: endDate,
-        completed: false,
-      })
-        .then(() => {
-          this.setState({
-            title: '',
-            description: '',
-            type: 'Yardwork',
-            tip: '',
-            endDate: '',
-            busy: false,
-            error: false
-          }, () => console.log('Create Job', 'job created'))
-          this.context.refresh()
-          this.context.navigation.navigate('Manage Jobs')
-        })
-        .catch((e) => {
-          this.setState({
-            busy: false,
-            error: true
-          }, () => console.log('Create Job', 'error creating job', e))
-        })
+      // push(ref(db, 'jobs/'), {
+      //   ID: jobID,
+      //   provider: user.uid,
+      //   name: user.displayName,
+      //   title: title,
+      //   phone: phone,
+      //   email: user.email,
+      //   address: address,
+      //   geo: {
+      //     lat: latitude,
+      //     lng: longitude,
+      //   },
+      //   description: description,
+      //   creationDate: creationDate,
+      //   type: type,
+      //   tip: parseInt(tip),
+      //   endDate: endDate,
+      //   completed: false,
+      // })
+      //   .then(() => {
+      //     this.setState({
+      //       title: '',
+      //       description: '',
+      //       type: 'Yardwork',
+      //       tip: '',
+      //       endDate: '',
+      //       busy: false,
+      //       error: false
+      //     }, () => console.log('Create Job', 'job created'))
+      //     this.context.refresh()
+      //     this.context.navigation.navigate('Manage Jobs')
+      //   })
+      //   .catch((e) => {
+      //     this.setState({
+      //       busy: false,
+      //       error: true
+      //     }, () => console.log('Create Job', 'error creating job', e))
+      //   })
     }
   }
 
@@ -195,7 +194,7 @@ export default class CreateJob extends Component {
         {showDatePicker && (
           <DateTimePicker
             value={new Date()}
-            onChange={(event, date) => this.setState({ endDate: dFNS.format(date, 'yyyy-MM-dd'), showDatePicker: false })}
+            onChange={(event, date) => this.setState({ endDate: format(date, 'yyyy-MM-dd'), showDatePicker: false })}
           />
         )}
 

@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import Context from '../context/Context.js'
 import { Box, Button, Center, Divider, Heading, FlatList, Row, ScrollView, Spinner, Stack, Text } from 'native-base'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
-import * as dFNS from 'date-fns'
+import { format } from 'date-fns'
 
 export default class Test2JobView extends Component {
   constructor(props) {
@@ -24,8 +24,8 @@ export default class Test2JobView extends Component {
       { x: 'Address', y: job.address.replace(/([,][\s])/, `\n`) },
       { x: 'Email', y: job.email },
       { x: 'Phone', y: job.phone },
-      { x: 'Creation Date', y: dFNS.format(new Date(job.creationDate), 'EEEE, PPP') },
-      { x: 'Deadline', y: dFNS.format(new Date(job.endDate), 'EEEE PPP') },
+      { x: 'Creation Date', y: format(new Date(job.creationDate), 'EEEE, PPP') },
+      { x: 'Deadline', y: format(new Date(job.endDate), 'EEEE PPP') },
     ]
 
     list.map(x => {

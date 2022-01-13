@@ -8,8 +8,9 @@ import { NavigationContainer, useNavigation, useIsFocused, useFocusEffect, useSc
 import { NativeBaseProvider, Text } from "native-base"
 import firebase from './config/firebase'
 import theme from './config/theme'
-import * as author from 'firebase/auth'
-import * as database from 'firebase/database'
+import { getAuth } from 'firebase/auth'
+import { getDatabase } from 'firebase/database'
+import { getFirestore } from 'firebase/firestore'
 import GlobalState from './context/GlobalState'
 import Preface from './preface/Preface'
 import Home from './components/Home'
@@ -34,11 +35,11 @@ import Test3JobView from './test/test3/Test3JobView'
 import Test3Profile from './test/test3/Test3Profile'
 import Test3ManageJobs from './test/test3/Test3ManageJobs'
 
-
 let Stack = createNativeStackNavigator()
 let Drawer = createDrawerNavigator()
-let auth = author.getAuth()
-let db = database.getDatabase()
+let auth = getAuth()
+let db = getDatabase()
+let fire = getFirestore()
 
 LogBox.ignoreLogs([
   'Setting a timer',
@@ -67,6 +68,7 @@ const ContextWithHooks = (props) => {
       {...props}
       auth={auth}
       db={db}
+      fire={fire}
       navigation={navigation}
       isFocused={isFocused}
     />

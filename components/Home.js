@@ -46,7 +46,7 @@ export default class Home extends Component {
 
           {/* <Button onPress={() => this.context.navigation.navigate('Test3JobView')}>Test 3 Job View</Button> */}
           {/* <Button onPress={() => this.context.navigation.navigate('Test3Profile')}>Test 3 Profile</Button> */}
-          <Button onPress={() => this.context.navigation.navigate('Test3ManageJobs')}>Manage Jobs 1</Button>
+          <Button onPress={() => this.context.navigation.navigate('Test3ManageJobs')}>Manage Jobs 3</Button>
         </Stack>
       </Center>
     );

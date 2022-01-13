@@ -3,8 +3,8 @@ import Context from '../context/Context.js'
 import { Box, Button, Center, Column, FormControl, Heading, Input, Row, Stack, Text } from 'native-base'
 import { ActivityIndicator } from 'react-native'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
-import * as author from 'firebase/auth'
-import * as database from 'firebase/database'
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
+import { collection, doc, setDoc, addDoc } from 'firebase/firestore'
 
 export default class Signup extends Component {
   constructor(props) {
@@ -22,22 +22,21 @@ export default class Signup extends Component {
   static contextType = Context
 
   registerUser = async () => {
-    let { ref, set } = database
     let { auth, db } = this.context
     let { role, displayName, email, password } = this.state
     if (this.state.displayName === '' && this.state.email === '' && this.state.password === '') {
-      Alert.alert('Enter details to signup!')
+      alert('Enter details to signup!')
     } else if (this.state.password !== this.state.passwordConfirm) {
-      Alert.alert("Passwords don't match!")
+      alert("Passwords don't match!")
     } else {
       this.setState({ isLoading: true })
-      author.createUserWithEmailAndPassword(auth, email, password)
+      createUserWithEmailAndPassword(auth, email, password)
         .then(x => {
           console.log('User registered successfully!', x)
           // set(ref(db, 'users/' + x.user.uid), { role: role })
           // x.user.role = role
           this.props.context.updateContext('user', x.user)
-          author.updateProfile(auth.currentUser, {displayName: displayName})
+          updateProfile(auth.currentUser, {displayName: displayName})
             .then(async () => {
               await this.context.refresh()
               this.setState({ isLoading: false, error: false }, () => this.context.navigation.navigate('Home'))
@@ -46,6 +45,12 @@ export default class Signup extends Component {
         })
         .catch(e => this.setState({ isLoading: false, error: true }, () => console.log('registration error', e)))
     }
+  }
+
+  registerUser = async () => {
+    let { fire } = this.context
+
+    await add
   }
 
   render() {
@@ -120,13 +125,13 @@ export default class Signup extends Component {
             type='password'
             w={wp(50)}
             bg='white'
-            onChangeText={(x) => this.setState({ passwordComfirm: x })}
+            onChangeText={(x) => this.setState({ passwordConfirm: x })}
             value={passwordComfirm}
           />
         </FormControl>
 
         <Button
-          onPress={() => console.log('Sign Up')}
+          onPress={() => this.registerUser()}
         >Sign Up</Button>
 
         <Text>

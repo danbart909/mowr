@@ -4,7 +4,6 @@ import React, { Component } from 'react'
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import Context from '../context/Context.js'
-import * as database from 'firebase/database'
 
 export default class UserJobView extends Component {
   constructor(props) {
@@ -51,7 +50,6 @@ export default class UserJobView extends Component {
 
   update = async (x) => {
     let { db, job } = this.context
-    let { ref, update } = database
 
     if (x.x === 'Tip') { x.new = parseInt(x.new) }
 
@@ -59,26 +57,25 @@ export default class UserJobView extends Component {
       alert('Please Enter a Number')
     } else {
       this.setState({ [x.busyName]: true, [x.errorName]: false })
-      x.x === 'Completion Status' ?
-        update(ref(db, 'jobs/' + job.key), { 'completed': true })
-          .then(() => this.updateThen(x))
-          .catch((e) => this.updateCatch(e, x)) :
-        update(ref(db, 'jobs/' + job.key), { [x.y]: x.new })
-          .then(() => this.updateThen(x))
-          .catch((e) => this.updateCatch(e, x))
+      // x.x === 'Completion Status' ?
+      //   update(ref(db, 'jobs/' + job.key), { 'completed': true })
+      //     .then(() => this.updateThen(x))
+      //     .catch((e) => this.updateCatch(e, x)) :
+      //   update(ref(db, 'jobs/' + job.key), { [x.y]: x.new })
+      //     .then(() => this.updateThen(x))
+      //     .catch((e) => this.updateCatch(e, x))
     }
   }
 
   delete = async (x) => {
     let { db, job } = this.context
-    let { ref, update, remove } = database
     let emptyJob = { ID: '', address: '', completed: false, creationDate: new Date(), description: '', email: '', endDate: new Date(), geo: {}, key: '', name: '', phone: '', provider: '', tip: [], title: [], type: '' }
 
     this.setState({ [x.busyName]: true, [x.errorName]: false })
 
-    remove(ref(db, 'jobs/' + job.key))
-      .then(() => this.updateThen(x))
-      .catch((e) => this.updateCatch(e, x))
+    // remove(ref(db, 'jobs/' + job.key))
+    //   .then(() => this.updateThen(x))
+    //   .catch((e) => this.updateCatch(e, x))
 
     this.context.updateContext('job', emptyJob)
     this.context.navigation.navigate('Manage Jobs')

@@ -3,11 +3,9 @@ import Context from '../context/Context.js'
 import { Box, Button, Center, Factory, FormControl, Heading, Input, Row, ScrollView, Spinner, Stack, Text } from 'native-base'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import Constants from 'expo-constants'
-import * as LocationExpo from 'expo-location'
+import { getCurrentPositionAsync, geocodeAsync, getForegroundPermissionsAsync } from 'expo-location'
 import Geocoder from 'react-native-geocoding'
 import MapView, { Marker } from 'react-native-maps'
-import * as author from "firebase/auth"
-import * as database from 'firebase/database'
 
 const { civicAPIKey } = Constants.manifest.extra
 Geocoder.init(civicAPIKey)
@@ -41,9 +39,9 @@ export default class Location extends Component {
 
     this.setState({ busy: true, error: 0 })
 
-    let status = await LocationExpo.getForegroundPermissionsAsync()
+    let status = await getForegroundPermissionsAsync()
     if (status.granted) {
-      await LocationExpo.geocodeAsync(address)
+      await geocodeAsync(address)
       .then(x => {
         if (x.length === 0) {
           console.log('empty response', x)
@@ -56,7 +54,7 @@ export default class Location extends Component {
       .catch(e => this.setState({ busy: false, error: 4 }, () => console.log(e)))
     } else {
       console.log('permissions not granted, asking for permissions')
-      let permission = await LocationExpo.requestForegroundPermissionsAsync()
+      let permission = await requestForegroundPermissionsAsync()
       if (permission.granted) {
         this.findCoordinatesUsingForm()
       } else {
@@ -69,14 +67,14 @@ export default class Location extends Component {
   findCoordinatesUsingGPS = async () => {
     this.setState({ busy: true, error: 0 })
 
-    let status = await LocationExpo.getForegroundPermissionsAsync()
+    let status = await getForegroundPermissionsAsync()
     if (status.granted) {
-      await LocationExpo.getCurrentPositionAsync({ accuracy: 5 })
+      await getCurrentPositionAsync({ accuracy: 5 })
         .then(x => this.setState({ latitude: x.coords.latitude, longitude: x.coords.longitude, busy: false, error: 0 }, () => this.geocodeAddressFromGPS()))
         .catch(e => this.setState({ busy: false, error: 4 }, () => console.log(e)))
     } else {
       console.log('permissions not granted, asking for permissions')
-      let permission = await LocationExpo.requestForegroundPermissionsAsync()
+      let permission = await requestForegroundPermissionsAsync()
       if (permission.granted) {
         this.findCoordinatesUsingGPS()
       } else {
@@ -88,7 +86,6 @@ export default class Location extends Component {
 
   saveAddress = async (address) => {
     let { db, user } = this.context
-    let { ref, get, child, update } = database
     let { latitude, longitude } = this.state
     
     this.setState({
@@ -96,26 +93,26 @@ export default class Location extends Component {
       error: 0
     })
 
-    update(ref(db, 'users/' + user.uid), {
-      address: address,
-      latitude: latitude,
-      longitude: longitude
-    })
-      .then(() => {
-        try { this.context.refreshUser() } catch(e){console.log(e)}
-        finally {
-          this.setState({
-            busy: false,
-            error: 0
-          }, () => console.log('Location', 'address updated', {address}))
-        }
-      })
-      .catch((e) => {
-        this.setState({
-          busy: false,
-          error: 1
-        }, () => console.log('Location', 'error updating address', e))
-      })
+    // update(ref(db, 'users/' + user.uid), {
+    //   address: address,
+    //   latitude: latitude,
+    //   longitude: longitude
+    // })
+    //   .then(() => {
+    //     try { this.context.refreshUser() } catch(e){console.log(e)}
+    //     finally {
+    //       this.setState({
+    //         busy: false,
+    //         error: 0
+    //       }, () => console.log('Location', 'address updated', {address}))
+    //     }
+    //   })
+    //   .catch((e) => {
+    //     this.setState({
+    //       busy: false,
+    //       error: 1
+    //     }, () => console.log('Location', 'error updating address', e))
+    //   })
   }
 
   geocodeAddressFromGPS = async () => {
@@ -312,7 +309,6 @@ export default class Location extends Component {
 // import Geocoder from 'react-native-geocoding'
 // import MapView, { Marker } from 'react-native-maps'
 // import * as author from "firebase/auth"
-// import * as database from 'firebase/database'
 
 // const { civicAPIKey } = Constants.manifest.extra
 // Geocoder.init(civicAPIKey)
@@ -340,22 +336,22 @@ export default class Location extends Component {
 
 //     let address = `${street}, ${city}, ${state}, ${zip}`
 
-//     await LocationExpo.geocodeAsync(address)
+//     await geocodeAsync(address)
 //       .then(x => this.setState({ latitude: x[0].latitude, longitude: x[0].longitude }, () => this.saveAddress(address)))
 //       .catch(e => console.log(e))
 //   }
 
 //   findCoordinatesUsingGPS = async () => {
-//     let status = await LocationExpo.getForegroundPermissionsAsync();
+//     let status = await getForegroundPermissionsAsync();
 //     if (status.granted) {
-//       await LocationExpo.getCurrentPositionAsync({ accuracy: 5 })
+//       await getCurrentPositionAsync({ accuracy: 5 })
 //         .then(x => this.setState({ latitude: x.coords.latitude, longitude: x.coords.longitude }, () => this.geocodeAddressFromGPS()))
 //         .catch(e => console.log(e))
 //     } else {
 //       console.log('permissions not granted, asking for permissions')
-//       let permission = await LocationExpo.requestForegroundPermissionsAsync();
+//       let permission = await requestForegroundPermissionsAsync();
 //       if (permission.granted) {
-//         await LocationExpo.getCurrentPositionAsync({ accuracy: 5 })
+//         await getCurrentPositionAsync({ accuracy: 5 })
 //           .then(x => this.setState({latitude: x.coords.latitude, longitude: x.coords.longitude }, () => this.geocodeAddressFromGPS()))
 //           .catch(e => console.log(e))
 //       } else {
@@ -366,7 +362,6 @@ export default class Location extends Component {
 
 //   saveAddress = async (address) => {
 //     let { db, user } = this.context
-//     let { ref, get, child, update } = database
 //     let { latitude, longitude } = this.state
     
 //     this.setState({

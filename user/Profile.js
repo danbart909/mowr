@@ -2,8 +2,7 @@ import React, { Component } from 'react'
 import Context from '../context/Context.js'
 import { Box, Button, Center, FormControl, Heading, Input, Modal, Stack, Text } from 'native-base'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
-import * as author from 'firebase/auth'
-import * as database from 'firebase/database'
+import { EmailAuthProvider, updatePassword, updateEmail, updateProfile, reauthenticateWithCredential } from 'firebase/auth'
 
 export default class Profile extends Component {
   constructor(props) {
@@ -43,9 +42,9 @@ export default class Profile extends Component {
   reauthenticate = () => {
     let { auth, user } = this.context
     let { loginPassword, emailOrPassword } = this.state
-    let credential = author.EmailAuthProvider.credential(user.email, loginPassword)
+    let credential = EmailAuthProvider.credential(user.email, loginPassword)
 
-    author.reauthenticateWithCredential(auth.currentUser, credential)
+    reauthenticateWithCredential(auth.currentUser, credential)
       .then(() => {
         console.log('reauthentication successful')
         emailOrPassword === 'email' ? this.setState({ showEmail: true, showLogin: false, emailOrPassword: '' }) : this.setState({ showPassword: true, showLogin: false, emailOrPassword: '' })
@@ -62,7 +61,7 @@ export default class Profile extends Component {
       nameError: false
     })
 
-    author.updateProfile(auth.currentUser, { displayName: nameNew })
+    updateProfile(auth.currentUser, { displayName: nameNew })
       .then(() => {
         try { this.context.refresh() } catch(e){console.log('refresh error', e)}
         finally {
@@ -94,7 +93,7 @@ export default class Profile extends Component {
       emailError: false
     })
 
-    author.updateEmail(auth.currentUser, newEmail)
+    updateEmail(auth.currentUser, newEmail)
       .then(() => this.setState({
           showEmail: false,
           newEmail: '',
@@ -122,7 +121,7 @@ export default class Profile extends Component {
       passwordError: false
     })
 
-    author.updatePassword(auth.currentUser, newPassword)
+    updatePassword(auth.currentUser, newPassword)
       .then(() => {
         try { this.context.refresh() } catch(e){console.log('refresh error', e)}
         finally {
@@ -147,8 +146,7 @@ export default class Profile extends Component {
   }
 
   updatePhone = () => {
-    let { auth, db, user } = this.context
-    let { ref, get, child, update } = database
+    let { auth, user } = this.context
     let { newPhone } = this.state
     
     this.setState({
@@ -156,28 +154,29 @@ export default class Profile extends Component {
       phoneNumberError: false
     })
 
-    // author.updateProfile(auth.currentUser, { phoneNumber: phoneNumber })
-    update(ref(db, 'users/' + user.uid), { phoneNumber: newPhone })
-      .then(() => {
-        try { this.context.refresh() } catch(e){console.log('refresh error', e)}
-        finally {
-          this.setState({
-            showPhone: false,
-            newPhone: '',
-            phoneNumberBusy: false,
-            phoneNumberError: false
-          }, () => {
-            console.log('Profile', 'phone updated', newPhone)
-            // this.context.refresh()
-          })
-        }
-      })
-      .catch((e) => {
-        this.setState({
-          phoneNumberBusy: false,
-          phoneNumberError: true
-        }, () => console.log('Profile', 'error updating phone number', e))
-      })
+    // updateProfile(auth.currentUser, { phoneNumber: phoneNumber })
+
+    // update(ref(db, 'users/' + user.uid), { phoneNumber: newPhone })
+    //   .then(() => {
+    //     try { this.context.refresh() } catch(e){console.log('refresh error', e)}
+    //     finally {
+    //       this.setState({
+    //         showPhone: false,
+    //         newPhone: '',
+    //         phoneNumberBusy: false,
+    //         phoneNumberError: false
+    //       }, () => {
+    //         console.log('Profile', 'phone updated', newPhone)
+    //         // this.context.refresh()
+    //       })
+    //     }
+    //   })
+    //   .catch((e) => {
+    //     this.setState({
+    //       phoneNumberBusy: false,
+    //       phoneNumberError: true
+    //     }, () => console.log('Profile', 'error updating phone number', e))
+    //   })
   }
 
   modals = () => {
@@ -387,7 +386,7 @@ const Row = (props) => {
   //     displayNameError: false
   //   })
 
-  //   author.updateProfile(auth.currentUser, { displayName: displayName })
+  //   updateProfile(auth.currentUser, { displayName: displayName })
   //     .then(() => {
   //       try { this.context.refresh() } catch(e){console.log(e)}
   //       finally {
