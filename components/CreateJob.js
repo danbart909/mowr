@@ -93,12 +93,12 @@ export default class CreateJob extends Component {
         phone: phone,
         email: user.email,
         address: address,
-        lat: parseInt(latitude),
-        lng: parseInt(longitude),
+        latitude: parseFloat(latitude),
+        longitude: parseFloat(longitude),
         description: description,
         creationDate: creationDate,
         type: type,
-        tip: parseInt(tip),
+        tip: parseFloat(tip),
         endDate: endDate,
       })
         .then(() => {

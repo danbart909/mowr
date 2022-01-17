@@ -1,15 +1,15 @@
 import React, { Component } from 'react'
-import { Alert, Animated, LayoutAnimation } from 'react-native';
+// import { Alert, Animated, LayoutAnimation } from 'react-native';
 import Context from './Context.js'
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
+// import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 // import AsyncStorage from '@react-native-async-storage/async-storage'
 import Constants from 'expo-constants';
 import * as SplashScreen from 'expo-splash-screen';
 import { signOut, signInWithEmailAndPassword, onAuthStateChanged, updateProfile } from 'firebase/auth'
-import { collection, doc, setDoc, addDoc, getDoc, getDocs, Timestamp, query, where } from 'firebase/firestore'
-import { parseISO, formatISO, addHours, isPast, addSeconds, addMinutes, compareAsc } from "date-fns";
+import { collection, doc, setDoc, addDoc, getDoc, getDocs, query, where, orderBy, limit } from 'firebase/firestore'
+// import { parseISO, formatISO, addHours, isPast, addSeconds, addMinutes, compareAsc } from "date-fns";
 import Geocoder from 'react-native-geocoding'
-import { getDistance } from 'geolib';
+// import { getDistance } from 'geolib';
 // import axios from 'react-native-axios'
 
 const { civicAPIKey } = Constants.manifest.extra
@@ -24,21 +24,20 @@ export default class GlobalState extends Component {
       userJobs: [],
       jobSearchResults: [],
       job: {
-        ID: '',
-        address: '',
-        completed: false,
-        creationDate: new Date(),
+        uid: '',
+        userId: '',
+        userName: '',
+        title: '',
+        type: '',
         description: '',
-        email: '',
+        address: '',
+        creationDate: new Date(),
         endDate: new Date(),
-        geo: {},
-        key: '',
-        name: '',
-        phone: '',
-        provider: '',
-        tip: [],
-        title: [],
-        type: ''
+        email: '',
+        latitude: 0,
+        longitude: 0,
+        tip: 0,
+        phone: ''
       },
       zip: '30062',
       geo: {}
@@ -48,7 +47,7 @@ export default class GlobalState extends Component {
   componentDidMount() {
     SplashScreen.preventAutoHideAsync()
 
-    let { auth, db } = this.props
+    let { auth } = this.props
 
     onAuthStateChanged(auth, (user) => {
       if (user && !this.state.introCheck) {
@@ -106,30 +105,6 @@ export default class GlobalState extends Component {
     }
     state.user = customUserObject
 
-    // const jobsRef = collection(fire, 'jobs')
-    // const userJobsQuery = query(jobsRef, where('userId', '==', uid))
-    // const userJobs = await getDocs(userJobsQuery)
-    // let userJobs2 = []
-
-    // userJobs.forEach((doc) => {
-    //   let data = doc.data()
-    //   data.uid = doc.id
-    //   userJobs2.push(data)
-    // })
-    // state.userJobs = userJobs2
-
-    // const docRef = doc(db, "jobs", "SF");
-    // const docSnap = await getDoc(docRef);
-
-    // if (docSnap.exists()) {
-    //   console.log("Document data:", docSnap.data());
-    // } else {
-    //   // doc.data() will be undefined in this case
-    //   console.log("No such document!");
-    // }
-
-    // save userJobs to userJobs
-
     // user.email &&
     // get(ref(db, 'jobs/'))
     //   .then(x => {
@@ -170,17 +145,15 @@ export default class GlobalState extends Component {
     
     console.log('refreshing userJobs')
 
-    const jobsRef = collection(fire, 'jobs')
-    const userJobsQuery = query(jobsRef, where('userId', '==', uid))
-    const userJobs = await getDocs(userJobsQuery)
-    let userJobs2 = []
+    const rawUserJobs = await getDocs(query(collection(fire, 'jobs'), where('userId', '==', uid)))
+    let userJobs = []
 
-    userJobs.forEach((doc) => {
+    rawUserJobs.forEach((doc) => {
       let data = doc.data()
       data.uid = doc.id
-      userJobs2.push(data)
+      userJobs.push(data)
     })
-    state.userJobs = userJobs2
+    state.userJobs = userJobs
 
     this.setState(state)
   }
@@ -214,42 +187,33 @@ export default class GlobalState extends Component {
     let geo1 = { lat: 33.9957883, lng: -84.46976629999999 }
     let geo2 = { lat: 34.9957883, lng: -85.46976629999999 }
     let uid = auth.currentUser.uid
-    // let address = auth.currentUser.photoURL
+    let jobs = []
+    let jobsQuery = collection(fire, 'jobs')
 
-    // let newAddress = address.split('|')
-    // let justAddress = newAddress[0]
-    // let justLat = newAddress[1]
-    // let justLng = newAddress[2]
-    // console.log(newAddress)
-    // console.log(justAddress)
-    // console.log(justLat)
-    // console.log(justLng)
+    // distance, tip, createdDate, endDate
 
-    // console.log(uid)
+    // const rawJobs = await getDocs(query(jobsQuery))
+    // const rawJobs = await getDocs(query(jobsQuery, orderBy('tip', 'desc'), limit(5)))
 
-    // const docRef = doc(fire, 'jobs')
-    // const docSnap = await getDoc(docRef)
+    // rawJobs.forEach((x) => jobs.push(x.data().tip))
 
-    // console.log(docRef)
+    // console.log('jobs', jobs)
 
-    // if (docSnap.exists()) {
-    //   console.log('user data:', docSnap.data())
-    // } else {
-    //   console.log('Document does not exist!')
-    // }
+    // let random = String(Math.random())
+    // let jobID = random.slice(-10)
 
-    const jobsRef = collection(fire, 'jobs')
-    const userJobsQuery = query(jobsRef, where('userId', '==', uid))
-    const userJobs = await getDocs(userJobsQuery)
-    let userJobs2 = []
+    // console.log(jobID)
+    
+    // const jobsRef = collection(fire, 'jobs')
+    // const userJobsQuery = query(jobsRef, where('userId', '==', uid))
+    // const userJobs = await getDocs(userJobsQuery)
+    // let userJobs2 = []
 
-    userJobs.forEach((doc) => {
-      let data = doc.data()
-      data.uid = doc.id
-      userJobs2.push(data)
-    })
-
-    console.log(userJobs2)
+    // userJobs.forEach((doc) => {
+    //   let data = doc.data()
+    //   data.uid = doc.id
+    //   userJobs2.push(data)
+    // })
 
     // await addDoc(collection(fire, 'users'), {
     //   joinDate: Timestamp.fromDate(new Date()),
@@ -266,24 +230,6 @@ export default class GlobalState extends Component {
     // }, { merge: true })
     //   .then(x => console.log('success', x))
     //   .catch(e => console.log('error', e))
-
-    // await setDoc(doc(fire, 'users', 'XQb2ICAUlPNtAhw8jwv6'), {
-    //   phone: 'some number'
-    // }, { merge: true })
-    //   .then(x => console.log('success', x))
-    //   .catch(e => console.log('error', e))
-    
-    // console.log('1', auth.currentUser)
-
-    // updateProfile(auth.currentUser, { photoURL: 'this is an address 35345' })
-    //   .then(x => console.log('success', x))
-    //   .catch(e => console.log('fail', e))
-
-    // updateProfile(auth.currentUser, { tenantId: 'geo object' })
-    //   .then(x => console.log('success', x))
-    //   .catch(e => console.log('fail', e))
-
-    // console.log('2', auth.currentUser)
   }
   
   render() {

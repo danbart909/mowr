@@ -31,22 +31,14 @@ export default class Home extends Component {
           // bg='emerald.500'
         >
           <Button onPress={() => this.context.navigation.navigate('Search Jobs')}>Search for Jobs</Button>
-          <Button onPress={() => this.context.refresh()}>Refresh</Button>
-          <Button onPress={() => this.context.test()}>Test</Button>
+          <Button onPress={() => this.context.refresh()}>Refresh User</Button>
+          <Button onPress={() => this.context.test()}>Experiment</Button>
         </Stack>
         <Stack mt='20' space='12'>
-          {/* <Button onPress={() => this.context.navigation.navigate('Test1JobView')}>Job View 1</Button> */}
-          {/* <Button onPress={() => this.context.navigation.navigate('Test2JobView')}>Job View 2</Button> */}
-          <Button onPress={() => this.context.navigation.navigate('Test1Profile')}>Profile 1</Button>
-          <Button onPress={() => this.context.navigation.navigate('Test1SearchJobs')}>Search Jobs 1</Button>
-          {/* <Button onPress={() => this.context.navigation.navigate('Test1CreateJob')}>Test 1 Create Job</Button> */}
-
-          {/* <Button onPress={() => this.context.navigation.navigate('Test2Profile')}>Test 2 Profile</Button> */}
-          {/* <Button onPress={() => this.context.navigation.navigate('Test2SearchJobs')}>Test 2 SearchJobs</Button> */}
-
-          {/* <Button onPress={() => this.context.navigation.navigate('Test3JobView')}>Test 3 Job View</Button> */}
-          {/* <Button onPress={() => this.context.navigation.navigate('Test3Profile')}>Test 3 Profile</Button> */}
-          {/* <Button onPress={() => this.context.navigation.navigate('Test3ManageJobs')}>Manage Jobs 3</Button> */}
+          {/* <Button onPress={() => this.context.navigation.navigate('TestJobView')}>Test Job View</Button> */}
+          {/* <Button onPress={() => this.context.navigation.navigate('TestProfile')}>Test Profile</Button> */}
+          {/* <Button onPress={() => this.context.navigation.navigate('TestSearchJobs')}>Test Search Jobs</Button> */}
+          {/* <Button onPress={() => this.context.navigation.navigate('TestCreateJob')}>Test Create Job</Button> */}
         </Stack>
       </Center>
     );
