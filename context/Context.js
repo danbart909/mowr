@@ -16,6 +16,7 @@ export default React.createContext({
   login: () => {},
   logout: () => {},
   refresh: () => {},
+  refreshUserJobs: () => {},
   refreshJob: () => {},
   // storeData: () => {},
   // getData: () => {},

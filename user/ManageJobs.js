@@ -2,7 +2,8 @@ import React, { Component } from 'react'
 import Context from '../context/Context.js'
 import { Box, Button, Center, FlatList, Flex, Heading, Row, ScrollView, Spinner, Stack, Text } from 'native-base'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
-import { format, formatDistance } from 'date-fns'
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+import { faArrowUp } from '@fortawesome/free-solid-svg-icons'
 
 export default class ManageJobs extends Component {
   constructor(props) {
@@ -16,6 +17,7 @@ export default class ManageJobs extends Component {
   static contextType = Context
 
   componentDidMount() {
+    this.context.refreshUserJobs()
   }
 
   viewJob = async (x) => {
@@ -43,7 +45,7 @@ export default class ManageJobs extends Component {
       )
     }
 
-    if (!userJobs.length) {
+    if (userJobs.length === 0) {
       return (
         <Center flex='1'>
           <Text>When you create a job, it will show up here.</Text>
@@ -51,77 +53,72 @@ export default class ManageJobs extends Component {
       )
     }
 
+    // .title
+    // .tip
+    // .type
+    // .description
+    // this.viewJob(x)
+
     return (
       <FlatList
         data={userJobs}
-        keyExtractor={item => item.ID}
-        renderItem={({item}) => (
+        keyExtractor={item => item.uid}
+        ref='list'
+        renderItem={({item, index}) => (
           <Stack
-            mb={wp(10)}
+            m={wp(5)}
             bg='white'
-            borderWidth='1'
+            borderRadius='25'
+            // borderWidth='1'
           >
             <Row
-              justifyContent='space-between'
-              alignItems='center'
+              // justifyContent='space-between'
+              alignItems='flex-start'
               p={wp(2)}
-              borderBottomWidth='1'
+              // borderBottomWidth='1'
             >
-              <Box flex='6'>
-                <Text fontSize='2xl'>{item.title}</Text>
-              </Box>
-              <Flex>
-                <Text fontSize='lg'>$ {item.tip}</Text>
-              </Flex>
-            </Row>
-            <Row
-              justifyContent='space-between'
-              alignItems='center'
-              p={wp(2)}
-              borderBottomWidth='1'
-            >
-              <Flex>
-                <Text fontSize='xs'>Type: {item.type}</Text>
-              </Flex>
-              <Flex>
-                <Text fontSize='xs'>Status: {item.completed ? 'Completed' : 'Not Completed'}</Text>
-              </Flex>
-            </Row>
-            <Box
-              h={wp(40)}
-              p={wp(2)}
-              overflow='hidden'
-              borderBottomWidth='1'
-            >
-              <Text
-                // isTruncated
-                // noOfLines={6}
-                fontSize='xs'
-              >{item.description}</Text>
-            </Box>
-            <Row
-              justifyContent='space-between'
-              alignItems='center'
-              p={wp(2)}
-              borderBottomWidth='1'
-            >
-              <Flex alignItems='flex-start'>
-                <Text fontSize='xs'>Created {formatDistance(new Date(item.creationDate), new Date(), { addSuffix: true })}</Text>
-                <Text>{format(new Date(item.creationDate), 'EEEE, PPP')}</Text>
-              </Flex>
-              <Flex alignItems='flex-end'>
-                <Text fontSize='xs'>Ending {formatDistance(new Date(item.endDate), new Date(), { addSuffix: true })}</Text>
-                <Text>{format(new Date(item.endDate), 'EEEE, PPP')}</Text>
-              </Flex>
-            </Row>
-            <Center>
-              <Button
-                my={wp(1.5)}
-                onPress={() => this.viewJob(item)}
+              <Center
+                flex='1'
+                p={wp(1)}
+                // borderWidth='1'
               >
-                VIEW JOB
-              </Button>
+                <Text fontSize={wp(5)}>{index+1}</Text>
+              </Center>
+              <Box
+                flex='9'
+                p={wp(1)}
+                // borderWidth='1'
+              >
+                <Text fontSize={wp(3.5)}>{item.title}</Text>
+              </Box>
+            </Row>
+
+            <Row
+              justifyContent='space-between'
+              px={wp(2)}
+              // borderWidth='1'
+            >
+              <Box
+                flex='1'
+                // borderWidth='1'
+              >
+                <Text>Creation Date</Text>
+                <Text>{item.creationDate}</Text>
+              </Box>
+              <Box
+                flex='1'
+                alignItems='flex-end'
+                // borderWidth='1'
+              >
+                <Text>Deadline</Text>
+                <Text>{item.endDate}</Text>
+              </Box>
+            </Row>
+
+            <Center>
+              <Button my={wp(1.5)} onPress={() => this.viewJob(item)}>VIEW JOB</Button>
             </Center>
+            
           </Stack>
         )}
       />
@@ -133,6 +130,23 @@ export default class ManageJobs extends Component {
       <Box bg='green.600'>
 
         {this.renderList()}
+
+        <Button
+          position='absolute'
+          justifyContent='center'
+          alignItems='center'
+          right={wp(5)}
+          bottom={wp(5)}
+          boxSize={wp(10)}
+          bg='white'
+          borderRadius='50'
+          borderColor='green.600'
+          borderWidth='1'
+          // onPress={() => this.refs.list.scrollTo()}
+          onPress={() => this.refs.list.scrollToIndex({ index: 0 })}
+        >
+          <FontAwesomeIcon icon={faArrowUp} size={wp(4)}/>
+        </Button>
 
       </Box>
     )

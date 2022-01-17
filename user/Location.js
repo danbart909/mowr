@@ -6,6 +6,7 @@ import Constants from 'expo-constants'
 import { getCurrentPositionAsync, geocodeAsync, getForegroundPermissionsAsync } from 'expo-location'
 import Geocoder from 'react-native-geocoding'
 import MapView, { Marker } from 'react-native-maps'
+import { updateProfile } from 'firebase/auth'
 
 const { civicAPIKey } = Constants.manifest.extra
 Geocoder.init(civicAPIKey)
@@ -85,34 +86,52 @@ export default class Location extends Component {
   }
 
   saveAddress = async (address) => {
-    let { db, user } = this.context
+    let { auth, user } = this.context
     let { latitude, longitude } = this.state
+    let addressAndGeo = `${address}|${latitude}|${longitude}`
     
     this.setState({
       busy: true,
       error: 0
     })
 
+    updateProfile(auth.currentUser, { photoURL: addressAndGeo })
+      .then(() => {
+        try { this.context.refresh() } catch(e){console.log(e)}
+        finally {
+          this.setState({
+            busy: false,
+            error: 0
+          }, () => console.log('Location', 'address updated', { addressAndGeo }))
+        }
+      })
+      .catch((e) => {
+        this.setState({
+          busy: false,
+          error: 1
+        }, () => console.log('Location', 'error updating address', e))
+      })
+
     // update(ref(db, 'users/' + user.uid), {
     //   address: address,
     //   latitude: latitude,
     //   longitude: longitude
     // })
-    //   .then(() => {
-    //     try { this.context.refreshUser() } catch(e){console.log(e)}
-    //     finally {
-    //       this.setState({
-    //         busy: false,
-    //         error: 0
-    //       }, () => console.log('Location', 'address updated', {address}))
-    //     }
-    //   })
-    //   .catch((e) => {
-    //     this.setState({
-    //       busy: false,
-    //       error: 1
-    //     }, () => console.log('Location', 'error updating address', e))
-    //   })
+      // .then(() => {
+      //   try { this.context.refreshUser() } catch(e){console.log(e)}
+      //   finally {
+      //     this.setState({
+      //       busy: false,
+      //       error: 0
+      //     }, () => console.log('Location', 'address updated', {address}))
+      //   }
+      // })
+      // .catch((e) => {
+      //   this.setState({
+      //     busy: false,
+      //     error: 1
+      //   }, () => console.log('Location', 'error updating address', e))
+      // })
   }
 
   geocodeAddressFromGPS = async () => {

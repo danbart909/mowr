@@ -5,8 +5,8 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 // import AsyncStorage from '@react-native-async-storage/async-storage'
 import Constants from 'expo-constants';
 import * as SplashScreen from 'expo-splash-screen';
-import { signOut, signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth'
-import { collection, doc, setDoc, addDoc, getDoc, Timestamp } from 'firebase/firestore'
+import { signOut, signInWithEmailAndPassword, onAuthStateChanged, updateProfile } from 'firebase/auth'
+import { collection, doc, setDoc, addDoc, getDoc, getDocs, Timestamp, query, where } from 'firebase/firestore'
 import { parseISO, formatISO, addHours, isPast, addSeconds, addMinutes, compareAsc } from "date-fns";
 import Geocoder from 'react-native-geocoding'
 import { getDistance } from 'geolib';
@@ -88,26 +88,47 @@ export default class GlobalState extends Component {
   }
 
   refresh = async () => {
-    let user = this.props.auth.currentUser
+    let { auth, fire } = this.props
+    let user = auth.currentUser
     console.log('user signed in', user)
+    let state = this.state
     let { job, introCheck } = this.state
-    let { db } = this.props
-    
-    // get(child(ref(db), `users/${user.uid}`))
-    //   .then(x => {
-    //     let newState = this.state
-    //     newState = {
-    //       ...this.state,
-    //       introCheck: true,
-    //       user: { ...user, ...x.val() }
-    //     }
-    //     this.setState(newState)
-    //     console.log('user loaded')
-    //   })
-    //   .catch(e => {
-    //     console.log(e)
-    //     SplashScreen.hideAsync()
-    //   })
+    let { displayName, email, phoneNumber, photoURL, uid } = user
+    let addressArray = photoURL.split('|')
+    let geo = { latitude: addressArray[1], longitude: addressArray[2] }
+    let customUserObject = {
+      displayName: displayName,
+      email: email,
+      address: addressArray[0],
+      geo: geo,
+      phoneNumber: phoneNumber,
+      uid: uid,
+    }
+    state.user = customUserObject
+
+    // const jobsRef = collection(fire, 'jobs')
+    // const userJobsQuery = query(jobsRef, where('userId', '==', uid))
+    // const userJobs = await getDocs(userJobsQuery)
+    // let userJobs2 = []
+
+    // userJobs.forEach((doc) => {
+    //   let data = doc.data()
+    //   data.uid = doc.id
+    //   userJobs2.push(data)
+    // })
+    // state.userJobs = userJobs2
+
+    // const docRef = doc(db, "jobs", "SF");
+    // const docSnap = await getDoc(docRef);
+
+    // if (docSnap.exists()) {
+    //   console.log("Document data:", docSnap.data());
+    // } else {
+    //   // doc.data() will be undefined in this case
+    //   console.log("No such document!");
+    // }
+
+    // save userJobs to userJobs
 
     // user.email &&
     // get(ref(db, 'jobs/'))
@@ -120,21 +141,48 @@ export default class GlobalState extends Component {
     //     // console.log('x', x.val())
     //     console.log('userJobs', userJobs)
     //     // this.setState({ userJobs: userJobs, job: newjob, busy: false, error: false })
-    //     if (job.ID) {
-    //       if (job.ID !== '') {
+    //     if (job.title) {
+    //       if (job.title !== '') {
     //         let newjob = userJobs.filter(y => y.key === job.key)
-    //         console.log('job.ID !== ""', newjob)
+    //         console.log('job.title !== ""', newjob)
     //         this.setState({ userJobs: userJobs, job: newjob[0], busy: false, error: false })
     //       } else {
-    //         console.log('job.ID === ""')
+    //         console.log('job.title === ""')
     //         this.setState({ userJobs: userJobs, busy: false, error: false })
     //       }
     //     } else {
-    //       console.log('no job.ID')
+    //       console.log('no job.title')
     //       this.setState({ userJobs: userJobs, busy: false, error: false })
     //     }
     //   })
     //   .catch(e => this.setState({ busy: false, error: true }, () => console.log(e)))
+
+    this.setState(state)
+
+    console.log('state', state)
+  }
+
+  refreshUserJobs = async () => {
+    let { auth, fire } = this.props
+    let user = auth.currentUser
+    let { uid } = user
+    let state = this.state
+    
+    console.log('refreshing userJobs')
+
+    const jobsRef = collection(fire, 'jobs')
+    const userJobsQuery = query(jobsRef, where('userId', '==', uid))
+    const userJobs = await getDocs(userJobsQuery)
+    let userJobs2 = []
+
+    userJobs.forEach((doc) => {
+      let data = doc.data()
+      data.uid = doc.id
+      userJobs2.push(data)
+    })
+    state.userJobs = userJobs2
+
+    this.setState(state)
   }
 
   refreshJob = () => {
@@ -162,27 +210,53 @@ export default class GlobalState extends Component {
   test = async () => {
     let { auth, fire } = this.props
     let { user, jobSearchResults, geo, job } = this.state
-    let lat = ''
-    let lng = ''
     let arr = []
     let geo1 = { lat: 33.9957883, lng: -84.46976629999999 }
     let geo2 = { lat: 34.9957883, lng: -85.46976629999999 }
+    let uid = auth.currentUser.uid
+    // let address = auth.currentUser.photoURL
 
-    const docRef = doc(fire, 'users', 'XQb2ICAUlPNtAhw8jwv6')
-    const docSnap = await getDoc(docRef)
+    // let newAddress = address.split('|')
+    // let justAddress = newAddress[0]
+    // let justLat = newAddress[1]
+    // let justLng = newAddress[2]
+    // console.log(newAddress)
+    // console.log(justAddress)
+    // console.log(justLat)
+    // console.log(justLng)
 
-    if (docSnap.exists()) {
-      console.log('user data:', docSnap.data())
-    } else {
-      console.log('Document does not exist!')
-    }
+    // console.log(uid)
+
+    // const docRef = doc(fire, 'jobs')
+    // const docSnap = await getDoc(docRef)
+
+    // console.log(docRef)
+
+    // if (docSnap.exists()) {
+    //   console.log('user data:', docSnap.data())
+    // } else {
+    //   console.log('Document does not exist!')
+    // }
+
+    const jobsRef = collection(fire, 'jobs')
+    const userJobsQuery = query(jobsRef, where('userId', '==', uid))
+    const userJobs = await getDocs(userJobsQuery)
+    let userJobs2 = []
+
+    userJobs.forEach((doc) => {
+      let data = doc.data()
+      data.uid = doc.id
+      userJobs2.push(data)
+    })
+
+    console.log(userJobs2)
 
     // await addDoc(collection(fire, 'users'), {
-      // joinDate: Timestamp.fromDate(new Date()),
-      // email: 'b@gmail.com',
-      // name: 'batman',
-      // address: '',
-      // phone: '',
+    //   joinDate: Timestamp.fromDate(new Date()),
+    //   email: 'b@gmail.com',
+    //   name: 'batman',
+    //   address: '',
+    //   phone: '',
     // })
     //   .then(x => console.log('success', x))
     //   .catch(e => console.log('error', e))
@@ -198,8 +272,18 @@ export default class GlobalState extends Component {
     // }, { merge: true })
     //   .then(x => console.log('success', x))
     //   .catch(e => console.log('error', e))
+    
+    // console.log('1', auth.currentUser)
 
-    console.log()
+    // updateProfile(auth.currentUser, { photoURL: 'this is an address 35345' })
+    //   .then(x => console.log('success', x))
+    //   .catch(e => console.log('fail', e))
+
+    // updateProfile(auth.currentUser, { tenantId: 'geo object' })
+    //   .then(x => console.log('success', x))
+    //   .catch(e => console.log('fail', e))
+
+    // console.log('2', auth.currentUser)
   }
   
   render() {
@@ -221,6 +305,7 @@ export default class GlobalState extends Component {
           login: this.login,
           logout: this.logout,
           refresh: this.refresh,
+          refreshUserJobs: this.refreshUserJobs,
           refreshJob: this.refreshJob,
           clearData: this.clearData,
           test: this.test

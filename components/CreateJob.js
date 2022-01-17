@@ -3,7 +3,7 @@ import Context from '../context/Context.js'
 import { Box, Button, Center, FormControl, Heading, Input, Row, ScrollView, Select, Stack, Spinner, TextArea, Text } from 'native-base'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import DateTimePicker from '@react-native-community/datetimepicker'
-// import * as author from 'firebase/auth'
+import { collection, doc, setDoc, addDoc, getDoc, Timestamp } from 'firebase/firestore'
 import { format } from 'date-fns'
 
 export default class CreateJob extends Component {
@@ -19,6 +19,7 @@ export default class CreateJob extends Component {
       address: '',
       latitude: 0,
       longitude: 0,
+      firstCheck: false,
       busy: false,
       error: false,
       showDatePicker: false
@@ -32,19 +33,18 @@ export default class CreateJob extends Component {
   }
 
   setAddressAndPhoneOnMount = () => {
-    let { address, latitude, longitude, phoneNumber } = this.context.user
+    let { address, geo, phoneNumber } = this.context.user
     let state = this.state
     state.address = address
-    state.latitude = latitude
-    state.longitude = longitude
+    state.latitude = geo.latitude
+    state.longitude = geo.longitude
     state.phone = phoneNumber
-    this.setState({ state })
+    this.setState(state)
     console.log('CreateJob - setAddressAndPhoneOnMount() - sets address, latitude, longitude, and phone for the form')
   }
 
-  submit = () => {
-    let { db, user } = this.context
-    let { ref, get, child, update, push } = database
+  submit = async () => {
+    let { user, fire } = this.context
     let { title, phone, address, description, type, tip, endDate, latitude, longitude } = this.state
     let random = String(Math.random())
     let jobID = random.slice(-14)
@@ -85,27 +85,41 @@ export default class CreateJob extends Component {
       //   type: type,
       //   tip: parseInt(tip),
       //   endDate: endDate,
-      //   completed: false,
       // })
-      //   .then(() => {
-      //     this.setState({
-      //       title: '',
-      //       description: '',
-      //       type: 'Yardwork',
-      //       tip: '',
-      //       endDate: '',
-      //       busy: false,
-      //       error: false
-      //     }, () => console.log('Create Job', 'job created'))
-      //     this.context.refresh()
-      //     this.context.navigation.navigate('Manage Jobs')
-      //   })
-      //   .catch((e) => {
-      //     this.setState({
-      //       busy: false,
-      //       error: true
-      //     }, () => console.log('Create Job', 'error creating job', e))
-      //   })
+      await addDoc(collection(fire, 'jobs'), {
+        userId: user.uid,
+        userName: user.displayName,
+        title: title,
+        phone: phone,
+        email: user.email,
+        address: address,
+        lat: parseInt(latitude),
+        lng: parseInt(longitude),
+        description: description,
+        creationDate: creationDate,
+        type: type,
+        tip: parseInt(tip),
+        endDate: endDate,
+      })
+        .then(() => {
+          this.setState({
+            title: '',
+            description: '',
+            type: 'Yardwork',
+            tip: '',
+            endDate: '',
+            busy: false,
+            error: false
+          }, () => console.log('Create Job', 'job created'))
+          this.context.refresh()
+          this.context.navigation.navigate('Manage Jobs')
+        })
+        .catch((e) => {
+          this.setState({
+            busy: false,
+            error: true
+          }, () => console.log('Create Job', 'error creating job', e))
+        })
     }
   }
 

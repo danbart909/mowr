@@ -22,8 +22,8 @@ export default class Signup extends Component {
   static contextType = Context
 
   registerUser = async () => {
-    let { auth, db } = this.context
-    let { role, displayName, email, password } = this.state
+    let { auth } = this.context
+    let { displayName, email, password } = this.state
     if (this.state.displayName === '' && this.state.email === '' && this.state.password === '') {
       alert('Enter details to signup!')
     } else if (this.state.password !== this.state.passwordConfirm) {
@@ -33,10 +33,8 @@ export default class Signup extends Component {
       createUserWithEmailAndPassword(auth, email, password)
         .then(x => {
           console.log('User registered successfully!', x)
-          // set(ref(db, 'users/' + x.user.uid), { role: role })
-          // x.user.role = role
           this.props.context.updateContext('user', x.user)
-          updateProfile(auth.currentUser, {displayName: displayName})
+          updateProfile(auth.currentUser, { displayName: displayName })
             .then(async () => {
               await this.context.refresh()
               this.setState({ isLoading: false, error: false }, () => this.context.navigation.navigate('Home'))
@@ -47,11 +45,20 @@ export default class Signup extends Component {
     }
   }
 
-  registerUser = async () => {
-    let { fire } = this.context
-
-    await add
-  }
+  // createMirror = async () => {
+  //   let { fire, auth } = this.context
+  //   let { displayName, email, phoneNumber, uid } = auth.currentUser
+    
+  //   await setDoc(doc(fire, 'users', uid), {
+  //     address: null,
+  //     displayName: displayName,
+  //     email: email,
+  //     joinDate: Timestamp.fromDate(new Date()),
+  //     phoneNumber: phoneNumber,
+  //   })
+  //     .then(() => console.log('mirror success'))
+  //     .catch(e => console.log('mirror error', e))
+  // }
 
   render() {
 

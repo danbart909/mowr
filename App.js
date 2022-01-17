@@ -24,16 +24,10 @@ import ManageJobs from './user/ManageJobs'
 import UserJobView from './user/UserJobView'
 import Location from './user/Location'
 
-import Test1JobView from './test/test1/Test1JobView'
-import Test1Profile from './test/test1/Test1Profile'
-import Test1SearchJobs from './test/test1/Test1SearchJobs'
-import Test1CreateJob from './test/test1/Test1CreateJob'
-import Test2JobView from './test/test2/Test2JobView'
-import Test2Profile from './test/test2/Test2Profile'
-import Test2SearchJobs from './test/test2/Test2SearchJobs'
-import Test3JobView from './test/test3/Test3JobView'
-import Test3Profile from './test/test3/Test3Profile'
-import Test3ManageJobs from './test/test3/Test3ManageJobs'
+// import TestJobView from './test/TestJobView'
+// import TestProfile from './test/TestProfile'
+// import TestSearchJobs from './test/TestSearchJobs'
+// import TestCreateJob from './test/TestCreateJob'
 
 let Stack = createNativeStackNavigator()
 let Drawer = createDrawerNavigator()
@@ -154,88 +148,38 @@ export default class App extends Component {
   testMenuItems = () => {
     return (
       <>
-        <Drawer.Screen
-          name='Test1JobView'
-          component={Test1JobView}
+        {/* <Drawer.Screen
+          name='TestJobView'
+          component={TestJobView}
           options={{
             drawerItemStyle: { height: 0 },
             headerLeft: () => <BackButton screen={'Home'} />
           }}
         />
         <Drawer.Screen
-          name='Test1Profile'
-          component={Test1Profile}
+          name='TestProfile'
+          component={TestProfile}
           options={{
             drawerItemStyle: { height: 0 },
             headerLeft: () => <BackButton screen={'Home'} />
           }}
         />
         <Drawer.Screen
-          name='Test1SearchJobs'
-          component={Test1SearchJobs}
+          name='TestSearchJobs'
+          component={TestSearchJobs}
           options={{
             drawerItemStyle: { height: 0 },
             headerLeft: () => <BackButton screen={'Home'} />
           }}
         />
         <Drawer.Screen
-          name='Test1CreateJob'
-          component={Test1CreateJob}
+          name='TestCreateJob'
+          component={TestCreateJob}
           options={{
             drawerItemStyle: { height: 0 },
             headerLeft: () => <BackButton screen={'Home'} />
           }}
-        />
-
-        <Drawer.Screen
-          name='Test2JobView'
-          component={Test2JobView}
-          options={{
-            drawerItemStyle: { height: 0 },
-            headerLeft: () => <BackButton screen={'Home'} />
-          }}
-        />
-        <Drawer.Screen
-          name='Test2Profile'
-          component={Test2Profile}
-          options={{
-            drawerItemStyle: { height: 0 },
-            headerLeft: () => <BackButton screen={'Home'} />
-          }}
-        />
-        <Drawer.Screen
-          name='Test2SearchJobs'
-          component={Test2SearchJobs}
-          options={{
-            drawerItemStyle: { height: 0 },
-            headerLeft: () => <BackButton screen={'Home'} />
-          }}
-        />
-
-        <Drawer.Screen
-          name='Test3JobView'
-          component={Test3JobView}
-          options={{
-            drawerItemStyle: { height: 0 },
-            headerLeft: () => <BackButton screen={'Home'} />
-          }}
-        />
-        <Drawer.Screen
-          name='Tes3tProfile'
-          component={Test3Profile}
-          options={{
-            drawerItemStyle: { height: 0 },
-            headerLeft: () => <BackButton screen={'Home'} />
-          }}
-        />
-        <Drawer.Screen
-          name='Test3ManageJobs'
-          component={Test3ManageJobs}
-          options={{
-            drawerItemStyle: { height: 0 },
-            headerLeft: () => <BackButton screen={'Home'} />
-          }}
-        />
+        /> */}
       </>
     )
   }

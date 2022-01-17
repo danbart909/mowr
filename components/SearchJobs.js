@@ -2,11 +2,14 @@ import React, { Component } from 'react'
 import Context from '../context/Context.js'
 import { Box, Button, Center, Heading, FlatList, Input, Text, Select, Stack, Row, Switch } from 'native-base'
 import { ActivityIndicator, ScrollView } from 'react-native'
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+import { faArrowUp } from '@fortawesome/free-solid-svg-icons'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import Constants from 'expo-constants'
 import Geocoder from 'react-native-geocoding'
 import { getDistance } from 'geolib'
-import { format, formatDistance } from 'date-fns'
+import * as dFNS from 'date-fns'
+import * as database from 'firebase/database'
 
 const { civicAPIKey } = Constants.manifest.extra
 Geocoder.init(civicAPIKey)
@@ -27,59 +30,61 @@ export default class SearchJobs extends Component {
   search = async () => {
     let { db, user, zip } = this.context
     let { sortBy, sortDirection } = this.state
+    let { ref, get } = database
+    // child, update, push, query, limitToLast, equalTo, orderByKey, orderByChild, orderByValue = database
 
     if (sortBy === 'Distance' && !zip) {
       alert('Please Enter a Zip Code')
     } else {
       this.setState({ busy: true, error: false }, () => {
-        // get(ref(db, 'jobs/'))
-        // .then(x => {
-        //   let data1 = Object.values(x.val())
-        //   let data2 = data1.filter(x => x.completed === false)
-        //   let data3 = []
-        //   let geo = {}
+        get(ref(db, 'jobs/'))
+        .then(x => {
+          let data1 = Object.values(x.val())
+          let data2 = data1.filter(x => x.completed === false)
+          let data3 = []
+          let geo = {}
 
-        //   if (sortBy === 'Distance') {
-        //     Geocoder.from(zip)
-        //       .then(x => {
-        //         // console.log('geoZip', x.results[0].geometry.location)
-        //         geo = x.results[0].geometry.location
-        //         sortDirection === 0 ?
-        //         data3 = data2.sort((a, b) => (getDistance(geo, a.geo) > getDistance(geo, b.geo)) ? 1 : -1) :
-        //         data3 = data2.sort((a, b) => (getDistance(geo, a.geo) > getDistance(geo, b.geo)) ? -1 : 1)
-        //         // console.log('Distance', 'data3', data3)
-        //         this.context.updateContext('jobSearchResults', data3)
-        //         this.context.updateContext('geo', geo)
-        //         this.setState({ busy: false, error: false })
-        //       })
-        //       .catch(e => console.log('Geocoder error', e))
-        //   } else if (sortBy === 'Tip') {
-        //     sortDirection === 0 ?
-        //     data3 = data2.sort((a, b) => (a.tip > b.tip) ? 1 : -1) :
-        //     data3 = data2.sort((a, b) => (a.tip > b.tip) ? -1 : 1)
-        //     // console.log('Tip', 'data3', data3)
-        //     this.context.updateContext('jobSearchResults', data3)
-        //     this.setState({ busy: false, error: false })
-        //   } else if (sortBy === 'Creation Date') {
-        //     sortDirection === 0 ?
-        //     data3 = data2.sort((a, b) => (new Date(a.creationDate) > new Date(b.creationDate)) ? 1 : -1) :
-        //     data3 = data2.sort((a, b) => (new Date(a.creationDate) > new Date(b.creationDate)) ? -1 : 1)
-        //     // console.log('Creation Date', 'data3', data3)
-        //     this.context.updateContext('jobSearchResults', data3)
-        //     this.setState({ busy: false, error: false })
-        //   } else {
-        //     sortDirection === 0 ?
-        //     data3 = data2.sort((a, b) => (new Date(a.endDate) > new Date(b.endDate)) ? 1 : -1) :
-        //     data3 = data2.sort((a, b) => (new Date(a.endDate) > new Date(b.endDate)) ? -1 : 1)
-        //     // console.log('End Date', 'data3', data3)
-        //     this.context.updateContext('jobSearchResults', data3)
-        //     this.setState({ busy: false, error: false })
-        //   }
+          if (sortBy === 'Distance') {
+            Geocoder.from(zip)
+              .then(x => {
+                // console.log('geoZip', x.results[0].geometry.location)
+                geo = x.results[0].geometry.location
+                sortDirection === 0 ?
+                data3 = data2.sort((a, b) => (getDistance(geo, a.geo) > getDistance(geo, b.geo)) ? 1 : -1) :
+                data3 = data2.sort((a, b) => (getDistance(geo, a.geo) > getDistance(geo, b.geo)) ? -1 : 1)
+                // console.log('Distance', 'data3', data3)
+                this.context.updateContext('jobSearchResults', data3)
+                this.context.updateContext('geo', geo)
+                this.setState({ busy: false, error: false })
+              })
+              .catch(e => console.log('Geocoder error', e))
+          } else if (sortBy === 'Tip') {
+            sortDirection === 0 ?
+            data3 = data2.sort((a, b) => (a.tip > b.tip) ? 1 : -1) :
+            data3 = data2.sort((a, b) => (a.tip > b.tip) ? -1 : 1)
+            // console.log('Tip', 'data3', data3)
+            this.context.updateContext('jobSearchResults', data3)
+            this.setState({ busy: false, error: false })
+          } else if (sortBy === 'Creation Date') {
+            sortDirection === 0 ?
+            data3 = data2.sort((a, b) => (new Date(a.creationDate) > new Date(b.creationDate)) ? 1 : -1) :
+            data3 = data2.sort((a, b) => (new Date(a.creationDate) > new Date(b.creationDate)) ? -1 : 1)
+            // console.log('Creation Date', 'data3', data3)
+            this.context.updateContext('jobSearchResults', data3)
+            this.setState({ busy: false, error: false })
+          } else {
+            sortDirection === 0 ?
+            data3 = data2.sort((a, b) => (new Date(a.endDate) > new Date(b.endDate)) ? 1 : -1) :
+            data3 = data2.sort((a, b) => (new Date(a.endDate) > new Date(b.endDate)) ? -1 : 1)
+            // console.log('End Date', 'data3', data3)
+            this.context.updateContext('jobSearchResults', data3)
+            this.setState({ busy: false, error: false })
+          }
 
-        //   // console.log('data3', data3)
-        //   // this.context.updateContext('jobSearchResults', data3)
-        // })
-        // .catch(e => this.setState({ busy: false, error: true }, () => console.log('job search error', e)))
+          // console.log('data3', data3)
+          // this.context.updateContext('jobSearchResults', data3)
+        })
+        .catch(e => this.setState({ busy: false, error: true }, () => console.log('job search error', e)))
       })
     }
   }
@@ -129,71 +134,92 @@ export default class SearchJobs extends Component {
         <FlatList
           data={jobSearchResults}
           keyExtractor={item => item.ID}
-          renderItem={({item}) => (
-            <Box
-              mb={wp(10)}
+          ref='list'
+          renderItem={({item, index}) => (
+            <Stack
+              m={wp(5)}
               bg='white'
-              borderWidth='1'
+              borderRadius='25'
+              // borderWidth='1'
             >
               <Row
-                justifyContent='space-between'
-                alignItems='center'
+                // justifyContent='space-between'
+                alignItems='flex-start'
                 p={wp(2)}
-                borderBottomWidth='1'
+                // borderBottomWidth='1'
               >
-                <Text fontSize='2xl'>{item.title}</Text>
-                <Text fontSize='lg'>$ {item.tip}</Text>
-              </Row>
-              <Row
-                justifyContent='space-between'
-                alignItems='center'
-                p={wp(2)}
-                borderBottomWidth='1'
-              >
-                <Text fontSize='xs'>Type: {item.type}</Text>
-                <Text>{item.name}</Text>
-              </Row>
-              <Box
-                minH='2xs'
-                maxH='xs'
-                p={wp(2)}
-                borderBottomWidth='1'
-              >
-                <Text fontSize='xs'>{item.description}</Text>
-              </Box>
-              <Row
-                justifyContent='space-between'
-                alignItems='center'
-                p={wp(2)}
-                borderBottomWidth='1'
-              >
-                <Text>{item.address.replace(/([,][\s])/, `\n`)}</Text>
-                <Text>{`${this.calcDistance(item.geo, geo)}`}</Text>
-              </Row>
-              <Row
-                justifyContent='space-between'
-                alignItems='center'
-                p={wp(2)}
-                borderBottomWidth='1'
-              >
-                <Stack alignItems='flex-start'>
-                  <Text fontSize='xs'>Created {formatDistance(new Date(item.creationDate), new Date(), { addSuffix: true })}</Text>
-                  <Text>{format(new Date(item.creationDate), 'EEEE, PPP')}</Text>
-                </Stack>
-                <Stack alignItems='flex-end'>
-                  <Text fontSize='xs'>Ending {formatDistance(new Date(item.endDate), new Date(), { addSuffix: true })}</Text>
-                  <Text>{format(new Date(item.endDate), 'EEEE, PPP')}</Text>
-                </Stack>
-              </Row>
-              <Center>
-                <Button
-                  my={wp(4)}
-                  onPress={() => this.viewJob(item)}
+                <Center
+                  flex='1'
+                  p={wp(1)}
+                  // borderWidth='1'
                 >
-                  VIEW JOB
-                </Button>
+                  <Text fontSize={wp(4)}>#{index+1}</Text>
+                </Center>
+                <Box
+                  flex='9'
+                  p={wp(1)}
+                  // borderWidth='1'
+                >
+                  <Text fontSize={wp(3.5)}>{item.title}</Text>
+                </Box>
+                <Box
+                  flex='2'
+                  p={wp(1)}
+                >
+                  <Text fontSize={wp(4)} textAlign='right'>${item.tip}</Text>
+                </Box>
+              </Row>
+
+              <Row
+                p={wp(2)}
+                justifyContent='space-between'
+              >
+                <Box>
+                  <Text borderBottomWidth='1' pb='5'>Type</Text>
+                  <Text>{item.type}</Text>
+                </Box>
+                <Box>
+                  <Text borderBottomWidth='1' pb='5' textAlign='right'>Job Poster</Text>
+                  <Text>{item.name}</Text>
+                </Box>
+              </Row>
+
+              <Row
+                justifyContent='space-between'
+                px={wp(2)}
+                mb={wp(2)}
+              >
+                <Text>{`${this.calcDistance(item.geo, geo)}`}</Text>
+                <Text textAlign='right'>{item.address.replace(/([,][\s])/, `\n`)}</Text>
+              </Row>
+
+              <Row
+                justifyContent='space-between'
+                px={wp(2)}
+                // borderWidth='1'
+              >
+                <Box
+                  flex='1'
+                  // borderWidth='1'
+                >
+                  <Text>Creation Date</Text>
+                  <Text>{item.creationDate}</Text>
+                </Box>
+                <Box
+                  flex='1'
+                  alignItems='flex-end'
+                  // borderWidth='1'
+                >
+                  <Text>Deadline</Text>
+                  <Text>{item.endDate}</Text>
+                </Box>
+              </Row>
+
+              <Center>
+                <Button my={wp(1.5)} onPress={() => this.viewJob(item)}>VIEW JOB</Button>
               </Center>
-            </Box>
+            
+            </Stack>
           )}
         />
       )
@@ -209,25 +235,32 @@ export default class SearchJobs extends Component {
       <>
         <Stack
           bg='coolGray.300'
-          py={wp(2.1)}
-          space={wp(2.1)}
+          py={wp(3)}
+          space={wp(3)}
           alignItems='center'
         >
-  
-          <Input
-            placeholder='Zip Code'
-            w='75%'
-            // my={wp(2)}
-            bg='white'
-            // borderWidth='1'
-            onChangeText={(x) => this.context.updateContext('zip', x)}
-            value={zip}
-          />
   
           <Row
             justifyContent='space-evenly'
             w='90%'
-            borderWidth='1'
+            alignItems='center'
+          >
+            <Text>Zip Code:</Text>
+            <Input
+              placeholder='e.g. 30102'
+              w='75%'
+              // my={wp(2)}
+              bg='white'
+              // borderWidth='1'
+              onChangeText={(x) => this.context.updateContext('zip', x)}
+              value={zip}
+            />
+          </Row>
+
+          <Row
+            justifyContent='space-evenly'
+            w='90%'
+            // borderWidth='1'
           >
             <Stack
               alignItems='center'
@@ -238,7 +271,11 @@ export default class SearchJobs extends Component {
               <Box>
                 <Text>Sort By:</Text>
               </Box>
-              <Box w='90%' my='auto' borderWidth='1'>
+              <Box
+                w='90%'
+                my='auto'
+                // borderWidth='1'
+              >
                 <Select
                   selectedValue={sortBy}
                   accessibilityLabel='Sort By'
@@ -256,7 +293,6 @@ export default class SearchJobs extends Component {
                 </Select>
               </Box>
             </Stack>
-  
             <Stack
               alignItems='center'
               justifyContent='space-between'
@@ -266,8 +302,14 @@ export default class SearchJobs extends Component {
               <Box>
                 <Text>Order By:</Text>
               </Box>
-              <Box w='90%'>
-                <Row justifyContent='space-evenly' borderWidth='1'>
+              <Box
+                w='90%'
+              >
+                <Row
+                  justifyContent='space-evenly'
+                  px={wp(5)}
+                  // borderWidth='1'
+                >
                   <Text alignSelf='center'>desc</Text>
                   <Switch
                     // size='sm'
@@ -279,7 +321,6 @@ export default class SearchJobs extends Component {
                 </Row>
               </Box>
             </Stack>
-  
           </Row>
   
           <Button
@@ -289,16 +330,94 @@ export default class SearchJobs extends Component {
   
         </Stack>
 
-        <Box bg='green.600'>
+        <Box bg='green.600' pb={wp(37)}>
           {this.resultsView()}
         </Box>
+
+        <Button
+          position='absolute'
+          justifyContent='center'
+          alignItems='center'
+          right={wp(5)}
+          bottom={wp(5)}
+          boxSize={wp(10)}
+          bg='white'
+          borderRadius='50'
+          borderColor='green.600'
+          borderWidth='1'
+          onPress={() => this.refs.list.scrollToIndex({ index: 0 })}
+        >
+          <FontAwesomeIcon icon={faArrowUp} size={wp(4)}/>
+        </Button>
       </>
     )
   }
 }
 
-{/* <Box
-  bg='primary.500'
-  p={wp(5)}
-  boxSize='200'
-></Box> */}
+
+
+
+// <Box
+//               mb={wp(10)}
+//               bg='white'
+//               borderWidth='1'
+//             >
+//               <Row
+//                 justifyContent='space-between'
+//                 alignItems='center'
+//                 p={wp(2)}
+//                 borderBottomWidth='1'
+//               >
+//                 <Text fontSize='2xl'>{item.title}</Text>
+//                 <Text fontSize='lg'>$ {item.tip}</Text>
+//               </Row>
+//               <Row
+//                 justifyContent='space-between'
+//                 alignItems='center'
+//                 p={wp(2)}
+//                 borderBottomWidth='1'
+//               >
+//                 <Text fontSize='xs'>Type: {item.type}</Text>
+//                 <Text>{item.name}</Text>
+//               </Row>
+//               <Box
+//                 minH='2xs'
+//                 maxH='xs'
+//                 p={wp(2)}
+//                 borderBottomWidth='1'
+//               >
+//                 <Text fontSize='xs'>{item.description}</Text>
+//               </Box>
+//               <Row
+//                 justifyContent='space-between'
+//                 alignItems='center'
+//                 p={wp(2)}
+//                 borderBottomWidth='1'
+//               >
+//                 <Text>{item.address.replace(/([,][\s])/, `\n`)}</Text>
+//                 <Text>{`${this.calcDistance(item.geo, geo)}`}</Text>
+//               </Row>
+//               <Row
+//                 justifyContent='space-between'
+//                 alignItems='center'
+//                 p={wp(2)}
+//                 borderBottomWidth='1'
+//               >
+//                 <Stack alignItems='flex-start'>
+//                   <Text fontSize='xs'>Created {dFNS.formatDistance(new Date(item.creationDate), new Date(), { addSuffix: true })}</Text>
+//                   <Text>{dFNS.format(new Date(item.creationDate), 'EEEE, PPP')}</Text>
+//                 </Stack>
+//                 <Stack alignItems='flex-end'>
+//                   <Text fontSize='xs'>Ending {dFNS.formatDistance(new Date(item.endDate), new Date(), { addSuffix: true })}</Text>
+//                   <Text>{dFNS.format(new Date(item.endDate), 'EEEE, PPP')}</Text>
+//                 </Stack>
+//               </Row>
+//               <Center>
+//                 <Button
+//                   my={wp(4)}
+//                   onPress={() => this.viewJob(item)}
+//                 >
+//                   VIEW JOB
+//                 </Button>
+//               </Center>
+//             </Box>
