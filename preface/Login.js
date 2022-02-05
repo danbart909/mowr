@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import Context from '../context/Context.js'
-import { Box, Button, Center, Column, FormControl, Heading, Input, Row, Stack, Text } from 'native-base'
+import { Box, Button, Center, Column, FormControl, Heading, Input, Spinner, Row, Stack, Text } from 'native-base'
 import { ActivityIndicator, ScrollView } from 'react-native'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 
@@ -8,8 +8,8 @@ export default class Login extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      email: 'p@gmail.com',
-      password: 'pppppppp',
+      email: '',
+      password: '',
       isLoading: false,
       error: false
     }
@@ -37,11 +37,11 @@ export default class Login extends Component {
       return (
         <Box
           bg='white'
-          p={wp(2.5)}
           borderWidth='5'
           borderColor='green.500'
+          borderRadius='40'
         >
-          <ActivityIndicator size='large' color='green'/>
+          <Spinner size={wp(10)} m={wp(10)} color='green.500'/>
         </Box>
       )
     }
@@ -54,6 +54,7 @@ export default class Login extends Component {
         bg='gray.100'
         borderWidth='3'
         borderColor='green.500'
+        borderRadius='40'
       >
 
         {/* <Text fontSize={wp(5)}>Log In</Text> */}
@@ -106,6 +107,7 @@ export default class Login extends Component {
           underline
           color='green.600'
           onPress={() => this.props.setView('Signup')}
+          // onPress={() => this.props.setView('Address')}
         >
           Press Here to Sign Up
         </Text>

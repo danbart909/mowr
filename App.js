@@ -8,6 +8,7 @@ import { NavigationContainer, useNavigation, useIsFocused, useFocusEffect, useSc
 import { NativeBaseProvider, Text } from "native-base"
 import firebase from './config/firebase'
 import theme from './config/theme'
+import { getApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
 import { getDatabase } from 'firebase/database'
 import { getFirestore } from 'firebase/firestore'
@@ -23,6 +24,7 @@ import Profile from './user/Profile'
 import ManageJobs from './user/ManageJobs'
 import UserJobView from './user/UserJobView'
 import Location from './user/Location'
+import SearchJobs2 from './components/SearchJobs2'
 
 // import TestJobView from './test/TestJobView'
 // import TestProfile from './test/TestProfile'
@@ -31,6 +33,7 @@ import Location from './user/Location'
 
 let Stack = createNativeStackNavigator()
 let Drawer = createDrawerNavigator()
+let app = getApp()
 let auth = getAuth()
 let db = getDatabase()
 let fire = getFirestore()
@@ -60,6 +63,7 @@ const ContextWithHooks = (props) => {
   return (
     <GlobalState
       {...props}
+      app={app}
       auth={auth}
       db={db}
       fire={fire}
@@ -104,7 +108,7 @@ export default class App extends Component {
           name='User Job View'
           component={UserJobView}
           options={{
-            drawerItemStyle: { height: 0, width: 0 },
+            drawerItemStyle: { height: 0 },
             headerLeft: () => <BackButton screen={'Manage Jobs'} />
           }}
         />
@@ -114,6 +118,16 @@ export default class App extends Component {
           options={{
             drawerItemStyle: { height: 0 },
             headerLeft: () => <BackButton screen={'Profile'} />
+          }}
+        />
+        <Drawer.Screen
+          name='Preface'
+          component={Preface}
+          options={{
+            headerTitle: 'Login/Signup',
+            // headerShown: false,
+            drawerItemStyle: { height: 0 },
+            // headerLeft: () => <></>
           }}
         />
       </>
@@ -196,7 +210,7 @@ export default class App extends Component {
               screenOptions={{
                 headerTitleAlign: 'center',
                 headerStyle: {
-                  backgroundColor: '#16a800',
+                  backgroundColor: '#289d15',
                 },
                 headerTintColor: '#fff',
                 headerTitleStyle: {
@@ -212,6 +226,14 @@ export default class App extends Component {
                 component={Home}
               />
               {this.state.loggedIn ? this.userMenuItems() : this.loggedOutMenuItems()}
+              <Drawer.Screen
+                name='Search Jobs 2'
+                component={SearchJobs2}
+                options={{
+                  // drawerItemStyle: { height: 0, width: 0 },
+                  // headerLeft: () => <BackButton screen={'SearchJobs'} />
+                }}
+              />
               <Drawer.Screen
                 name='Search Jobs'
                 component={SearchJobs}

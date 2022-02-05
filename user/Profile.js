@@ -3,6 +3,7 @@ import Context from '../context/Context.js'
 import { Box, Button, Center, FormControl, Heading, Input, Modal, Stack, Text } from 'native-base'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { EmailAuthProvider, updatePassword, updateEmail, updateProfile, reauthenticateWithCredential } from 'firebase/auth'
+import { doc, setDoc } from 'firebase/firestore'
 
 export default class Profile extends Component {
   constructor(props) {
@@ -121,6 +122,12 @@ export default class Profile extends Component {
       passwordError: false
     })
 
+    await setDoc(doc(fire, 'users', 'XQb2ICAUlPNtAhw8jwv6'), {
+      address: 'some address'
+    }, { merge: true })
+      .then(x => console.log('success', x))
+      .catch(e => console.log('error', e))
+
     updatePassword(auth.currentUser, newPassword)
       .then(() => {
         try { this.context.refresh() } catch(e){console.log('refresh error', e)}
@@ -145,38 +152,39 @@ export default class Profile extends Component {
     
   }
 
-  updatePhone = () => {
-    let { auth, user } = this.context
+  updatePhone = async () => {
+    let { auth, user, fire } = this.context
     let { newPhone } = this.state
+    let { uid } = user
     
     this.setState({
-      phoneNumberBusy: true,
-      phoneNumberError: false
+      phoneBusy: true,
+      phoneError: false
     })
 
-    // updateProfile(auth.currentUser, { phoneNumber: phoneNumber })
-
-    // update(ref(db, 'users/' + user.uid), { phoneNumber: newPhone })
-    //   .then(() => {
-    //     try { this.context.refresh() } catch(e){console.log('refresh error', e)}
-    //     finally {
-    //       this.setState({
-    //         showPhone: false,
-    //         newPhone: '',
-    //         phoneNumberBusy: false,
-    //         phoneNumberError: false
-    //       }, () => {
-    //         console.log('Profile', 'phone updated', newPhone)
-    //         // this.context.refresh()
-    //       })
-    //     }
-    //   })
-    //   .catch((e) => {
-    //     this.setState({
-    //       phoneNumberBusy: false,
-    //       phoneNumberError: true
-    //     }, () => console.log('Profile', 'error updating phone number', e))
-    //   })
+    await setDoc(doc(fire, 'users', uid), {
+      phone: newPhone
+    }, { merge: true })
+      .then(() => {
+        try { this.context.refresh() } catch(e){console.log('refresh error', e)}
+        finally {
+          this.setState({
+            showPhone: false,
+            newPhone: '',
+            phoneBusy: false,
+            phoneError: false
+          }, () => {
+            console.log('Profile', 'phone updated', newPhone)
+            this.context.refresh()
+          })
+        }
+      })
+      .catch((e) => {
+        this.setState({
+          phoneBusy: false,
+          phoneError: true
+        }, () => console.log('Profile', 'error updating phone number', e))
+      })
   }
 
   modals = () => {
@@ -204,10 +212,18 @@ export default class Profile extends Component {
             <Modal.Body>
               <FormControl>
                 <FormControl.Label>{`${x.x}`}</FormControl.Label>
+                { x.x === 'Phone' ?
                 <Input
                   value={x.new}
+                  placeholder='XXX-XXX-XXXX'
+                  keyboardType='phone-pad'
+                  textContentType='telephoneNumber'
                   onChangeText={y => this.setState({ [x.newName]: y })}
                 />
+                : <Input
+                  value={x.new}
+                  onChangeText={y => this.setState({ [x.newName]: y })}
+                /> }
               </FormControl>
             </Modal.Body>
             <Button.Group
@@ -281,85 +297,94 @@ export default class Profile extends Component {
     let { user } = this.context
 
     return (
-      <Center>
-
-        <Stack w='90%'
-          mt={wp(5)}
-          space={wp(3)}
-          // borderWidth='1'
+      <Box
+        flex='1'
+        p={wp(5)}
+        bg='primary.1'
+      >
+        <Center
+          bg='white'
+          borderRadius='40'
         >
-
-          <Row>
-            <Box flex='4'>
-              <Text>Display Name:</Text>
-            </Box>
-            <Box flex='6'>
-              <Text textAlign='right'>{user.displayName}</Text>
-              <Text bold underline color='green.600'
-                fontSize='10'
-                alignSelf='flex-end'
-                onPress={() => this.setState({ nameShow: true })}
-              >Press Here to Edit</Text>
-            </Box>
-          </Row>
+          <Stack w='90%'
+            my={wp(5)}
+            space={wp(3)}
+            // borderWidth='1'
+          >
   
-          <Row>
-            <Box flex='3'>
-              <Text>Email:</Text>
-            </Box>
-            <Box flex='7'>
-              <Text textAlign='right'>{user.email}</Text>
-              <Text bold underline color='green.600'
-                fontSize='10'
-                alignSelf='flex-end'
-                onPress={() => this.setState({ emailOrPassword: 'email', showLogin: true })}
-                // onPress={() => this.setState({ showEmail: true })}
-              >Press Here to Edit</Text>
-            </Box>
-          </Row>
+            <Row>
+              <Box flex='4'>
+                <Text>Display Name:</Text>
+              </Box>
+              <Box flex='6'>
+                <Text textAlign='right'>{user.name}</Text>
+                <Text bold underline color='green.600'
+                  fontSize='10'
+                  alignSelf='flex-end'
+                  onPress={() => this.setState({ nameShow: true })}
+                >Press Here to Edit</Text>
+              </Box>
+            </Row>
+    
+            <Row>
+              <Box flex='3'>
+                <Text>Email:</Text>
+              </Box>
+              <Box flex='7'>
+                <Text textAlign='right'>{user.email}</Text>
+                <Text bold underline color='green.600'
+                  fontSize='10'
+                  alignSelf='flex-end'
+                  onPress={() => this.setState({ emailOrPassword: 'email', showLogin: true })}
+                  // onPress={() => this.setState({ showEmail: true })}
+                >Press Here to Edit</Text>
+              </Box>
+            </Row>
+    
+            <Row>
+              <Box flex='4'>
+                <Text>Phone Number:</Text>
+              </Box>
+              <Box flex='6'>
+                <Text textAlign='right'>{user.phone ? user.phone : 'No Phone Number Saved'}</Text>
+                <Text bold underline color='green.600'
+                  fontSize='10'
+                  alignSelf='flex-end'
+                  onPress={() => this.setState({ showPhone: true })}
+                >Press Here to Edit</Text>
+              </Box>
+            </Row>
   
-          <Row>
-            <Box flex='4'>
-              <Text>Phone Number:</Text>
-            </Box>
-            <Box flex='6'>
-              <Text textAlign='right'>{user.phoneNumber}</Text>
-              <Text bold underline color='green.600'
-                fontSize='10'
-                alignSelf='flex-end'
-                onPress={() => this.setState({ showPhone: true })}
-              >Press Here to Edit</Text>
-            </Box>
-          </Row>
-
-          <Row>
-            <Box flex='3'>
-              <Text>Your Address:</Text>
-            </Box>
-            <Box flex='7'>
-              <Text textAlign='right'>{user.address ? user.address.replace(/([,][\s])/, `\n`) : 'No Address Saved'}</Text>
-              <Text bold underline color='green.600'
-                fontSize='10'
-                alignSelf='flex-end'
-                onPress={() => this.context.navigation.navigate('Location')}
-              >Press Here to Edit</Text>
-            </Box>
-          </Row>
-
-          <Text bold underline color='green.600'
-            fontSize='10'
-            alignSelf='flex-end'
-            onPress={() => this.setState({ emailOrPassword: 'password', showLogin: true })}
-            // onPress={() => this.setState({ showPassword: true })}
-          >Press Here to Change Password</Text>
+            <Row>
+              <Box flex='3'>
+                <Text>Your Address:</Text>
+              </Box>
+              <Box flex='7'>
+                <Text textAlign='right' lineHeight={wp(3.2)}>{user.address ? user.address.replace(/([,][\s])/, `\n`) : 'No Address Saved'}</Text>
+                <Text bold underline color='green.600'
+                  fontSize='10'
+                  alignSelf='flex-end'
+                  onPress={() => this.context.navigation.navigate('Location')}
+                >Press Here to Edit</Text>
+              </Box>
+            </Row>
   
-          <Button onPress={() => this.context.logout()}>Logout</Button>
-
-        </Stack>
-
-        {this.modals()}
-
-      </Center>
+            <Text bold underline color='green.600'
+              fontSize='10'
+              alignSelf='flex-end'
+              onPress={() => this.setState({ emailOrPassword: 'password', showLogin: true })}
+              // onPress={() => this.setState({ showPassword: true })}
+            >Press Here to Change Password</Text>
+    
+            <Button
+              mt={wp(1)}
+              onPress={() => this.context.logout()}
+            >Logout</Button>
+  
+          </Stack>
+          {this.modals()}
+        </Center>
+      </Box>
     )
   }
 }
@@ -376,147 +401,3 @@ const Row = (props) => {
     />
   )
 }
-
-  // updateDisplayName = () => {
-  //   let { auth } = this.context
-  //   let { displayName } = this.state
-    
-  //   this.setState({
-  //     displayNameBusy: true,
-  //     displayNameError: false
-  //   })
-
-  //   updateProfile(auth.currentUser, { displayName: displayName })
-  //     .then(() => {
-  //       try { this.context.refresh() } catch(e){console.log(e)}
-  //       finally {
-  //         this.setState({
-  //           displayName: '',
-  //           displayNameBusy: false,
-  //           displayNameError: false
-  //         }, () => console.log('Profile', 'name updated', { displayName: displayName }))
-  //       }
-  //     })
-  //     .catch((e) => {
-  //       this.setState({
-  //         displayNameBusy: false,
-  //         displayNameError: true
-  //       }, () => console.log('Profile', 'error updating name', e))
-  //     })
-  // }
-
-
-
-
-
-
-
-
-
-
-
-
-//   <Modal
-//   isOpen={showEmail}
-//   onClose={() => this.setState({ showEmail: false })}
-// >
-//   <Modal.Content w={wp(80)}>
-//     <Modal.CloseButton />
-//     <Modal.Header>Change Email</Modal.Header>
-//     <Modal.Body>
-//       <FormControl>
-//         <FormControl.Label>Change Email</FormControl.Label>
-//         <Input
-//           value={newEmail}
-//           onChangeText={x => this.setState({ newEmail: x })}
-//         />
-//       </FormControl>
-//     </Modal.Body>
-//     <Button.Group
-//       space={wp(2)}
-//       alignSelf='flex-end'
-//       pr={wp(2)}
-//       pb={wp(2)}
-//     >
-//       <Button
-//         variant='ghost'
-//         onPress={() => this.setState({ showEmail: false })}
-//       >Cancel</Button>
-//       <Button
-//         onPress={() => {
-//           this.setState({ showEmail: false, newEmail: '' })
-//         }}
-//       >Save</Button>
-//     </Button.Group>
-//   </Modal.Content>
-// </Modal>
-
-// <Modal
-//   isOpen={showPhone}
-//   onClose={() => this.setState({ showPhone: false })}
-// >
-//   <Modal.Content w={wp(80)}>
-//     <Modal.CloseButton />
-//     <Modal.Header>Change Phone</Modal.Header>
-//     <Modal.Body>
-//       <FormControl>
-//         <FormControl.Label>Change Phone</FormControl.Label>
-//         <Input
-//           value={newPhone}
-//           onChangeText={x => this.setState({ newPhone: x })}
-//         />
-//       </FormControl>
-//     </Modal.Body>
-//     <Button.Group
-//       space={wp(2)}
-//       alignSelf='flex-end'
-//       pr={wp(2)}
-//       pb={wp(2)}
-//     >
-//       <Button
-//         variant='ghost'
-//         onPress={() => this.setState({ showPhone: false })}
-//       >Cancel</Button>
-//       <Button
-//         onPress={() => {
-//           this.setState({ showPhone: false, newPhone: '' })
-//         }}
-//       >Save</Button>
-//     </Button.Group>
-//   </Modal.Content>
-// </Modal>
-
-// <Modal
-//   isOpen={showAddress}
-//   onClose={() => this.setState({ showAddress: false })}
-// >
-//   <Modal.Content w={wp(80)}>
-//     <Modal.CloseButton />
-//     <Modal.Header>Change Address</Modal.Header>
-//     <Modal.Body>
-//       <FormControl>
-//         <FormControl.Label>Change Address</FormControl.Label>
-//         <Input
-//           value={newAddress}
-//           onChangeText={x => this.setState({ newAddress: x })}
-//         />
-//       </FormControl>
-//     </Modal.Body>
-//     <Button.Group
-//       space={wp(2)}
-//       alignSelf='flex-end'
-//       pr={wp(2)}
-//       pb={wp(2)}
-//     >
-//       <Button
-//         variant='ghost'
-//         onPress={() => this.setState({ showAddress: false })}
-//       >Cancel</Button>
-//       <Button
-//         onPress={() => {
-//           this.setState({ showAddress: false, newAddress: '' })
-//         }}
-//       >Save</Button>
-//     </Button.Group>
-//   </Modal.Content>
-// </Modal>

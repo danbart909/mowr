@@ -16,22 +16,22 @@ export default class JobView extends Component {
 
     let { job } = this.context
     let list = [
-      { x: 'Type', y: job.type },
+      // { x: 'Type', y: job.type },
       { x: 'Title', y: job.title },
-      { x: 'Name', y: job.name },
+      { x: 'Name', y: job.userName },
       { x: 'Description', y: job.description },
       { x: 'Tip', y: job.tip },
       { x: 'Address', y: job.address.replace(/([,][\s])/, `\n`) },
       { x: 'Email', y: job.email },
       { x: 'Phone', y: job.phone },
-      { x: 'Creation Date', y: dFNS.format(new Date(job.creationDate), 'EEEE, PPP') },
-      { x: 'Deadline', y: dFNS.format(new Date(job.endDate), 'EEEE PPP') },
+      { x: 'Creation Date', y: job.creationDate },
+      { x: 'Deadline', y: job.endDate },
     ]
 
     return (
       <Center
         flex='1'
-        bg='green.500'
+        bg='primary.1'
       >
         <Stack
           w='90%'

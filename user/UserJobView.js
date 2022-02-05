@@ -4,6 +4,7 @@ import React, { Component } from 'react'
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import Context from '../context/Context.js'
+import { collection, doc, setDoc, addDoc, getDoc, getDocs, query, where, orderBy, limit, deleteDoc } from 'firebase/firestore'
 
 export default class UserJobView extends Component {
   constructor(props) {
@@ -49,36 +50,33 @@ export default class UserJobView extends Component {
   }
 
   update = async (x) => {
-    let { db, job } = this.context
+    let { fire, job } = this.context
 
     if (x.x === 'Tip') { x.new = parseInt(x.new) }
 
     if (x.x === 'Tip' && typeof(x.new) !== 'number') {
       alert('Please Enter a Number')
     } else {
-      this.setState({ [x.busyName]: true, [x.errorName]: false })
-      // x.x === 'Completion Status' ?
-      //   update(ref(db, 'jobs/' + job.key), { 'completed': true })
-      //     .then(() => this.updateThen(x))
-      //     .catch((e) => this.updateCatch(e, x)) :
-      //   update(ref(db, 'jobs/' + job.key), { [x.y]: x.new })
-      //     .then(() => this.updateThen(x))
-      //     .catch((e) => this.updateCatch(e, x))
+    this.setState({ [x.busyName]: true, [x.errorName]: false })
+    await setDoc(doc(fire, 'jobs', job.uid), {
+      [x.y]: x.new
+    }, { merge: true })
+      .then(() => this.setState({ [x.busyName]: false, [x.showName]: false }, () => this.context.refreshUserJobs()))
+      .catch(e => console.log('updating error', e))
     }
   }
 
-  delete = async (x) => {
-    let { db, job } = this.context
-    let emptyJob = { ID: '', address: '', completed: false, creationDate: new Date(), description: '', email: '', endDate: new Date(), geo: {}, key: '', name: '', phone: '', provider: '', tip: [], title: [], type: '' }
+  delete = async () => {
+    let { fire, job } = this.context
+    let emptyJob = { uid: '', address: '', creationDate: new Date(), description: '', email: '', endDate: new Date(), latitude: 0, longitude: 0, userName: '', phone: '', userId: '', tip: '', title: '', type: '' }
 
-    this.setState({ [x.busyName]: true, [x.errorName]: false })
-
-    // remove(ref(db, 'jobs/' + job.key))
-    //   .then(() => this.updateThen(x))
-    //   .catch((e) => this.updateCatch(e, x))
-
-    this.context.updateContext('job', emptyJob)
-    this.context.navigation.navigate('Manage Jobs')
+    await deleteDoc(doc(fire, 'jobs', job.uid))
+      .then(async () => {
+        this.context.updateContext('job', emptyJob)
+        this.context.refreshUserJobs()
+        this.context.navigation.navigate('Manage Jobs')
+      })
+      .catch(e => console.log('deletion error', e))
   }
 
   updateThen = (x) => {
@@ -94,7 +92,6 @@ export default class UserJobView extends Component {
 
   modals = () => {
     let mr = this.state
-    let { job } = this.context
     let html = []
     let list = [
       { x: 'Title', y: 'title', show: mr.titleShow, showName: 'titleShow', new: mr.titleNew, newName: 'titleNew', busy: mr.titleBusy, busyName: 'titleBusy', error: mr.titleError, errorName: 'titleError' },
@@ -135,8 +132,8 @@ export default class UserJobView extends Component {
               <Button
                 // colorScheme={job.completed && 'red'}
                 isLoading={x.busy}
-                onPress={() => job.completed ? this.delete(x) : this.update(x)}
-              >{!x.busy && job.completed ? 'Delete' : 'Save'}</Button>
+                onPress={() => this.update(x)}
+              >Save</Button>
             </Button.Group>
           </Modal.Content>
         </Modal>
@@ -172,38 +169,25 @@ export default class UserJobView extends Component {
           value={x.new}
         />
       )
-    } else if (x.x === 'Phone') {
-      return (
-        <Input
-          value={x.new}
-          onChangeText={y => this.setState({ [x.newName]: y })}
-        />
-      )
-    } else if (x.x === 'Completion Status') {
-      return (
-        <Text>Are you sure you want to mark this job as completed? This will remove it from the job search. You can undo this later if you change your mind. Press "Save" to continue with marking this job as completed, otherwise press "Cancel".</Text>
-      )
-    } else {
-      return (
-        <Text>This will delete the job forever, are you sure?</Text>
-      )
     }
   }
+
+  // value: dFNS.format(new Date(job.creationDate), 'EEEE, PPP')
+  // value: dFNS.format(new Date(job.endDate), 'EEEE PPP')
 
   renderList = () => {
     let { job } = this.context
     let html = []
     let list = [
-      { name: 'Type', value: job.type, show: '', busy: '', error: ''},
-      { name: 'Creation Date', value: dFNS.format(new Date(job.creationDate), 'EEEE, PPP'), show: '', busy: '', error: ''},
-      { name: 'Deadline', value: dFNS.format(new Date(job.endDate), 'EEEE PPP'), show: '', busy: '', error: ''},
-      { name: 'Title', value: job.title, show: 'titleShow', busy: 'titleBusy', error: 'titleError'},
-      { name: 'Address', value: job.address.replace(/([,][\s])/, `\n`), show: '', busy: '', error: ''},
-      { name: 'Tip', value: `$ ${job.tip}`, show: 'tipShow', busy: 'tipBusy', error: 'tipError'},
-      { name: 'Description', value: job.description, show: 'descShow', busy: 'descBusy', error: 'descError'},
-      { name: 'Phone', value: job.phone, show: 'phoneShow', busy: 'phoneBusy', error: 'phoneError'},
-      { name: 'Email', value: job.email, show: '', busy: '', error: ''},
-      { name: 'Completion Status', value: job.completed ? 'Completed' : 'Not Completed', show: 'completionShow', busy: '', error: ''}
+      { name: 'Type', value: job.type, show: '', busy: '', error: '' },
+      { name: 'Creation Date', value: job.creationDate, show: '', busy: '', error: '' },
+      { name: 'Deadline', value: job.endDate, show: '', busy: '', error: '' },
+      { name: 'Title', value: job.title, show: 'titleShow', busy: 'titleBusy', error: 'titleError' },
+      { name: 'Address', value: job.address.replace(/([,][\s])/, `\n`), show: '', busy: '', error: '' },
+      { name: 'Tip', value: `$ ${job.tip}`, show: 'tipShow', busy: 'tipBusy', error: 'tipError' },
+      { name: 'Description', value: job.description, show: 'descShow', busy: 'descBusy', error: 'descError' },
+      { name: 'Phone', value: job.phone, show: '', busy: '', error: '' },
+      { name: 'Email', value: job.email, show: '', busy: '', error: '' },
     ]
 
     list.map(x => {
@@ -232,7 +216,7 @@ export default class UserJobView extends Component {
             p={wp(1)}
             alignItems='center'
           >
-            {(x.show && list[9].value !== 'Completed') ? <Text bold underline color='green.600' onPress={() => this.setState({ [x.show]: true })}>Edit</Text> : (x.show && x.value === 'Completed') ? <Text bold underline color='green.600' onPress={() => this.setState({ deleteShow: true })}>Delete</Text> : null}
+            {x.show ? <Text bold underline color='primary.1' onPress={() => this.setState({ [x.show]: true })}>Edit</Text> : null}
           </Box>
         </Stack>
       )
@@ -243,22 +227,35 @@ export default class UserJobView extends Component {
 
   render() {
     return (
-      <Center>
+      <ScrollView bg='primary.1'>
 
-        {this.renderList()}
+        <Center>
+          <Center
+            bg='white'
+            m={wp(5)}
+            p={wp(2.5)}
+            borderRadius={wp(5)}
+          >
+            {this.renderList()}
+    
+            <Button
+              w={wp(60)}
+              my={wp(10)}
+              onPress={() => this.delete()}
+            >Delete</Button>
+          </Center>
+  
+          {this.modals()}
+  
+          {this.state.showDatePicker && (
+            <DateTimePicker
+              value={new Date()}
+              onChange={(event, date) => this.setState({ deadlineNew: dFNS.format(date, 'yyyy-MM-dd'), showDatePicker: false })}
+            />
+          )}
+        </Center>
 
-        {this.modals()}
-
-        {this.context.job.completed && <Center p={wp(10)}><Text textAlign='center'>You have marked this job as completed. It will be automatically deleted in two weeks.</Text></Center>}
-
-        {this.state.showDatePicker && (
-          <DateTimePicker
-            value={new Date()}
-            onChange={(event, date) => this.setState({ deadlineNew: dFNS.format(date, 'yyyy-MM-dd'), showDatePicker: false })}
-          />
-        )}
-
-      </Center>
+      </ScrollView>
     )
   }
 }

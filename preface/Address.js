@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import Context from '../context/Context.js'
-import { Box, Button, Center, Factory, FlatList, FormControl, Heading, Input, Row, ScrollView, Spinner, Stack, Text } from 'native-base'
+import { Box, Button, Column, Center, FlatList, FormControl, Heading, Input, Modal, Row, ScrollView, Spinner, Stack, Text } from 'native-base'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { doc, setDoc } from 'firebase/firestore'
 import Constants from 'expo-constants'
@@ -12,12 +12,7 @@ import axios from 'react-native-axios'
 const { civicAPIKey, mapAPIKey } = Constants.manifest.extra
 Geocoder.init(civicAPIKey)
 
-const AutoCompleteInput = () => {
-  const FactoryAutoCompleteInput = Factory()
-  return <FactoryAutoCompleteInput />
-}
-
-export default class Location extends Component {
+export default class Address extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -27,17 +22,11 @@ export default class Location extends Component {
       busy: false,
       error: 0,
       latitude: 0,
-      longitude: 0
+      longitude: 0,
     }
   }
 
   static contextType = Context
-
-  componentDidMount() {
-    let { user } = this.context
-
-    user.latitude && this.setState({ latitude: user.latitude, longitude: user.longitude })
-  }
 
   findCoordinatesUsingForm = async () => {
     let { address } = this.state
@@ -166,8 +155,8 @@ export default class Location extends Component {
     } else {
       html = <>
         <Button
-          onPress={() => this.findCoordinatesUsingForm()}
-        >Submit Form</Button>
+          onPress={() => this.state.address ? this.findCoordinatesUsingForm() : alert('Please Enter an Address')}
+        >Save Address</Button>
         <Button
           onPress={() => this.findCoordinatesUsingGPS()}
         >Use GPS</Button>
@@ -177,11 +166,10 @@ export default class Location extends Component {
     return (
       <Row
         w='100%'
-        pt={wp(2)}
         justifyContent='space-evenly'
         alignItems='center'
       >
-        {html}
+        { html }
       </Row>
     )
   }
@@ -195,7 +183,7 @@ export default class Location extends Component {
     } if (error === 1) {
       html = <Center mb={wp(3)}><Text color='error.700'>Error Saving Address to Profile, Please Try Again</Text></Center>
     } if (error === 2) {
-      html = <Center mb={wp(3)}><Text color='error.700'>Error Communicating with Server, Please Try Again</Text></Center>
+      html = <Center mb={wp(3)}><Text color='error.700'>No Address Received From Server, Please Try Again</Text></Center>
     } if (error === 3) {
       html = <Center mb={wp(3)}><Text color='error.700'>Please Grant Location Permissions to Mowr to Proceed</Text></Center>
     } if (error === 4) {
@@ -205,24 +193,41 @@ export default class Location extends Component {
     return html
   }
 
+  finish = async () => {
+    this.props.setView('Login')
+    this.context.navigation.navigate('Home')
+  }
+
   render() {
 
     let { user } = this.context
     let { address, autoResults, autoShow, busy, error, latitude, longitude } = this.state
 
     return (
-      <>
+      <Column
+        alignItems='center'
+        w='85%'
+        h='90%'
+        bg='gray.100'
+        borderWidth='3'
+        borderColor='green.500'
+        borderRadius='40'
+      >
+
         <Stack
-          my={wp(3)}
-          px={wp(5)}
+          px={wp(3)}
           space={wp(3)}
-          mb={wp(3)}
+          mb={wp(5)}
+          // borderWidth='1'
         >
 
+          <Heading pt={wp(5)} textAlign='center'>Enter Your Address</Heading>
+
           <Row
-            w='100%'
+            // w='100%'
             justifyContent='space-between'
             alignItems='flex-start'
+            // borderWidth='1'
           >
             <Box flex='3'>
               <Text>Your saved address:</Text>
@@ -232,26 +237,35 @@ export default class Location extends Component {
             </Box>
           </Row>
 
-          <Box>
-            <Text pb='5'>Address:</Text>
-            <Input
-              w={wp(90)}
-              bg='white'
-              alignSelf='center'
-              onChangeText={(x) => this.changeInputByTyping(x)}
-              value={address}
-            />
-          </Box>
+            <Box>
+              <Text pb='5'>Address:</Text>
+              <Input
+                w={wp(78)}
+                bg='white'
+                alignSelf='center'
+                onChangeText={(x) => this.changeInputByTyping(x)}
+                value={address}
+              />
+            </Box>
 
           {this.buttons()}
 
           {this.errorMessage()}
 
+          <Button
+            variant={latitude ? 'solid' : 'disabled'}
+            onPress={() => latitude ? this.finish() : alert('Please Enter an Address')}
+            mt={wp(-2)}
+            w={wp(40)}
+            alignSelf='center'
+            borderWidth={address ? null : '1'}
+          >Continue to Mowr Homepage</Button>
+
         </Stack>
 
         <ScrollView>
           <MapView
-            style={{ height: wp(75), width: '100%' }}
+            style={{ paddingTop: wp(20), height: hp(42), width: wp(80) }}
             scrollEnabled={false}
             // loadingEnabled
             region={{
@@ -269,19 +283,20 @@ export default class Location extends Component {
 
         { autoShow &&
         <Box
-          flex={1}
           position='absolute'
           h={hp(100)}
           w={wp(100)}
-          zIndex='5'
-          borderWidth='1'
+          mt={wp(-7)}
+          bg='white'
+          zIndex='10'
+          borderWidth='3'
           onStartShouldSetResponder={() => this.setState({ autoShow: false })}
         >
           <Box
             position='absolute'
-            top={wp(20)}
-            left={wp(5)}
-            w={wp(80)}
+            top={wp(40)}
+            left={wp(11)}
+            w={wp(70)}
             h='auto'
             bg='white'
             // borderWidth='1'
@@ -310,7 +325,22 @@ export default class Location extends Component {
             />
           </Box>
         </Box> }
-      </>
+
+        {/* <FormControl>
+          <FormControl.Label pb='5'>Address:</FormControl.Label>
+          <Input
+            w={wp(50)}
+            bg='white'
+            onChangeText={(x) => this.setState({ address: x })}
+            value={this.state.address}
+          />
+        </FormControl>
+
+        <Button
+          onPress={() => this.setAddress()}
+        >Submit</Button> */}
+
+      </Column>
     )
   }
 }

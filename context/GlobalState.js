@@ -5,9 +5,9 @@ import Context from './Context.js'
 // import AsyncStorage from '@react-native-async-storage/async-storage'
 import Constants from 'expo-constants';
 import * as SplashScreen from 'expo-splash-screen';
-import { signOut, signInWithEmailAndPassword, onAuthStateChanged, updateProfile } from 'firebase/auth'
-import { collection, doc, setDoc, addDoc, getDoc, getDocs, query, where, orderBy, limit } from 'firebase/firestore'
-// import { parseISO, formatISO, addHours, isPast, addSeconds, addMinutes, compareAsc } from "date-fns";
+import { signOut, signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth'
+import { collection, doc, setDoc, addDoc, getDoc, getDocs, query, where, orderBy, limit, Timestamp } from 'firebase/firestore'
+import { format, parseISO, formatISO, addHours, isPast, addSeconds, addMinutes, compareAsc } from "date-fns";
 import Geocoder from 'react-native-geocoding'
 // import { getDistance } from 'geolib';
 // import axios from 'react-native-axios'
@@ -24,7 +24,7 @@ export default class GlobalState extends Component {
       userJobs: [],
       jobSearchResults: [],
       job: {
-        uid: '',
+        id: '',
         userId: '',
         userName: '',
         title: '',
@@ -39,8 +39,15 @@ export default class GlobalState extends Component {
         tip: 0,
         phone: ''
       },
-      zip: '30062',
-      geo: {}
+      zip: '',
+      geo: {
+        latitude: 0,
+        longitude: 0
+      },
+      results: {
+        lat: [],
+        lng: []
+      }
     }
   }
 
@@ -88,53 +95,24 @@ export default class GlobalState extends Component {
 
   refresh = async () => {
     let { auth, fire } = this.props
-    let user = auth.currentUser
-    console.log('user signed in', user)
+    let { displayName, email, uid } = auth.currentUser
     let state = this.state
-    let { job, introCheck } = this.state
-    let { displayName, email, phoneNumber, photoURL, uid } = user
-    let addressArray = photoURL.split('|')
-    let geo = { latitude: addressArray[1], longitude: addressArray[2] }
+
+    let user = await getDoc(doc(fire, 'users', uid))
+
     let customUserObject = {
-      displayName: displayName,
+      name: displayName,
       email: email,
-      address: addressArray[0],
-      geo: geo,
-      phoneNumber: phoneNumber,
+      address: user.data().address,
+      latitude: user.data().latitude,
+      longitude: user.data().longitude,
+      phone: user.data().phone,
       uid: uid,
     }
     state.user = customUserObject
-
-    // user.email &&
-    // get(ref(db, 'jobs/'))
-    //   .then(x => {
-    //     let keys = Object.keys(x.val())
-    //     let data = Object.values(x.val())
-    //     for (let i = 0; i < data.length; i++) { data[i].key = keys[i] }
-    //     let userJobs = data.filter(y => y.provider === user.uid)
-    //     // let newjob = userJobs.filter(y => y.key === job.key)
-    //     // console.log('x', x.val())
-    //     console.log('userJobs', userJobs)
-    //     // this.setState({ userJobs: userJobs, job: newjob, busy: false, error: false })
-    //     if (job.title) {
-    //       if (job.title !== '') {
-    //         let newjob = userJobs.filter(y => y.key === job.key)
-    //         console.log('job.title !== ""', newjob)
-    //         this.setState({ userJobs: userJobs, job: newjob[0], busy: false, error: false })
-    //       } else {
-    //         console.log('job.title === ""')
-    //         this.setState({ userJobs: userJobs, busy: false, error: false })
-    //       }
-    //     } else {
-    //       console.log('no job.title')
-    //       this.setState({ userJobs: userJobs, busy: false, error: false })
-    //     }
-    //   })
-    //   .catch(e => this.setState({ busy: false, error: true }, () => console.log(e)))
-
     this.setState(state)
 
-    console.log('state', state)
+    console.log('user refreshed', auth.currentUser, customUserObject)
   }
 
   refreshUserJobs = async () => {
@@ -142,20 +120,26 @@ export default class GlobalState extends Component {
     let user = auth.currentUser
     let { uid } = user
     let state = this.state
-    
-    console.log('refreshing userJobs')
+    let refreshedJob = {}
+
+    if (state.job.id !== '') {
+      refreshedJob = await getDoc(doc(fire, 'jobs', state.job.id))
+      state.job = refreshedJob.data()
+    }
 
     const rawUserJobs = await getDocs(query(collection(fire, 'jobs'), where('userId', '==', uid)))
     let userJobs = []
 
     rawUserJobs.forEach((doc) => {
       let data = doc.data()
-      data.uid = doc.id
+      data.id = doc.id
       userJobs.push(data)
     })
-    state.userJobs = userJobs
 
+    userJobs.sort((a, b) => (a.creationDate > b.creationDate) ? -1 : 1)
+    state.userJobs = userJobs
     this.setState(state)
+    console.log('userJobs refreshed', userJobs)
   }
 
   refreshJob = () => {
@@ -171,9 +155,27 @@ export default class GlobalState extends Component {
         user: {},
         userJobs: [],
         jobSearchResults: {},
-        job: {},
+        job: {
+          id: '',
+          userId: '',
+          userName: '',
+          title: '',
+          type: '',
+          description: '',
+          address: '',
+          creationDate: new Date(),
+          endDate: new Date(),
+          email: '',
+          latitude: 0,
+          longitude: 0,
+          tip: 0,
+          phone: ''
+        },
         zip: '',
-        geo: {}
+        geo: {
+          latitude: 0,
+          longitude: 0
+        }
       })
       console.log('memory cleared')
     } catch(e) { console.log('error clearing data', e) }
@@ -181,61 +183,21 @@ export default class GlobalState extends Component {
   }
 
   test = async () => {
-    let { auth, fire } = this.props
-    let { user, jobSearchResults, geo, job } = this.state
-    let arr = []
-    let geo1 = { lat: 33.9957883, lng: -84.46976629999999 }
-    let geo2 = { lat: 34.9957883, lng: -85.46976629999999 }
-    let uid = auth.currentUser.uid
-    let jobs = []
-    let jobsQuery = collection(fire, 'jobs')
+    // let { app, auth, fire } = this.props
+    // let { user, jobSearchResults, geo, job } = this.state
 
-    // distance, tip, createdDate, endDate
+    // this.props.navigation.navigate('Preface')
+    // let i1 = '55.5555'
+    // let i2 = parseFloat(i1).toFixed(2)
 
-    // const rawJobs = await getDocs(query(jobsQuery))
-    // const rawJobs = await getDocs(query(jobsQuery, orderBy('tip', 'desc'), limit(5)))
-
-    // rawJobs.forEach((x) => jobs.push(x.data().tip))
-
-    // console.log('jobs', jobs)
-
-    // let random = String(Math.random())
-    // let jobID = random.slice(-10)
-
-    // console.log(jobID)
-    
-    // const jobsRef = collection(fire, 'jobs')
-    // const userJobsQuery = query(jobsRef, where('userId', '==', uid))
-    // const userJobs = await getDocs(userJobsQuery)
-    // let userJobs2 = []
-
-    // userJobs.forEach((doc) => {
-    //   let data = doc.data()
-    //   data.uid = doc.id
-    //   userJobs2.push(data)
-    // })
-
-    // await addDoc(collection(fire, 'users'), {
-    //   joinDate: Timestamp.fromDate(new Date()),
-    //   email: 'b@gmail.com',
-    //   name: 'batman',
-    //   address: '',
-    //   phone: '',
-    // })
-    //   .then(x => console.log('success', x))
-    //   .catch(e => console.log('error', e))
-
-    // await setDoc(doc(fire, 'users', 'XQb2ICAUlPNtAhw8jwv6'), {
-    //   address: 'some address'
-    // }, { merge: true })
-    //   .then(x => console.log('success', x))
-    //   .catch(e => console.log('error', e))
+    // console.log(i2)
   }
   
   render() {
     return (
       <Context.Provider
         value={{
+          app: this.props.app,
           auth: this.props.auth,
           db: this.props.db,
           fire: this.props.fire,
@@ -247,6 +209,7 @@ export default class GlobalState extends Component {
           job: this.state.job,
           zip: this.state.zip,
           geo: this.state.geo,
+          results: this.state.results,
           updateContext: this.updateContext,
           login: this.login,
           logout: this.logout,

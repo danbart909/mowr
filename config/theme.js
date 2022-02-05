@@ -9,8 +9,9 @@ export default theme = extendTheme({
     Button: {
       defaultProps: {
         py: wp(2),
-        px: wp(3.5)
-      }
+        px: wp(3.5),
+        borderRadius: '20'
+      },
     },
     Input: {
       defaultProps: {
@@ -186,12 +187,22 @@ export default theme = extendTheme({
   },
   colors: {
     primary: {
-      50: '#f0fdf4',
-      100: '#dcfce7',
+      1: '#289d15',
+      2: '#24b40e',
+      3: '#1dbd05',
+      4: '#1fdf01',
+      5: '#16a800',
+      6: '#1f850f',
+      7: '#22c55e',
+
+      100: '#723cc8',
+      101: '#641cd9',
+      102: '#8c59de',
+
       200: '#bbf7d0',
       300: '#86efac',
       400: '#4ade80',
-      500: '#22c55e',
+      500: '#289d15',
       600: '#16a34a',
       700: '#15803d',
       800: '#166534',
@@ -199,3 +210,15 @@ export default theme = extendTheme({
     }
   }
 })
+
+// 50: '#16a800',
+// 60: '#8c59de',
+// 100: '#1dbd05',
+// 200: '#1fdf01',
+// 300: '#86efac',
+// 400: '#4ade80',
+// 500: '#22c55e',
+// 600: '#16a34a',
+// 700: '#289d15',
+// 800: '#1f850f',
+// 900: '#24b40e'

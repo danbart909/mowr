@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import Context from '../context/Context.js'
 import { Box, Button, Flex, Text, Stack, Center, Heading } from 'native-base'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
+import { linkWithphone, PhoneAuthProvider } from 'firebase/auth'
+import firebase from '../config/firebase'
 
 // import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 // import { faCalendarAlt, faExclamationCircle, faArrowAltCircleDown } from '@fortawesome/free-solid-svg-icons'
@@ -16,31 +18,46 @@ export default class Home extends Component {
 
   render() {
     return (
-      <Center
-        _dark={{ bg: "blueGray.900" }}
-        _light={{ bg: "blueGray.50" }}
-        p='4'
-        flex='1'
-      >
-        <Stack
-          direction='row'
-          space='2'
-          p='12'
-          borderWidth='1'
-          borderColor='black'
-          // bg='emerald.500'
+      <>
+        <Center
+          _dark={{ bg: "blueGray.900" }}
+          _light={{ bg: "blueGray.50" }}
+          p='4'
+          flex='1'
         >
-          <Button onPress={() => this.context.navigation.navigate('Search Jobs')}>Search for Jobs</Button>
-          <Button onPress={() => this.context.refresh()}>Refresh User</Button>
-          <Button onPress={() => this.context.test()}>Experiment</Button>
-        </Stack>
-        <Stack mt='20' space='12'>
-          {/* <Button onPress={() => this.context.navigation.navigate('TestJobView')}>Test Job View</Button> */}
-          {/* <Button onPress={() => this.context.navigation.navigate('TestProfile')}>Test Profile</Button> */}
-          {/* <Button onPress={() => this.context.navigation.navigate('TestSearchJobs')}>Test Search Jobs</Button> */}
-          {/* <Button onPress={() => this.context.navigation.navigate('TestCreateJob')}>Test Create Job</Button> */}
-        </Stack>
-      </Center>
+          <Stack
+            direction='row'
+            space='2'
+            p='12'
+            borderWidth='1'
+            borderColor='black'
+            // bg='emerald.500'
+          >
+            <Button onPress={() => this.context.navigation.navigate('Search Jobs')}>Search for Jobs</Button>
+            <Button onPress={() => this.context.refresh()}>Refresh User</Button>
+            <Button onPress={() => this.context.test()}>Experiment</Button>
+            <Button onPress={() => this.context.navigation.navigate('Search Jobs 2')}>Search Jobs 2</Button>
+          </Stack>
+          {/* <Stack
+            direction='row'
+            space='2'
+            p='12'
+            borderWidth='1'
+            borderColor='black'
+            // bg='emerald.500'
+          >
+            <Button onPress={() => this.test1()}>test1</Button>
+            <Button onPress={() => this.test2()}>test2</Button>
+          </Stack> */}
+
+          <Stack mt='20' space='12'>
+            {/* <Button onPress={() => this.context.navigation.navigate('TestJobView')}>Test Job View</Button> */}
+            {/* <Button onPress={() => this.context.navigation.navigate('TestProfile')}>Test Profile</Button> */}
+            {/* <Button onPress={() => this.context.navigation.navigate('TestSearchJobs')}>Test Search Jobs</Button> */}
+            {/* <Button onPress={() => this.context.navigation.navigate('TestCreateJob')}>Test Create Job</Button> */}
+          </Stack>
+        </Center>
+      </>
     );
   }
 }

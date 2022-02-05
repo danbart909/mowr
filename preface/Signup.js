@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
 import Context from '../context/Context.js'
-import { Box, Button, Center, Column, FormControl, Heading, Input, Row, Stack, Text } from 'native-base'
+import { Box, Button, Center, Column, FormControl, Heading, Input, Spinner, Row, Stack, Text } from 'native-base'
 import { ActivityIndicator } from 'react-native'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
-import { collection, doc, setDoc, addDoc } from 'firebase/firestore'
+import { collection, doc, setDoc, addDoc, Timestamp } from 'firebase/firestore'
 
 export default class Signup extends Component {
   constructor(props) {
@@ -31,13 +31,14 @@ export default class Signup extends Component {
     } else {
       this.setState({ isLoading: true })
       createUserWithEmailAndPassword(auth, email, password)
-        .then(x => {
+        .then(async x => {
           console.log('User registered successfully!', x)
           this.props.context.updateContext('user', x.user)
           updateProfile(auth.currentUser, { displayName: displayName })
             .then(async () => {
+              await this.createMirror()
               await this.context.refresh()
-              this.setState({ isLoading: false, error: false }, () => this.context.navigation.navigate('Home'))
+              this.setState({ isLoading: false, error: false }, () => this.props.setView('Phone'))
             })
             .catch(e => this.setState({ isLoading: false, error: true }, () => console.log('error updating during registration', e)))
         })
@@ -45,20 +46,23 @@ export default class Signup extends Component {
     }
   }
 
-  // createMirror = async () => {
-  //   let { fire, auth } = this.context
-  //   let { displayName, email, phoneNumber, uid } = auth.currentUser
+  createMirror = async () => {
+    let { fire, auth } = this.context
+    let { email, uid } = auth.currentUser
     
-  //   await setDoc(doc(fire, 'users', uid), {
-  //     address: null,
-  //     displayName: displayName,
-  //     email: email,
-  //     joinDate: Timestamp.fromDate(new Date()),
-  //     phoneNumber: phoneNumber,
-  //   })
-  //     .then(() => console.log('mirror success'))
-  //     .catch(e => console.log('mirror error', e))
-  // }
+    await setDoc(doc(fire, 'users', uid), {
+      name: this.state.displayName,
+      address: '',
+      latitude: 0,
+      longitude: 0,
+      email: email,
+      phone: '',
+      joinDate: Timestamp.fromDate(new Date()),
+      uid: uid
+    })
+      .then(() => console.log('mirror success'))
+      .catch(e => console.log('mirror error', e))
+  }
 
   render() {
 
@@ -68,11 +72,11 @@ export default class Signup extends Component {
       return (
         <Box
           bg='white'
-          p={wp(5)}
           borderWidth='5'
           borderColor='green.500'
+          borderRadius='40'
         >
-          <ActivityIndicator size='large' color='green'/>
+          <Spinner size={wp(10)} m={wp(10)} color='green.500'/>
         </Box>
       )
     }
@@ -85,6 +89,7 @@ export default class Signup extends Component {
         bg='gray.100'
         borderWidth='3'
         borderColor='green.500'
+        borderRadius='40'
       >
 
         {/* <Text fontSize={wp(5)}>Signup</Text> */}

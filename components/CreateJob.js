@@ -11,51 +11,34 @@ export default class CreateJob extends Component {
     super(props)
     this.state = {
       title: '',
-      phone: '',
       description: '',
       type: 'Yardwork',
       tip: '',
       endDate: '',
-      address: '',
-      latitude: 0,
-      longitude: 0,
+      endTime: '',
+      pickerMode: 'date',
       firstCheck: false,
       busy: false,
       error: false,
-      showDatePicker: false
+      showDatePicker: false,
+      showTimePicker: false,
     }
   }
 
   static contextType = Context
 
   componentDidMount() {
-    this.setAddressAndPhoneOnMount()
-  }
-
-  setAddressAndPhoneOnMount = () => {
-    let { address, geo, phoneNumber } = this.context.user
-    let state = this.state
-    state.address = address
-    state.latitude = geo.latitude
-    state.longitude = geo.longitude
-    state.phone = phoneNumber
-    this.setState(state)
-    console.log('CreateJob - setAddressAndPhoneOnMount() - sets address, latitude, longitude, and phone for the form')
   }
 
   submit = async () => {
     let { user, fire } = this.context
-    let { title, phone, address, description, type, tip, endDate, latitude, longitude } = this.state
-    let random = String(Math.random())
-    let jobID = random.slice(-14)
-    let creationDate = format(new Date(), 'yyyy-MM-dd')
+    let { title, description, type, tip, endDate, endTime } = this.state
+    let { address, phone, email, uid, name, latitude, longitude } = user
+    let creationDate = format(new Date(), 'PPPPp')
+    let endDateAndTime = `${endDate} at ${endTime}`
 
     if (title === '') {
       alert('Please enter a Title')
-    } else if (phone === '') {
-      alert('Please enter a Phone Number')
-    } else if (address === '') {
-      alert('Please enter an Address')
     } else if (description === '') {
       alert('Please enter a Description')
     } else if (type === '') {
@@ -66,42 +49,26 @@ export default class CreateJob extends Component {
       alert('Tip must be a number.')
     } else if (endDate === '') {
       alert('Please select an End Date')
+    } else if (endTime === '') {
+      alert('Please select a Time./\n/If you do not want to select a time, please select 12:00 PM (Noon)')
     } else {
       this.setState({ busy: true })
-      // push(ref(db, 'jobs/'), {
-      //   ID: jobID,
-      //   provider: user.uid,
-      //   name: user.displayName,
-      //   title: title,
-      //   phone: phone,
-      //   email: user.email,
-      //   address: address,
-      //   geo: {
-      //     lat: latitude,
-      //     lng: longitude,
-      //   },
-      //   description: description,
-      //   creationDate: creationDate,
-      //   type: type,
-      //   tip: parseInt(tip),
-      //   endDate: endDate,
-      // })
       await addDoc(collection(fire, 'jobs'), {
-        userId: user.uid,
-        userName: user.displayName,
+        userId: uid,
+        userName: name,
         title: title,
         phone: phone,
-        email: user.email,
+        email: email,
         address: address,
-        latitude: parseFloat(latitude),
-        longitude: parseFloat(longitude),
+        latitude: latitude,
+        longitude: longitude,
         description: description,
         creationDate: creationDate,
         type: type,
-        tip: parseFloat(tip),
-        endDate: endDate,
+        tip: parseFloat(tip).toFixed(2),
+        endDate: endDateAndTime,
       })
-        .then(() => {
+        .then(async (x) => {
           this.setState({
             title: '',
             description: '',
@@ -110,8 +77,9 @@ export default class CreateJob extends Component {
             endDate: '',
             busy: false,
             error: false
-          }, () => console.log('Create Job', 'job created'))
-          this.context.refresh()
+          })
+          this.context.refreshUserJobs()
+          console.log('Create Job', 'job created', x)
           this.context.navigation.navigate('Manage Jobs')
         })
         .catch((e) => {
@@ -126,13 +94,11 @@ export default class CreateJob extends Component {
   renderList = () => {
     let html = []
     let i = 0
-    let { type, title, description, address, phone, tip, endDate } = this.state
+    let { type, title, description, tip, endDate, endTime } = this.state
     let list = [
-      { x: type, y: 'Type', z: 'type' },
+      // { x: type, y: 'Type', z: 'type' },
       { x: title, y: 'Title', z: 'title'},
       { x: description, y: 'Description', z: 'description'},
-      { x: address, y: 'Address', z: 'address'},
-      { x: phone, y: 'Phone', z: 'phone'},
       { x: tip, y: 'Tip', z: 'tip'},
       { x: endDate, y: 'Deadline', z: 'endDate'},
     ]
@@ -165,8 +131,10 @@ export default class CreateJob extends Component {
             <Input
               // w={wp(70)}
               bg='white'
+              variant='rounded'
               onFocus={() => this.setState({ showDatePicker: true })}
-              value={endDate}
+              caretHidden={true}
+              value={(endDate !== '' && endTime !== '') ? `${endDate} at ${endTime}` : 'Press Here to Set a Date and Time'}
             /> :
             <Input
               // w={wp(70)}
@@ -191,24 +159,50 @@ export default class CreateJob extends Component {
 
   render() {
 
-    let { type, title, description, address, phone, tip, endDate, showDatePicker } = this.state
+    let { address, phone } = this.context.user
+    let { endDate, showDatePicker, showTimePicker, pickerMode } = this.state
 
     return (
-      <ScrollView>
+      <ScrollView
+        p={wp(5)}
+        bg='primary.1'
+      >
 
-        {this.renderList()}
-
-        <Button
-          w='80%'
-          m={wp(5)}
-          onPress={() => this.submit()}
-          alignSelf='center'
-        >Create Job</Button>
+        <Box
+          bg='white'
+          borderRadius='40'
+        >
+          {this.renderList()}
+  
+          <Box
+            p={wp(3)}
+            // mt={wp(2)}
+          >
+            <Text pb={wp(1)}>Address</Text>
+            <Text pb={wp(1)}>{address}</Text>
+            <Text pb={wp(1)}>Phone</Text>
+            <Text pb={wp(1)}>{phone}</Text>
+          </Box>
+  
+          <Button
+            w='80%'
+            m={wp(5)}
+            onPress={() => this.submit()}
+            alignSelf='center'
+          >Create Job</Button>
+        </Box>
 
         {showDatePicker && (
           <DateTimePicker
             value={new Date()}
-            onChange={(event, date) => this.setState({ endDate: format(date, 'yyyy-MM-dd'), showDatePicker: false })}
+            mode={pickerMode}
+            minuteInterval={5}
+            onChange={(event, date) => {
+              pickerMode === 'date' ?
+              this.setState({ pickerMode: 'time', endDate: format(date, 'PPPP')}) :
+              this.setState({ pickerMode: 'date', showDatePicker: false, endTime: format(date, 'p')})
+            }}
+            // onChange={(event, date) => this.setState({ endDate: format(date, 'yyyy-MM-dd'), showDatePicker: false, showTimePicker: true })}
           />
         )}
 
@@ -216,134 +210,3 @@ export default class CreateJob extends Component {
     )
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// return (
-//   <ScrollView>
-
-//     <FormControl
-//       p={wp(3)}
-//       mt={wp(2)}
-//     >
-//       <FormControl.Label pb='5'>Type</FormControl.Label>
-//       <Select
-//         // w={wp(70)}
-//         bg='white'
-//         selectedValue={type}
-//         onValueChange={(x) => this.setState({ type: x })}
-//       >
-//         <Select.Item p={wp(3)} label='Yardwork' value='Yardwork' />
-//         <Select.Item p={wp(3)} label='Child Care' value='Child Care' />
-//         <Select.Item p={wp(3)} label='Other' value='Other' />
-//       </Select>
-//     </FormControl>
-
-//     <FormControl
-//       p={wp(3)}
-//       mt={wp(2)}
-//     >
-//       <FormControl.Label pb='5'>Title</FormControl.Label>
-//       <Input
-//         // w={wp(70)}
-//         bg='white'
-//         onChangeText={(x) => this.setState({ title: x })}
-//         value={title}
-//       />
-//     </FormControl>
-
-//     <FormControl
-//       p={wp(3)}
-//       mt={wp(2)}
-//     >
-//       <FormControl.Label pb='5'>Description</FormControl.Label>
-//       <TextArea
-//         h={wp(40)}
-//         // w={wp(70)}
-//         p={wp(2)}
-//         bg='white'
-//         onChangeText={(x) => this.setState({ description: x })}
-//         value={description}
-//       />
-//     </FormControl>
-
-//     <FormControl
-//       p={wp(3)}
-//       mt={wp(2)}
-//     >
-//       <FormControl.Label pb='5'>Address</FormControl.Label>
-//       <Input
-//         // w={wp(70)}
-//         bg='white'
-//         onChangeText={(x) => this.setState({ address: x })}
-//         value={address}
-//       />
-//     </FormControl>
-
-//     <FormControl
-//       p={wp(3)}
-//       mt={wp(2)}
-//     >
-//       <FormControl.Label pb='5'>Phone</FormControl.Label>
-//       <Input
-//         // w={wp(70)}
-//         bg='white'
-//         onChangeText={(x) => this.setState({ phone: x })}
-//         value={phone}
-//       />
-//     </FormControl>
-
-//     <FormControl
-//       p={wp(3)}
-//       mt={wp(2)}
-//     >
-//       <FormControl.Label pb='5'>Tip</FormControl.Label>
-//       <Input
-//         // w={wp(70)}
-//         bg='white'
-//         onChangeText={(x) => this.setState({ tip: x })}
-//         value={tip}
-//       />
-//     </FormControl>
-
-//     <FormControl
-//       p={wp(3)}
-//       mt={wp(2)}
-//     >
-//       <FormControl.Label pb='5'>End Date</FormControl.Label>
-//       <Input
-//         // w={wp(70)}
-//         bg='white'
-//         onFocus={() => this.setState({ showDatePicker: true })}
-//         value={endDate}
-//       />
-//     </FormControl>
-
-//     <Button
-//       w='80%'
-//       m={wp(5)}
-//       onPress={() => console.log('Create Job')}
-//       alignSelf='center'
-//     >Create Job</Button>
-
-//     {showDatePicker && (
-//       <DateTimePicker
-//         value={new Date()}
-//         onChange={(event, date) => this.setState({ endDate: dFNS.format(date, 'yyyy-MM-dd'), showDatePicker: false })}
-//       />
-//     )}
-
-//   </ScrollView>
-// )

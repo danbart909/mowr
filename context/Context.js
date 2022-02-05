@@ -1,6 +1,7 @@
 import React from 'react';
 
 export default React.createContext({
+  app: {},
   auth: {},
   db: {},
   fire: {},
@@ -12,6 +13,7 @@ export default React.createContext({
   job: {},
   zip: '',
   geo: {},
+  results: {},
   updateContext: () => {},
   login: () => {},
   logout: () => {},
