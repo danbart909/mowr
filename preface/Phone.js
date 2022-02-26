@@ -3,6 +3,7 @@ import Context from '../context/Context.js'
 import { Box, Button, Column, Center, FormControl, Heading, Input, Modal, Spinner, Stack, Text } from 'native-base'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { doc, setDoc } from 'firebase/firestore'
+import Gradient from '../config/gradient'
 
 export default class Phone extends Component {
   constructor(props) {
@@ -55,53 +56,85 @@ export default class Phone extends Component {
 
   render() {
 
-    if (this.state.busy) {
+    let { busy, error } = this.state
+
+    if (busy) {
       return (
-        <Box
-          bg='white'
+        <Gradient
           borderWidth='5'
-          borderColor='green.500'
-          borderRadius='40'
+          borderColor='primary.1'
         >
-          <Spinner size={wp(10)} m={wp(10)} color='green.500'/>
-        </Box>
+          <Spinner size={wp(10)} m={wp(10)} color='primary.1'/>
+        </Gradient>
       )
     }
 
     return (
-      <Column
-        alignItems='center'
-        p={wp(5)}
-        space={wp(2.5)}
-        bg='gray.100'
-        borderWidth='3'
-        borderColor='green.500'
-        borderRadius='40'
-      >
+      <>
+        <Gradient
+          position='absolute'
+          h='27%'
+          w='65%'
+          borderWidth='3'
+          borderColor='primary.1'
+        />
 
-        {/* <Text fontSize={wp(5)}>Signup</Text> */}
-
-        <Heading>Enter Your Phone Number</Heading>
-
-        <FormControl>
-          <FormControl.Label pb='5'>Phone:</FormControl.Label>
-          <Input
-            type='password'
-            placeholder='XXX-XXX-XXXX'
-            keyboardType='phone-pad'
-            textContentType='telephoneNumber'
-            w={wp(50)}
-            bg='white'
-            onChangeText={(x) => this.setState({ phone: x })}
-            value={this.state.phone}
-          />
-        </FormControl>
-
-        <Button
-          onPress={() => this.setPhone()}
-        >Submit</Button>
-
-      </Column>
+        <Stack
+          h='27%'
+          w='65%'
+          alignItems='center'
+          p={wp(4)}
+        >
+  
+          <Heading
+            flex='1'
+            pt={wp(1)}
+          >Enter Your Phone Number</Heading>
+  
+          <Stack
+            flex='2'
+            justifyContent='center'
+          >
+            <Text pb={wp(1)}>Phone:</Text>
+            <Input
+              type='password'
+              placeholder='XXX-XXX-XXXX'
+              keyboardType='phone-pad'
+              textContentType='telephoneNumber'
+              w={wp(50)}
+              bg='white'
+              onChangeText={(x) => this.setState({ phone: x })}
+              value={this.state.phone}
+            />
+          </Stack>
+  
+          <Box
+            flex='2'
+            justifyContent='flex-end'
+          >
+            <Button
+              onPress={() => this.setPhone()}
+            >Submit</Button>
+          </Box>
+  
+            { error &&
+              <Box
+                h='180%'
+                position='absolute'
+                justifyContent='flex-end'
+              >
+                <Text
+                  textAlign='center'
+                  color='red.700'
+                  bg='white'
+                  p={wp(3)}
+                  borderRadius='40'
+                >An error occured. Please try again.</Text>
+              </Box>
+            }
+  
+        </Stack>
+      </>
     )
   }
 }

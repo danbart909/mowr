@@ -4,6 +4,7 @@ import { Box, Button, Flex, Text, Stack, Center, Heading } from 'native-base'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { linkWithphone, PhoneAuthProvider } from 'firebase/auth'
 import firebase from '../config/firebase'
+import Gradient from '../config/gradient'
 
 // import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 // import { faCalendarAlt, faExclamationCircle, faArrowAltCircleDown } from '@fortawesome/free-solid-svg-icons'
@@ -17,6 +18,9 @@ export default class Home extends Component {
   static contextType = Context
 
   render() {
+
+    let { font } = this.context
+
     return (
       <>
         <Center
@@ -34,9 +38,13 @@ export default class Home extends Component {
             // bg='emerald.500'
           >
             <Button onPress={() => this.context.navigation.navigate('Search Jobs')}>Search for Jobs</Button>
+
             <Button onPress={() => this.context.refresh()}>Refresh User</Button>
-            <Button onPress={() => this.context.test()}>Experiment</Button>
-            <Button onPress={() => this.context.navigation.navigate('Search Jobs 2')}>Search Jobs 2</Button>
+
+            <Button onPress={() => this.context.test()}>Science !!!</Button>
+
+            <Button onPress={() => this.context.navigation.navigate('Location')}>Test Page</Button>
+
           </Stack>
           {/* <Stack
             direction='row'

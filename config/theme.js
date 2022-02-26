@@ -10,14 +10,26 @@ export default theme = extendTheme({
       defaultProps: {
         py: wp(2),
         px: wp(3.5),
-        borderRadius: '20'
+        borderRadius: '20',
+        borderColor: 'primary.1',
+        _text: { fontSize: wp(3) }
       },
     },
     Input: {
       defaultProps: {
         py: wp(0.5),
         pl: wp(2),
-        pr: wp(1)
+        pr: wp(1),
+        borderColor: '#8f8f8f'
+      },
+      _placeholder: {
+        fontSize: wp(3)
+      }
+    },
+    Text: {
+      defaultProps: {
+        fontSize: wp(3.2),
+        // fontFamily: 'SourceSansPro'
       }
     },
     ModalHeader: {
@@ -208,7 +220,7 @@ export default theme = extendTheme({
       800: '#166534',
       900: '#14532d'
     }
-  }
+  },
 })
 
 // 50: '#16a800',

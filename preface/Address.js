@@ -1,16 +1,24 @@
 import React, { Component } from 'react'
 import Context from '../context/Context.js'
-import { Box, Button, Column, Center, FlatList, FormControl, Heading, Input, Modal, Row, ScrollView, Spinner, Stack, Text } from 'native-base'
+import { Box, Button, Column, Center, Factory, FlatList, FormControl, Heading, Input, Modal, Row, ScrollView, Spinner, Stack, Text } from 'native-base'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons'
 import { doc, setDoc } from 'firebase/firestore'
 import Constants from 'expo-constants'
 import { getCurrentPositionAsync, geocodeAsync, getForegroundPermissionsAsync } from 'expo-location'
 import Geocoder from 'react-native-geocoding'
 import MapView, { Marker } from 'react-native-maps'
 import axios from 'react-native-axios'
+import Gradient from '../config/gradient'
 
 const { civicAPIKey, mapAPIKey } = Constants.manifest.extra
 Geocoder.init(civicAPIKey)
+
+const Icon = (props) => {
+  const FAIcon = Factory(FontAwesomeIcon)
+  return <FAIcon {...props} />
+}
 
 export default class Address extends Component {
   constructor(props) {
@@ -151,13 +159,20 @@ export default class Address extends Component {
     let html = []
 
     if (this.state.busy) {
-      html = <Spinner size='lg'/>
+      html = <Spinner my={wp(1.29)} size='lg'/>
     } else {
       html = <>
         <Button
           onPress={() => this.state.address ? this.findCoordinatesUsingForm() : alert('Please Enter an Address')}
         >Save Address</Button>
         <Button
+          leftIcon={
+            <Icon
+              icon={faMapMarkerAlt}
+              color='white'
+              mr={wp(2)}
+            />
+          }
           onPress={() => this.findCoordinatesUsingGPS()}
         >Use GPS</Button>
       </>
@@ -174,173 +189,168 @@ export default class Address extends Component {
     )
   }
 
-  errorMessage = () => {
+  errorMessageOrButton = () => {
+    let { user } = this.context
     let { error } = this.state
     let html = []
 
     if (error === 0) {
-      html = <></>
+      html = <Button
+      variant={user.address ? 'solid' : 'disabled'}
+      bg={user.address ? 'primary.1' : 'white'}
+      mt={wp(2)}
+      w={wp(60)}
+      borderWidth={user.address ? null : '1'}
+      onPress={() => user.address ? this.finish() : alert('Please Enter an Address')}
+    >
+      <Text color={user.address ? 'white' : 'coolGray.400'} >
+        Continue to Mowr Homepage
+      </Text>
+    </Button>
     } if (error === 1) {
-      html = <Center mb={wp(3)}><Text color='error.700'>Error Saving Address to Profile, Please Try Again</Text></Center>
+      html = <Center mt={wp(4)} mb={wp(2)}><Text color='error.700'>Error Saving Address to Profile, Please Try Again</Text></Center>
     } if (error === 2) {
-      html = <Center mb={wp(3)}><Text color='error.700'>No Address Received From Server, Please Try Again</Text></Center>
+      html = <Center mt={wp(4)} mb={wp(2)}><Text color='error.700'>No Address Received From Server, Please Try Again</Text></Center>
     } if (error === 3) {
-      html = <Center mb={wp(3)}><Text color='error.700'>Please Grant Location Permissions to Mowr to Proceed</Text></Center>
+      html = <Center mt={wp(4)} mb={wp(2)}><Text color='error.700'>Please Grant Location Permissions to Mowr to Proceed</Text></Center>
     } if (error === 4) {
-      html = <Center mb={wp(3)}><Text color='error.700'>Address Not Recognized or Another Error Occurred</Text></Center>
+      html = <Center mt={wp(4)} mb={wp(2)}><Text color='error.700'>Address Not Recognized or Another Error Occurred</Text></Center>
     }
 
     return html
   }
 
   finish = async () => {
-    this.props.setView('Login')
+    await this.props.setView('Login')
     this.context.navigation.navigate('Home')
   }
 
   render() {
 
     let { user } = this.context
-    let { address, autoResults, autoShow, busy, error, latitude, longitude } = this.state
+    let { address, autoResults, autoShow, latitude, longitude } = this.state
 
     return (
-      <Column
-        alignItems='center'
-        w='85%'
-        h='90%'
-        bg='gray.100'
-        borderWidth='3'
-        borderColor='green.500'
-        borderRadius='40'
-      >
+      <>
+        <Gradient
+          position='absolute'
+          h='90%'
+          w='85%'
+          borderWidth='3'
+          borderColor='primary.1'
+        />
 
         <Stack
-          px={wp(3)}
-          space={wp(3)}
-          mb={wp(5)}
-          // borderWidth='1'
+          h='90%'
+          w='85%'
+          alignItems='center'
         >
-
-          <Heading pt={wp(5)} textAlign='center'>Enter Your Address</Heading>
-
-          <Row
-            // w='100%'
-            justifyContent='space-between'
-            alignItems='flex-start'
+  
+          <Stack
+            px={wp(3)}
+            space={wp(3)}
+            mb={wp(5)}
             // borderWidth='1'
           >
-            <Box flex='3'>
-              <Text>Your saved address:</Text>
-            </Box>
-            <Box flex='7'>
-              <Text textAlign='right'>{user.address ? user.address : 'No Address Saved'}</Text>
-            </Box>
-          </Row>
-
-            <Box>
-              <Text pb='5'>Address:</Text>
-              <Input
-                w={wp(78)}
-                bg='white'
-                alignSelf='center'
-                onChangeText={(x) => this.changeInputByTyping(x)}
-                value={address}
+  
+            <Heading pt={wp(5)} textAlign='center'>Enter Your Address</Heading>
+  
+            <Row
+              // w='100%'
+              justifyContent='space-between'
+              alignItems='flex-start'
+              // borderWidth='1'
+            >
+              <Box flex='4'>
+                <Text>Your saved address:</Text>
+              </Box>
+              <Box flex='7'>
+                <Text textAlign='right'>{user.address ? user.address.replace(/([,][\s])/, `\n`) : 'No Address Saved'}</Text>
+              </Box>
+            </Row>
+  
+              <Box>
+                <Text pb={wp(1)}>Address:</Text>
+                <Input
+                  w={wp(78)}
+                  bg='white'
+                  alignSelf='center'
+                  onChangeText={(x) => this.changeInputByTyping(x)}
+                  value={address}
+                />
+              </Box>
+  
+            {this.buttons()}
+  
+            <Center>
+              {this.errorMessageOrButton()}
+            </Center>
+  
+          </Stack>
+  
+          <ScrollView>
+            <MapView
+              style={{ height: hp(42), width: wp(84) }}
+              scrollEnabled={false}
+              // loadingEnabled
+              region={{
+                latitude: latitude,
+                longitude: longitude,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
+              }}
+            >
+              <Marker
+                coordinate={{ latitude: latitude, longitude: longitude }}
               />
-            </Box>
-
-          {this.buttons()}
-
-          {this.errorMessage()}
-
-          <Button
-            variant={latitude ? 'solid' : 'disabled'}
-            onPress={() => latitude ? this.finish() : alert('Please Enter an Address')}
-            mt={wp(-2)}
-            w={wp(40)}
-            alignSelf='center'
-            borderWidth={address ? null : '1'}
-          >Continue to Mowr Homepage</Button>
-
-        </Stack>
-
-        <ScrollView>
-          <MapView
-            style={{ paddingTop: wp(20), height: hp(42), width: wp(80) }}
-            scrollEnabled={false}
-            // loadingEnabled
-            region={{
-              latitude: latitude,
-              longitude: longitude,
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
-            }}
-          >
-            <Marker
-              coordinate={{ latitude: latitude, longitude: longitude }}
-            />
-          </MapView>
-        </ScrollView>
-
-        { autoShow &&
-        <Box
-          position='absolute'
-          h={hp(100)}
-          w={wp(100)}
-          mt={wp(-7)}
-          bg='white'
-          zIndex='10'
-          borderWidth='3'
-          onStartShouldSetResponder={() => this.setState({ autoShow: false })}
-        >
+            </MapView>
+          </ScrollView>
+  
+          { autoShow &&
           <Box
             position='absolute'
-            top={wp(40)}
-            left={wp(11)}
-            w={wp(70)}
-            h='auto'
-            bg='white'
-            // borderWidth='1'
-            zIndex='10'
+            h={hp(100)}
+            w={wp(100)}
+            mt={wp(-7)}
+            zIndex='5'
+            onStartShouldSetResponder={() => this.setState({ autoShow: false })}
           >
-            <FlatList
-              data={autoResults}
-              keyExtractor={y => y}
-              renderItem={x => {
-                return (
-                  <Box
-                    w='100%'
-                    p='10'
-                    borderBottomColor='gray.400'
-                    borderBottomWidth='1'
-                  >
-                    <Text
+            <Box
+              position='absolute'
+              top={user.address ? hp(24.5) : hp(22)}
+              left={wp(11)}
+              w={wp(70)}
+              h='auto'
+              bg='white'
+              // borderWidth='1'
+              zIndex='10'
+            >
+              <FlatList
+                data={autoResults}
+                keyExtractor={y => y}
+                renderItem={x => {
+                  return (
+                    <Box
                       w='100%'
-                      onPress={() => this.changeInputByPressing(x.item)}
+                      p='10'
+                      borderBottomColor='gray.400'
+                      borderBottomWidth='1'
                     >
-                      {x.item}
-                    </Text>
-                  </Box>
-                )
-              }}
-            />
-          </Box>
-        </Box> }
-
-        {/* <FormControl>
-          <FormControl.Label pb='5'>Address:</FormControl.Label>
-          <Input
-            w={wp(50)}
-            bg='white'
-            onChangeText={(x) => this.setState({ address: x })}
-            value={this.state.address}
-          />
-        </FormControl>
-
-        <Button
-          onPress={() => this.setAddress()}
-        >Submit</Button> */}
-
-      </Column>
+                      <Text
+                        w='100%'
+                        onPress={() => this.changeInputByPressing(x.item)}
+                      >
+                        {x.item}
+                      </Text>
+                    </Box>
+                  )
+                }}
+              />
+            </Box>
+          </Box> }
+  
+        </Stack>
+      </>
     )
   }
 }

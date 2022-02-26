@@ -1,20 +1,23 @@
 import React, { Component } from 'react'
 import Context from '../context/Context.js'
-import { Box, Button, Center, Factory, FlatList, FormControl, Heading, Input, Row, ScrollView, Spinner, Stack, Text } from 'native-base'
+import { Box, Button, Center, Factory, FlatList, Heading, Input, Row, ScrollView, Spinner, Stack, Text } from 'native-base'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons'
 import { doc, setDoc } from 'firebase/firestore'
 import Constants from 'expo-constants'
 import { getCurrentPositionAsync, geocodeAsync, getForegroundPermissionsAsync } from 'expo-location'
 import Geocoder from 'react-native-geocoding'
 import MapView, { Marker } from 'react-native-maps'
 import axios from 'react-native-axios'
+import Gradient from '../config/gradient'
 
 const { civicAPIKey, mapAPIKey } = Constants.manifest.extra
 Geocoder.init(civicAPIKey)
 
-const AutoCompleteInput = () => {
-  const FactoryAutoCompleteInput = Factory()
-  return <FactoryAutoCompleteInput />
+const Icon = (props) => {
+  const FAIcon = Factory(FontAwesomeIcon)
+  return <FAIcon {...props} />
 }
 
 export default class Location extends Component {
@@ -162,13 +165,20 @@ export default class Location extends Component {
     let html = []
 
     if (this.state.busy) {
-      html = <Spinner size='lg'/>
+      html = <Spinner my={wp(1.29)} size='lg'/>
     } else {
       html = <>
         <Button
-          onPress={() => this.findCoordinatesUsingForm()}
-        >Submit Form</Button>
+          onPress={() => this.state.address ? this.findCoordinatesUsingForm() : alert('Please Enter an Address')}
+        >Save Address</Button>
         <Button
+          leftIcon={
+            <Icon
+              icon={faMapMarkerAlt}
+              color='white'
+              mr={wp(2)}
+            />
+          }
           onPress={() => this.findCoordinatesUsingGPS()}
         >Use GPS</Button>
       </>
@@ -181,7 +191,7 @@ export default class Location extends Component {
         justifyContent='space-evenly'
         alignItems='center'
       >
-        {html}
+        { html }
       </Row>
     )
   }
@@ -190,52 +200,74 @@ export default class Location extends Component {
     let { error } = this.state
     let html = []
 
-    if (error === 0) {
-      html = <></>
-    } if (error === 1) {
-      html = <Center mb={wp(3)}><Text color='error.700'>Error Saving Address to Profile, Please Try Again</Text></Center>
-    } if (error === 2) {
-      html = <Center mb={wp(3)}><Text color='error.700'>Error Communicating with Server, Please Try Again</Text></Center>
-    } if (error === 3) {
-      html = <Center mb={wp(3)}><Text color='error.700'>Please Grant Location Permissions to Mowr to Proceed</Text></Center>
-    } if (error === 4) {
-      html = <Center mb={wp(3)}><Text color='error.700'>Address Not Recognized or Another Error Occurred</Text></Center>
-    }
+    error === 1 ? html = <Text color='error.700'>Error Saving Address to Profile, Please Try Again</Text> :
+    error === 2 ? html = <Text color='error.700'>Error Communicating with Server, Please Try Again</Text> :
+    error === 3 ? html = <Text color='error.700'>Please Grant Location Permissions to Mowr to Proceed</Text> :
+    error === 4 ? html = <Text color='error.700'>Address Not Recognized or Another Error Occurred</Text> : <></>
 
-    return html
+    if (error === 0) {
+      return <></>
+    } else {
+      return (
+        <Gradient
+          position='absolute'
+          h='8%'
+          w='100%'
+          mt={hp(29)}
+          alignSelf='center'
+          justifyContent='center'
+          alignItems='center'
+          borderWidth='3'
+          borderColor='primary.1'
+        >
+          {html}
+        </Gradient>
+      )
+    }
   }
 
   render() {
 
     let { user } = this.context
-    let { address, autoResults, autoShow, busy, error, latitude, longitude } = this.state
+    let { address, autoResults, autoShow, latitude, longitude } = this.state
 
     return (
       <>
-        <Stack
-          my={wp(3)}
-          px={wp(5)}
-          space={wp(3)}
-          mb={wp(3)}
+        <Box
+          flex='1'
+          p={wp(5)}
+          bg='primary.1'
         >
-
+          <Gradient
+            position='absolute'
+            h='27%'
+            w='105%'
+            mt={wp(5)}
+            left={wp(3)}
+            borderWidth='3'
+            borderColor='primary.1'
+          />
+  
           <Row
             w='100%'
+            mt={wp(4)}
+            px={wp(4)}
+            pb={wp(3)}
             justifyContent='space-between'
             alignItems='flex-start'
           >
-            <Box flex='3'>
+            <Box flex='4'>
               <Text>Your saved address:</Text>
             </Box>
             <Box flex='7'>
-              <Text textAlign='right'>{user.address ? user.address : 'No Address Saved'}</Text>
+              <Text textAlign='right'>{user.address ? user.address.replace(/([,][\s])/, `\n`) : 'No Address Saved'}</Text>
             </Box>
           </Row>
 
           <Box>
-            <Text pb='5'>Address:</Text>
+            <Text pb={wp(1)} px={wp(4)}>Address:</Text>
             <Input
-              w={wp(90)}
+              w={wp(80)}
               bg='white'
               alignSelf='center'
               onChangeText={(x) => this.changeInputByTyping(x)}
@@ -246,26 +278,25 @@ export default class Location extends Component {
           {this.buttons()}
 
           {this.errorMessage()}
-
-        </Stack>
-
-        <ScrollView>
-          <MapView
-            style={{ height: wp(75), width: '100%' }}
-            scrollEnabled={false}
-            // loadingEnabled
-            region={{
-              latitude: latitude,
-              longitude: longitude,
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
-            }}
-          >
-            <Marker
-              coordinate={{ latitude: latitude, longitude: longitude }}
-            />
-          </MapView>
-        </ScrollView>
+    
+          <ScrollView mt={wp(25)}>
+            <MapView
+              style={{ height: wp(75), width: '100%' }}
+              scrollEnabled={false}
+              // loadingEnabled
+              region={{
+                latitude: latitude,
+                longitude: longitude,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
+              }}
+            >
+              <Marker
+                coordinate={{ latitude: latitude, longitude: longitude }}
+              />
+            </MapView>
+          </ScrollView>
+        </Box>
 
         { autoShow &&
         <Box
@@ -274,13 +305,13 @@ export default class Location extends Component {
           h={hp(100)}
           w={wp(100)}
           zIndex='5'
-          borderWidth='1'
+          // borderWidth='1'
           onStartShouldSetResponder={() => this.setState({ autoShow: false })}
         >
           <Box
             position='absolute'
-            top={wp(20)}
-            left={wp(5)}
+            top={wp(33)}
+            left={wp(10)}
             w={wp(80)}
             h='auto'
             bg='white'

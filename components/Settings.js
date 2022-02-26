@@ -1,5 +1,6 @@
 import React from 'react'
 import { Box, Text, Link, Stack, Switch, Center, Heading, Code, useColorMode } from "native-base"
+import Gradient from '../config/gradient'
 
 function ToggleDarkMode() {
   const { colorMode, toggleColorMode } = useColorMode()

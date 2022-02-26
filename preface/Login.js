@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import Context from '../context/Context.js'
-import { Box, Button, Center, Column, FormControl, Heading, Input, Spinner, Row, Stack, Text } from 'native-base'
-import { ActivityIndicator, ScrollView } from 'react-native'
+import { Box, Button, Center, Column, FormControl, Heading, Input, Spinner, Row, ScrollView, Stack, Text } from 'native-base'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
+import Gradient from '../config/gradient'
 
 export default class Login extends Component {
   constructor(props) {
@@ -10,7 +10,7 @@ export default class Login extends Component {
     this.state = {
       email: '',
       password: '',
-      isLoading: false,
+      busy: false,
       error: false
     }
   }
@@ -22,97 +22,140 @@ export default class Login extends Component {
     if (email === '' && password === '') {
       Alert.alert('Enter details to login!')
     } else {
-      this.setState({ isLoading: true })
+      this.setState({ busy: true })
       this.context.login(email, password)
-        .then(() => this.setState({ isLoading: false, error: false }, () => this.context.navigation.navigate('Home')))
-        .catch(e => this.setState({ isLoading: false, error: true }, () => console.log('error logging in', e)))
+        .then(() => this.setState({ busy: false, error: false }, () => this.context.navigation.navigate('Home')))
+        .catch(e => this.setState({ busy: false, error: true }, () => console.log('error logging in', e)))
     }
   }
 
   render() {
 
-    let { email, password, isLoading, error } = this.state
+    let { email, password, busy, error } = this.state
 
-    if (isLoading) {
+    if (busy) {
       return (
-        <Box
-          bg='white'
+        <Gradient
           borderWidth='5'
-          borderColor='green.500'
-          borderRadius='40'
+          borderColor='primary.1'
         >
-          <Spinner size={wp(10)} m={wp(10)} color='green.500'/>
-        </Box>
+          <Spinner size={wp(10)} m={wp(10)} color='primary.1'/>
+        </Gradient>
       )
     }
 
     return (
-      <Column
-        alignItems='center'
-        p={wp(5)}
-        space={wp(2.5)}
-        bg='gray.100'
-        borderWidth='3'
-        borderColor='green.500'
-        borderRadius='40'
-      >
-
-        {/* <Text fontSize={wp(5)}>Log In</Text> */}
-
-        <Heading>Log In</Heading>
-
-        <FormControl>
-          <FormControl.Label pb='5'>Email</FormControl.Label>
-          <Input
-            // placeholder='Email'
-            w={wp(50)}
-            bg='white'
-            onChangeText={(x) => this.setState({ email: x })}
-            value={email}
-          />
-        </FormControl>
-
-        <FormControl>
-          <FormControl.Label pb='5'>Password</FormControl.Label>
-          <Input
-            // placeholder='Password'
-            type='password'
-            w={wp(50)}
-            bg='white'
-            onChangeText={(x) => this.setState({ password: x })}
-            value={password}
-          />
-        </FormControl>
-
-        <Text
-          bold
-          underline
-          // color='green.600'
-          fontSize='10'
-          alignSelf='flex-end'
+      <>
+        <Gradient
+          position='absolute'
+          h='55%'
+          w='65%'
+          borderWidth='3'
+          borderColor='primary.1'
+        />
+  
+        <Stack
+          h='55%'
+          w='65%'
+          alignItems='center'
+          p={wp(4)}
         >
-          Forgot Password?
-        </Text>
-
-        <Button
-          onPress={() => this.loginUser()}
-        >Log In</Button>
-
-        <Text>
-          Don't have an account?
-        </Text>
-
-        <Text
-          bold
-          underline
-          color='green.600'
-          onPress={() => this.props.setView('Signup')}
-          // onPress={() => this.props.setView('Address')}
-        >
-          Press Here to Sign Up
-        </Text>
-
-      </Column>
+  
+          <Heading
+            flex='1'
+            pt={wp(3)}
+          >Log In</Heading>
+  
+          <Box
+            flex='3'
+          >
+            <Stack
+              flex='1'
+              justifyContent='center'
+            >
+              <Text pb={wp(1)}>Email</Text>
+              <Input
+                // placeholder='Email'
+                w={wp(50)}
+                bg='white'
+                onChangeText={(x) => this.setState({ email: x })}
+                value={email}
+              />
+            </Stack>
+    
+            <Stack
+              flex='1'
+              justifyContent='center'
+            >
+              <Text pb={wp(1)}>Password</Text>
+              <Input
+                // placeholder='Password'
+                type='password'
+                w={wp(50)}
+                bg='white'
+                onChangeText={(x) => this.setState({ password: x })}
+                value={password}
+              />
+            </Stack>
+          </Box>
+  
+          <Box
+            flex='2'
+            w='100%'
+            justifyContent='space-between'
+          >
+            <Text
+              bold
+              underline
+              fontSize={wp(2.5)}
+              alignSelf='flex-end'
+            >
+              Forgot Password?
+            </Text>
+    
+            <Button
+              w={wp(20)}
+              alignSelf='center'
+              onPress={() => this.loginUser()}
+            >Log In</Button>
+          </Box>
+  
+          <Box
+            flex='2'
+            justifyContent='flex-end'
+          >
+            <Text pb={wp(1)}>
+              Don't have an account?
+            </Text>
+    
+            <Text
+              bold
+              underline
+              color='primary.1'
+              onPress={() => this.props.setView('Signup')}
+              // onPress={() => this.props.setView('Address')}
+            >
+              Press Here to Sign Up
+            </Text>
+          </Box>
+  
+        </Stack>
+        { error &&
+          <Box
+            h='80%'
+            position='absolute'
+            justifyContent='flex-end'
+          >
+            <Text
+              textAlign='center'
+              color='red.700'
+              bg='white'
+              p={wp(3)}
+              borderRadius='40'
+            >An error occured. Please try again.</Text>
+          </Box>
+        }
+      </>
     )
   }
 }

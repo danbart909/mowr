@@ -1,13 +1,13 @@
 import React, { Component } from 'react'
 // import { Alert, Animated, LayoutAnimation } from 'react-native';
 import Context from './Context.js'
-// import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 // import AsyncStorage from '@react-native-async-storage/async-storage'
 import Constants from 'expo-constants';
 import * as SplashScreen from 'expo-splash-screen';
 import { signOut, signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth'
 import { collection, doc, setDoc, addDoc, getDoc, getDocs, query, where, orderBy, limit, Timestamp } from 'firebase/firestore'
-import { format, parseISO, formatISO, addHours, isPast, addSeconds, addMinutes, compareAsc } from "date-fns";
+import { format, parseISO, parse, lightFormat, formatISO, addHours, isPast, addSeconds, addMinutes, compareAsc, toDate } from "date-fns";
 import Geocoder from 'react-native-geocoding'
 // import { getDistance } from 'geolib';
 // import axios from 'react-native-axios'
@@ -23,6 +23,22 @@ export default class GlobalState extends Component {
       user: {},
       userJobs: [],
       jobSearchResults: [],
+      jobWindow: {
+        id: '',
+        userId: '',
+        userName: '',
+        title: '',
+        type: '',
+        description: '',
+        address: '',
+        creationDate: new Date(),
+        endDate: new Date(),
+        email: '',
+        latitude: 0,
+        longitude: 0,
+        tip: 0,
+        phone: ''
+      },
       job: {
         id: '',
         userId: '',
@@ -47,6 +63,11 @@ export default class GlobalState extends Component {
       results: {
         lat: [],
         lng: []
+      },
+      pagination: {
+        current: 0,
+        visibleJobs: [],
+        pages: []
       }
     }
   }
@@ -121,10 +142,14 @@ export default class GlobalState extends Component {
     let { uid } = user
     let state = this.state
     let refreshedJob = {}
+    let jobID = state.job.id
+
+    console.log('refreshUserJobs')
 
     if (state.job.id !== '') {
       refreshedJob = await getDoc(doc(fire, 'jobs', state.job.id))
       state.job = refreshedJob.data()
+      state.job.id = jobID
     }
 
     const rawUserJobs = await getDocs(query(collection(fire, 'jobs'), where('userId', '==', uid)))
@@ -155,6 +180,22 @@ export default class GlobalState extends Component {
         user: {},
         userJobs: [],
         jobSearchResults: {},
+        jobWindow: {
+          id: '',
+          userId: '',
+          userName: '',
+          title: '',
+          type: '',
+          description: '',
+          address: '',
+          creationDate: new Date(),
+          endDate: new Date(),
+          email: '',
+          latitude: 0,
+          longitude: 0,
+          tip: 0,
+          phone: ''
+        },
         job: {
           id: '',
           userId: '',
@@ -175,6 +216,15 @@ export default class GlobalState extends Component {
         geo: {
           latitude: 0,
           longitude: 0
+        },
+        results: {
+          lat: [],
+          lng: []
+        },
+        pagination: {
+          current: 0,
+          visibleJobs: [],
+          pages: []
         }
       })
       console.log('memory cleared')
@@ -183,14 +233,11 @@ export default class GlobalState extends Component {
   }
 
   test = async () => {
-    // let { app, auth, fire } = this.props
-    // let { user, jobSearchResults, geo, job } = this.state
+    let { app, auth, fire } = this.props
+    let { user, jobSearchResults, geo, job } = this.state
 
-    // this.props.navigation.navigate('Preface')
-    // let i1 = '55.5555'
-    // let i2 = parseFloat(i1).toFixed(2)
-
-    // console.log(i2)
+    console.log(wp(3))
+    this.props.navigation.navigate('Preface')
   }
   
   render() {
@@ -206,10 +253,12 @@ export default class GlobalState extends Component {
           user: this.state.user,
           userJobs: this.state.userJobs,
           jobSearchResults: this.state.jobSearchResults,
+          jobWindow: this.state.jobWindow,
           job: this.state.job,
           zip: this.state.zip,
           geo: this.state.geo,
           results: this.state.results,
+          pagination: this.state.pagination,
           updateContext: this.updateContext,
           login: this.login,
           logout: this.logout,

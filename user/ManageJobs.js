@@ -4,6 +4,8 @@ import { Box, Button, Center, FlatList, Flex, Heading, Row, ScrollView, Spinner,
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faArrowUp } from '@fortawesome/free-solid-svg-icons'
+import { format } from 'date-fns'
+import Gradient from '../config/gradient'
 
 export default class ManageJobs extends Component {
   constructor(props) {
@@ -21,6 +23,7 @@ export default class ManageJobs extends Component {
   }
 
   checkForJobs = async () => {
+    console.log('ManageJobs - checkForJobs')
     this.setState({ busy: true, error: false })
     await this.context.refreshUserJobs()
       .then(() => this.setState({ busy: false }))
@@ -69,130 +72,81 @@ export default class ManageJobs extends Component {
     return (
       <FlatList
         data={userJobs}
-        keyExtractor={item => item.uid}
+        keyExtractor={item => item.id}
         ref='list'
         // refreshing={false}
         // onRefresh={() => this.checkForJobs()}
         renderItem={({item, index}) => (
-          <Stack
-            m={wp(5)}
-            bg='white'
-            borderRadius='40'
-            // borderWidth='1'
+          <Gradient
+            m={wp(4)}
+            px={wp(4)}
           >
-            <Row
-              // justifyContent='space-between'
-              alignItems='flex-start'
-              p={wp(2)}
-              // borderBottomWidth='1'
-            >
-              <Center
-                // flex='2'
-                py={wp(1)}
-                px={wp(2)}
-                borderWidth='1'
-                borderRadius='40'
-                bg='primary.1'
-                // bg='primary.101'
-              >
-                <Text fontSize={wp(6)} color='white'>#{index+1}</Text>
+            <Row alignItems='flex-start' pt={wp(2)}>
+              <Center>
+                <Text fontSize={wp(6)}>#{index+1}</Text>
               </Center>
               <Box
                 flex='1'
-                py={wp(1)}
-                px={wp(3)}
-                // borderWidth='1'
+                pt={wp(1)}
+                pb={wp(2)}
+                px={wp(2)}
               >
-                <Text fontSize={wp(3.5)} borderBottomWidth='1'>{item.title}</Text>
+                <Text fontSize={wp(3.5)} noOfLines={2}>{item.title}</Text>
               </Box>
-              <Center
-                // flex='2'
-                p={wp(1)}
-                borderWidth='1'
-                borderRadius='40'
-                bg='primary.1'
-                // bg='primary.101'
-              >
-                <Text fontSize={wp(4)} textAlign='right' color='white'>${item.tip}</Text>
+              <Center py={wp(1)}>
+                <Text
+                  fontSize={wp(4)}
+                  textAlign='right'
+                >${item.tip}</Text>
               </Center>
             </Row>
 
-            <Row
-              justifyContent='space-between'
-              px={wp(2)}
-            >
+            <Box py={wp(5)}>
+              <Text noOfLines={6}>{item.description}</Text>
+            </Box>
+
+            <Row justifyContent='space-between'>
               <Box
-                // flex='1'
                 w={wp(42)}
-                px={wp(1.5)}
-                py={wp(2)}
-                borderRadius='20'
                 alignItems='flex-start'
-                bg='primary.101'
-                borderWidth='1'
               >
                 <Text
                   pb={wp(1)}
-                  color='white'
-                  borderBottomColor='white'
                   borderBottomWidth='1'
                 >Creation Date</Text>
                 <Text
                   pt={wp(1)}
-                  lineHeight={wp(3.2)}
-                  color='white'
-                >{item.creationDate.replace(' at', '\nat')}</Text>
+                  lineHeight={wp(3.5)}
+                >{format(new Date(item.creationDate.seconds*1000), 'E, PP')}</Text>
               </Box>
               <Box
-                // flex='1'
                 w={wp(42)}
-                px={wp(1.5)}
-                py={wp(2)}
-                borderRadius='20'
                 alignItems='flex-end'
-                bg='primary.101'
-                borderWidth='1'
               >
                 <Text
                   pb={wp(1)}
-                  color='white'
-                  borderBottomColor='white'
-                  borderBottomWidth='1'
+                  borderBottomWidth='1'                
                 >Deadline</Text>
                 <Text
                   pt={wp(1)}
                   textAlign='right'
-                  lineHeight={wp(3.2)}
-                  color='white'
-                >{item.endDate.replace(' at', '\nat')}</Text>
+                  lineHeight={wp(3.5)}
+                >{format(new Date(item.endDate.seconds*1000), 'E, PPp')}</Text>
               </Box>
             </Row>
 
             <Center>
               <Button
-                my={wp(1.5)}
+                my={wp(5)}
                 onPress={() => this.viewJob(item)}
               >VIEW JOB</Button>
             </Center>
             
-          </Stack>
+          </Gradient>
         )}
       />
     )
   }
-
-  // renderPage = () => {
-  //   let { busy, error } = this.state
-
-  //   if (error) {
-  //     return <Center>
-  //       <Text>An error occurred, please press the button below to retry.</Text>
-  //       <Button
-  //         onPress={() => }
-  //       >Retry</Button>
-  //     </Center>
-  //   }
-  // }
 
   render() {
     return (
@@ -200,7 +154,7 @@ export default class ManageJobs extends Component {
 
         {this.renderList()}
 
-        { this.context.userJobs.length >= 4 && <Button
+        { this.context.userJobs.length >= 3 && <Button
           position='absolute'
           justifyContent='center'
           alignItems='center'

@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
 import Context from '../context/Context.js'
 import { Box, Button, Center, Column, FormControl, Heading, Input, Spinner, Row, Stack, Text } from 'native-base'
-import { ActivityIndicator } from 'react-native'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
 import { collection, doc, setDoc, addDoc, Timestamp } from 'firebase/firestore'
+import Gradient from '../config/gradient'
 
 export default class Signup extends Component {
   constructor(props) {
@@ -14,7 +14,7 @@ export default class Signup extends Component {
       email: '',
       password: '',
       passwordConfirm: '',
-      isLoading: false,
+      busy: false,
       error: false
     }
   }
@@ -29,7 +29,7 @@ export default class Signup extends Component {
     } else if (this.state.password !== this.state.passwordConfirm) {
       alert("Passwords don't match!")
     } else {
-      this.setState({ isLoading: true })
+      this.setState({ busy: true })
       createUserWithEmailAndPassword(auth, email, password)
         .then(async x => {
           console.log('User registered successfully!', x)
@@ -38,11 +38,11 @@ export default class Signup extends Component {
             .then(async () => {
               await this.createMirror()
               await this.context.refresh()
-              this.setState({ isLoading: false, error: false }, () => this.props.setView('Phone'))
+              this.setState({ busy: false, error: false }, () => this.props.setView('Phone'))
             })
-            .catch(e => this.setState({ isLoading: false, error: true }, () => console.log('error updating during registration', e)))
+            .catch(e => this.setState({ busy: false, error: true }, () => console.log('error updating during registration', e)))
         })
-        .catch(e => this.setState({ isLoading: false, error: true }, () => console.log('registration error', e)))
+        .catch(e => this.setState({ busy: false, error: true }, () => console.log('registration error', e)))
     }
   }
 
@@ -66,100 +66,146 @@ export default class Signup extends Component {
 
   render() {
 
-    let { displayName, email, password, passwordComfirm, isLoading, error } = this.state
+    let { displayName, email, password, passwordComfirm, busy, error } = this.state
 
-    if (isLoading) {
+    if (busy) {
       return (
-        <Box
-          bg='white'
+        <Gradient
           borderWidth='5'
-          borderColor='green.500'
-          borderRadius='40'
+          borderColor='primary.1'
         >
-          <Spinner size={wp(10)} m={wp(10)} color='green.500'/>
-        </Box>
+          <Spinner size={wp(10)} m={wp(10)} color='primary.1'/>
+        </Gradient>
       )
     }
 
     return (
-      <Column
-        alignItems='center'
-        p={wp(5)}
-        space={wp(2.5)}
-        bg='gray.100'
-        borderWidth='3'
-        borderColor='green.500'
-        borderRadius='40'
-      >
+      <>
+        <Gradient
+          position='absolute'
+          h='60%'
+          w='65%'
+          borderWidth='3'
+          borderColor='primary.1'
+        />
 
-        {/* <Text fontSize={wp(5)}>Signup</Text> */}
-
-        <Heading>Signup</Heading>
-
-        <FormControl>
-          <FormControl.Label pb='5'>Name</FormControl.Label>
-          <Input
-            // placeholder='Name'
-            w={wp(50)}
-            bg='white'
-            onChangeText={(x) => this.setState({ displayName: x })}
-            value={displayName}
-          />
-        </FormControl>
-
-        <FormControl>
-          <FormControl.Label pb='5'>Email</FormControl.Label>
-          <Input
-            // placeholder='Email'
-            w={wp(50)}
-            bg='white'
-            onChangeText={(x) => this.setState({ email: x })}
-            value={email}
-          />
-        </FormControl>
-
-        <FormControl>
-          <FormControl.Label pb='5'>Password</FormControl.Label>
-          <Input
-            // placeholder='Password'
-            type='password'
-            w={wp(50)}
-            bg='white'
-            onChangeText={(x) => this.setState({ password: x })}
-            value={password}
-          />
-        </FormControl>
-
-        <FormControl>
-          <FormControl.Label pb='5'>Confirm Password</FormControl.Label>
-          <Input
-            // placeholder='Confirm Password'
-            type='password'
-            w={wp(50)}
-            bg='white'
-            onChangeText={(x) => this.setState({ passwordConfirm: x })}
-            value={passwordComfirm}
-          />
-        </FormControl>
-
-        <Button
-          onPress={() => this.registerUser()}
-        >Sign Up</Button>
-
-        <Text>
-          Already have an account?
-        </Text>
-
-        <Text
-          bold
-          underline
-          color='green.600'
-          onPress={() => this.props.setView('Login')}
+        <Stack
+          h='60%'
+          w='65%'
+          alignItems='center'
+          p={wp(4)}
+          // space={wp(2.5)}
         >
-          Press Here to Login
-        </Text>
-
-      </Column>
+    
+          <Heading
+            flex='1'
+            pt={wp(1)}
+          >Signup</Heading>
+  
+          <Stack
+            flex='2'
+            justifyContent='center'
+          >
+            <Text pb={wp(1)}>Name</Text>
+            <Input
+              // placeholder='Name'
+              w={wp(50)}
+              bg='white'
+              onChangeText={(x) => this.setState({ displayName: x })}
+              value={displayName}
+            />
+          </Stack>
+  
+          <Stack
+            flex='2'
+            justifyContent='center'
+          >
+            <Text pb={wp(1)}>Email</Text>
+            <Input
+              // placeholder='Email'
+              w={wp(50)}
+              bg='white'
+              onChangeText={(x) => this.setState({ email: x })}
+              value={email}
+            />
+          </Stack>
+  
+          <Stack
+            flex='2'
+            justifyContent='center'
+          >
+            <Text pb={wp(1)}>Password</Text>
+            <Input
+              // placeholder='Password'
+              type='password'
+              w={wp(50)}
+              bg='white'
+              onChangeText={(x) => this.setState({ password: x })}
+              value={password}
+            />
+          </Stack>
+  
+          <Stack
+            flex='2'
+            justifyContent='center'
+          >
+            <Text pb={wp(1)}>Confirm Password</Text>
+            <Input
+              // placeholder='Confirm Password'
+              type='password'
+              w={wp(50)}
+              bg='white'
+              onChangeText={(x) => this.setState({ passwordConfirm: x })}
+              value={passwordComfirm}
+            />
+          </Stack>
+  
+          <Box
+            flex='2'
+            justifyContent='flex-end'
+          >
+            <Button
+              onPress={() => this.registerUser()}
+            >Sign Up</Button>
+          </Box>
+  
+          <Stack
+            flex='2'
+            justifyContent='flex-end'
+            alignItems='center'
+          >
+            <Text pb={wp(1)}>
+              Already have an account?
+            </Text>
+    
+            <Text
+              bold
+              underline
+              color='green.600'
+              onPress={() => this.props.setView('Login')}
+            >
+              Press Here to Login
+            </Text>
+          </Stack>
+  
+          { error &&
+            <Box
+              h='130%'
+              position='absolute'
+              justifyContent='flex-end'
+            >
+              <Text
+                textAlign='center'
+                color='red.700'
+                bg='white'
+                p={wp(3)}
+                borderRadius='40'
+              >An error occured. Please try again.</Text>
+            </Box>
+          }
+  
+        </Stack>
+      </>
     )
   }
 }

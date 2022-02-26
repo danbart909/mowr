@@ -1,10 +1,11 @@
-import * as dFNS from 'date-fns'
-import { Box, Button, Center, FormControl, Heading, Input, Modal, TextArea, ScrollView, Spinner, Stack, Text } from 'native-base'
+import { format } from 'date-fns'
+import { Box, Button, Center, FormControl, Heading, Input, Modal, TextArea, Row, ScrollView, Spinner, Stack, Text } from 'native-base'
 import React, { Component } from 'react'
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import Context from '../context/Context.js'
 import { collection, doc, setDoc, addDoc, getDoc, getDocs, query, where, orderBy, limit, deleteDoc } from 'firebase/firestore'
+import Gradient from '../config/gradient'
 
 export default class UserJobView extends Component {
   constructor(props) {
@@ -24,21 +25,14 @@ export default class UserJobView extends Component {
       descShow: false,
       descBusy: false,
       descError: false,
-
-      phoneNew: '',
-      phoneShow: false,
-      phoneBusy: false,
-      phoneError: false,
-
-      completionShow: false,
-      completionBusy: false,
-      completionError: false,
       
-      deleteShow: false,
-      deleteBusy: false,
-      deleteError: false,
-
+      newDate: '',
+      newTime: '',
+      timeShow: false,
+      timeBusy: false,
+      timeError: false,
       showDatePicker: false,
+      pickerMode: 'date'
     }
   }
 
@@ -51,18 +45,28 @@ export default class UserJobView extends Component {
 
   update = async (x) => {
     let { fire, job } = this.context
+    let { newDate, newTime } = this.state
 
     if (x.x === 'Tip') { x.new = parseInt(x.new) }
-
     if (x.x === 'Tip' && typeof(x.new) !== 'number') {
       alert('Please Enter a Number')
     } else {
-    this.setState({ [x.busyName]: true, [x.errorName]: false })
-    await setDoc(doc(fire, 'jobs', job.uid), {
-      [x.y]: x.new
-    }, { merge: true })
-      .then(() => this.setState({ [x.busyName]: false, [x.showName]: false }, () => this.context.refreshUserJobs()))
-      .catch(e => console.log('updating error', e))
+      this.setState({ [x.busyName]: true, [x.errorName]: false })
+
+      if (x.x === 'Deadline') {
+      let endDateAndTime = new Date(newDate.getFullYear(), newDate.getMonth(), newDate.getDate(), newTime.getHours(), newTime.getMinutes())
+        await setDoc(doc(fire, 'jobs', job.id), {
+          endDate: endDateAndTime
+        }, { merge: true })
+        .then(() => this.setState({ [x.busyName]: false, [x.showName]: false }, () => this.context.refreshUserJobs()))
+        .catch(e => console.log('updating error', e))
+      } else {
+        await setDoc(doc(fire, 'jobs', job.id), {
+          [x.y]: x.new
+        }, { merge: true })
+        .then(() => this.setState({ [x.busyName]: false, [x.showName]: false }, () => this.context.refreshUserJobs()))
+        .catch(e => console.log('updating error', e))
+      }
     }
   }
 
@@ -70,7 +74,7 @@ export default class UserJobView extends Component {
     let { fire, job } = this.context
     let emptyJob = { uid: '', address: '', creationDate: new Date(), description: '', email: '', endDate: new Date(), latitude: 0, longitude: 0, userName: '', phone: '', userId: '', tip: '', title: '', type: '' }
 
-    await deleteDoc(doc(fire, 'jobs', job.uid))
+    await deleteDoc(doc(fire, 'jobs', job.id))
       .then(async () => {
         this.context.updateContext('job', emptyJob)
         this.context.refreshUserJobs()
@@ -94,12 +98,10 @@ export default class UserJobView extends Component {
     let mr = this.state
     let html = []
     let list = [
+      { x: 'Deadline', y: 'deadline', show: mr.timeShow, showName: 'timeShow', new: mr.newDate, newName: 'newDate', busy: mr.timeBusy, busyName: 'timeBusy', error: mr.timeError, errorName: 'timeError' },
       { x: 'Title', y: 'title', show: mr.titleShow, showName: 'titleShow', new: mr.titleNew, newName: 'titleNew', busy: mr.titleBusy, busyName: 'titleBusy', error: mr.titleError, errorName: 'titleError' },
       { x: 'Tip', y: 'tip', show: mr.tipShow, showName: 'tipShow', new: mr.tipNew, newName: 'tipNew', busy: mr.tipBusy, busyName: 'tipBusy', error: mr.tipError, errorName: 'tipError' },
-      { x: 'Description', y: 'description', show: mr.descShow, showName: 'descShow', new: mr.descNew, newName: 'descNew', busy: mr.descBusy, busyName: 'descBusy', error: mr.descError, errorName: 'descError' },
-      { x: 'Phone', y: 'phone', show: mr.phoneShow, showName: 'phoneShow', new: mr.phoneNew, newName: 'phoneNew', busy: mr.phoneBusy, busyName: 'phoneBusy', error: mr.phoneError, errorName: 'phoneError' },
-      { x: 'Completion Status', y: 'completed', show: mr.completionShow, showName: 'completionShow', new: 'true', newName: '', busy: mr.completionBusy, busyName: 'completionBusy', error: mr.completionError, errorName: 'completionError' },
-      { x: 'Delete', y: 'delete', show: mr.deleteShow, showName: 'deleteShow', new: '', newName: '', busy: mr.deleteBusy, busyName: 'deleteBusy', error: mr.deleteError, errorName: 'deleteError' }
+      { x: 'Description', y: 'description', show: mr.descShow, showName: 'descShow', new: mr.descNew, newName: 'descNew', busy: mr.descBusy, busyName: 'descBusy', error: mr.descError, errorName: 'descError' }
     ]
 
     list.map(x => {
@@ -144,6 +146,7 @@ export default class UserJobView extends Component {
   }
 
   renderInput = (x) => {
+    let { newDate, newTime } = this.state
     if (x.x === 'Title') {
       return (
         <Input
@@ -169,23 +172,31 @@ export default class UserJobView extends Component {
           value={x.new}
         />
       )
+    } else if (x.x === 'Deadline') {
+      return (
+        <Input
+          // w={wp(70)}
+          bg='white'
+          variant='rounded'
+          onFocus={() => this.setState({ showDatePicker: true })}
+          caretHidden={true}
+          value={(newDate !== '' && newTime !== '') ? `${newDate} at ${newTime}` : 'Press Here to Set a Date and Time'}
+        />
+      )
     }
   }
-
-  // value: dFNS.format(new Date(job.creationDate), 'EEEE, PPP')
-  // value: dFNS.format(new Date(job.endDate), 'EEEE PPP')
 
   renderList = () => {
     let { job } = this.context
     let html = []
     let list = [
-      { name: 'Type', value: job.type, show: '', busy: '', error: '' },
-      { name: 'Creation Date', value: job.creationDate, show: '', busy: '', error: '' },
-      { name: 'Deadline', value: job.endDate, show: '', busy: '', error: '' },
       { name: 'Title', value: job.title, show: 'titleShow', busy: 'titleBusy', error: 'titleError' },
-      { name: 'Address', value: job.address.replace(/([,][\s])/, `\n`), show: '', busy: '', error: '' },
       { name: 'Tip', value: `$ ${job.tip}`, show: 'tipShow', busy: 'tipBusy', error: 'tipError' },
       { name: 'Description', value: job.description, show: 'descShow', busy: 'descBusy', error: 'descError' },
+      { name: 'Creation Date', value: format(new Date(job.creationDate.seconds*1000), 'E, PP'), show: '', busy: '', error: '' },
+      { name: 'Deadline', value: format(new Date(job.endDate.seconds*1000), 'E, PPp'), show: 'timeShow', busy: 'timeBusy', error: 'timeError' },
+      { name: 'Type', value: job.type, show: '', busy: '', error: '' },
+      { name: 'Address', value: job.address.replace(/([,][\s])/, `\n`), show: '', busy: '', error: '' },
       { name: 'Phone', value: job.phone, show: '', busy: '', error: '' },
       { name: 'Email', value: job.email, show: '', busy: '', error: '' },
     ]
@@ -194,29 +205,50 @@ export default class UserJobView extends Component {
       html.push(
         <Stack
           key={x.name}
-          direction='row'
           w='100%'
-          justifyContent='space-between'
-          borderBottomWidth='1'
+          mb={wp(5)}
+          // flex='1'
+          // borderWidth='1'
         >
-          <Box
-            w='23%'
+          <Row
             p={wp(1)}
+            pb={wp(1.5)}
+            mb={wp(1.5)}
+            justifyContent='space-between'
+            borderBottomWidth='1'
+            alignItems='flex-start'
           >
-            <Text>{x.name}</Text>
+            <Heading py={wp(1)}>{x.name}</Heading>
+            {x.show ?
+              <Text
+                bold
+                px={wp(2)}
+                py={wp(1)}
+                mr={wp(1)}
+                mt={wp(1)}
+                color='primary.1'
+                borderColor='primary.1'
+                borderWidth='1'
+                onPress={() => this.setState({ [x.show]: true })}
+              >Edit</Text> : null}
+          </Row>
+          <Box
+            flex='2'
+            p={wp(1)}
+            justifyContent='center'
+            alignItems='flex-end'
+          >
+            <Text
+              h='100%'
+              px={wp(2)}
+              textAlign='right'
+            >{x.value}</Text>
           </Box>
           <Box
-            w='63%'
-            p={wp(1)}
-          >
-            <Text>{x.value}</Text>
-          </Box>
-          <Box
-            w='14%'
+            flex='1'
             p={wp(1)}
             alignItems='center'
           >
-            {x.show ? <Text bold underline color='primary.1' onPress={() => this.setState({ [x.show]: true })}>Edit</Text> : null}
           </Box>
         </Stack>
       )
@@ -226,34 +258,39 @@ export default class UserJobView extends Component {
   }
 
   render() {
+  
+    let { pickerMode, showDatePicker } = this.state
+
     return (
       <ScrollView bg='primary.1'>
 
-        <Center>
-          <Center
-            bg='white'
-            m={wp(5)}
-            p={wp(2.5)}
-            borderRadius={wp(5)}
+          <Gradient
+            m={wp(4)}
+            p={wp(3)}
           >
             {this.renderList()}
-    
             <Button
               w={wp(60)}
-              my={wp(10)}
+              my={wp(5)}
+              alignSelf='center'
               onPress={() => this.delete()}
             >Delete</Button>
-          </Center>
+          </Gradient>
   
           {this.modals()}
   
-          {this.state.showDatePicker && (
+          {showDatePicker && (
             <DateTimePicker
               value={new Date()}
-              onChange={(event, date) => this.setState({ deadlineNew: dFNS.format(date, 'yyyy-MM-dd'), showDatePicker: false })}
+              mode={pickerMode}
+              minuteInterval={5}
+              onChange={(event, date) => {
+                pickerMode === 'date' ?
+                this.setState({ pickerMode: 'time', newDate: new Date(date)}) :
+                this.setState({ pickerMode: 'date', showDatePicker: false, newTime: new Date(date)})
+              }}
             />
           )}
-        </Center>
 
       </ScrollView>
     )

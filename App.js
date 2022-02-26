@@ -6,12 +6,15 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { createDrawerNavigator } from '@react-navigation/drawer'
 import { NavigationContainer, useNavigation, useIsFocused, useFocusEffect, useScrollToTop } from '@react-navigation/native'
 import { NativeBaseProvider, Text } from "native-base"
+// import { Font } from 'expo'
 import firebase from './config/firebase'
 import theme from './config/theme'
 import { getApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
 import { getDatabase } from 'firebase/database'
 import { getFirestore } from 'firebase/firestore'
+import AppLoading from 'expo-app-loading'
+import * as Font from 'expo-font'
 import GlobalState from './context/GlobalState'
 import Preface from './preface/Preface'
 import Home from './components/Home'
@@ -20,11 +23,12 @@ import SearchJobs from './components/SearchJobs'
 import CreateJob from './components/CreateJob'
 import JobView from './components/JobView'
 import About from './components/About'
+import ReportBug from './components/ReportBug'
 import Profile from './user/Profile'
 import ManageJobs from './user/ManageJobs'
 import UserJobView from './user/UserJobView'
 import Location from './user/Location'
-import SearchJobs2 from './components/SearchJobs2'
+import Test from './components/Test'
 
 // import TestJobView from './test/TestJobView'
 // import TestProfile from './test/TestProfile'
@@ -77,8 +81,31 @@ export default class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      loggedIn: false
+      loggedIn: false,
+      fontsLoaded: false,
     }
+  }
+
+  loadFonts = async () => {
+    await Font.loadAsync({
+      'Karla': require('./assets/fonts/Karla.ttf'),
+      // 'JosefinSans': require('./assets/fonts/JosefinSans.ttf'),
+      // 'WorkSans': require('./assets/fonts/WorkSans.ttf'),
+      // 'Rubik': require('./assets/fonts/Rubik.ttf'),
+      // 'Nunito': require('./assets/fonts/Nunito.ttf'),
+      // 'Mulish': require('./assets/fonts/Mulish.ttf'),
+      'Heebo': require('./assets/fonts/Heebo.ttf'),
+      // 'Hahmlet': require('./assets/fonts/Hahmlet.ttf'),
+      // 'Arimo': require('./assets/fonts/Arimo.ttf'),
+      'Titillium': require('./assets/fonts/TitilliumWeb.ttf'),
+      'SourceSansPro': require('./assets/fonts/SourceSansPro.ttf'),
+      'PTSans': require('./assets/fonts/PTSans.ttf'),
+      'NotoSans': require('./assets/fonts/NotoSans.ttf'),
+      'Mukta': require('./assets/fonts/Mukta.ttf'),
+      'FiraSans': require('./assets/fonts/FiraSans.ttf'),
+      'Lato': require('./assets/fonts/Lato.ttf'),
+    })
+    .catch(e => console.log('error loading fonts\n', e, e.message))
   }
 
   userMenuItems = () => {
@@ -103,6 +130,10 @@ export default class App extends Component {
         <Drawer.Screen
           name='About'
           component={About}
+        />
+        <Drawer.Screen
+          name='Report a Bug'
+          component={ReportBug}
         />
         <Drawer.Screen
           name='User Job View'
@@ -146,6 +177,10 @@ export default class App extends Component {
           component={About}
         />
         <Drawer.Screen
+          name='Report a Bug'
+          component={ReportBug}
+        />
+        <Drawer.Screen
           name='Preface'
           component={Preface}
           options={{
@@ -159,46 +194,18 @@ export default class App extends Component {
     )
   }
 
-  testMenuItems = () => {
-    return (
-      <>
-        {/* <Drawer.Screen
-          name='TestJobView'
-          component={TestJobView}
-          options={{
-            drawerItemStyle: { height: 0 },
-            headerLeft: () => <BackButton screen={'Home'} />
-          }}
-        />
-        <Drawer.Screen
-          name='TestProfile'
-          component={TestProfile}
-          options={{
-            drawerItemStyle: { height: 0 },
-            headerLeft: () => <BackButton screen={'Home'} />
-          }}
-        />
-        <Drawer.Screen
-          name='TestSearchJobs'
-          component={TestSearchJobs}
-          options={{
-            drawerItemStyle: { height: 0 },
-            headerLeft: () => <BackButton screen={'Home'} />
-          }}
-        />
-        <Drawer.Screen
-          name='TestCreateJob'
-          component={TestCreateJob}
-          options={{
-            drawerItemStyle: { height: 0 },
-            headerLeft: () => <BackButton screen={'Home'} />
-          }}
-        /> */}
-      </>
-    )
-  }
-
   render() {
+
+    if (!this.state.fontsLoaded) {
+      return (
+        <AppLoading
+          startAsync={() => this.loadFonts()}
+          onFinish={() => this.setState({ fontsLoaded: true })}
+          onError={e => console.log('AppLoading error', e, e.message)}
+        />
+      )
+    }
+    
     return (
       <NavigationContainer>
         <ContextWithHooks
@@ -227,10 +234,10 @@ export default class App extends Component {
               />
               {this.state.loggedIn ? this.userMenuItems() : this.loggedOutMenuItems()}
               <Drawer.Screen
-                name='Search Jobs 2'
-                component={SearchJobs2}
+                name='Test'
+                component={Test}
                 options={{
-                  // drawerItemStyle: { height: 0, width: 0 },
+                  drawerItemStyle: { height: 0, width: 0 },
                   // headerLeft: () => <BackButton screen={'SearchJobs'} />
                 }}
               />
@@ -250,7 +257,6 @@ export default class App extends Component {
                   headerLeft: () => <BackButton screen={'Search Jobs'} />
                 }}
               />
-              {this.testMenuItems()}
             </Drawer.Navigator>
           </NativeBaseProvider>
         </ContextWithHooks>
