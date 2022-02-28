@@ -29,6 +29,7 @@
     "expo-location": "~13.0.4",
     "expo-splash-screen": "~0.13.5",
     "expo-status-bar": "~1.1.0",
+    "expo-updates": "~0.10.15",
     "firebase": "^9.4.1",
     "geolib": "^3.3.3",
     "native-base": "^3.2.2",

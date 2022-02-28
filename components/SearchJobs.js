@@ -109,13 +109,11 @@ export default class SearchJobs extends Component {
       }
          
       if (sortDirection === 'asc') {
-        console.log(1.2)
         newJobs.sort((a, b) =>
           (getDistance({ latitude: geo.latitude, longitude: geo.longitude },
           { latitude: a.latitude, longitude: a.longitude }) >
           getDistance({ latitude: geo.latitude, longitude: geo.longitude },
           { latitude: b.latitude, longitude: b.longitude})) ? 1 : -1)
-        console.log(1.3)
       } else {
         newJobs.sort((a, b) =>
           (getDistance({ latitude: geo.latitude, longitude: geo.longitude },
@@ -125,35 +123,24 @@ export default class SearchJobs extends Component {
       }
     }
 
-    console.log(2, newJobs)
-
     newJobs.map(x => {
       lat.push(x.latitude)
       lng.push(x.longitude)
     })
-
-    console.log(3)
 
     let jobsCopy = [...newJobs]
     while (jobsCopy.length > 0) {
       pages.push(jobsCopy.splice(0, 5))
     }
 
-    console.log(4)
-
     this.context.updateContext('jobSearchResults', newJobs)
-    console.log(4.1)
     this.context.updateContext('jobWindow', newJobs[0])
-    console.log(4.2)
     this.context.updateContext('results', { lat: lat, lng: lng })
-    console.log(4.3)
     this.context.updateContext('pagination', { current: 0, visibleJobs: pages[0], pages: pages })
-
-    console.log(5)
 
     this.setState({ sortByForSidebar: sortBy, inputZip: '', busy: false, error: false })
 
-    console.log(newJobs)
+    // console.log(newJobs)
   }
 
   switchOrder = () => {
@@ -576,7 +563,7 @@ export default class SearchJobs extends Component {
 
   render() {
     
-    let { zip, geo, job } = this.context
+    let { zip, geo, jobWindow } = this.context
     let { sortBy, sortType } = this.state
 
     return (
@@ -721,8 +708,8 @@ export default class SearchJobs extends Component {
               style={{ height: '100%', width: '100%' }}
               // scrollEnabled
               region={{
-                latitude: job.latitude === 0 ? geo.latitude : job.latitude,
-                longitude: job.longitude === 0 ? geo.longitude : job.longitude,
+                latitude: jobWindow.latitude === 0 ? geo.latitude : jobWindow.latitude,
+                longitude: jobWindow.longitude === 0 ? geo.longitude : jobWindow.longitude,
                 latitudeDelta: 0.15,
                 longitudeDelta: 0.15,
               }}

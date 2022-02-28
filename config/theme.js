@@ -1,3 +1,4 @@
+import { Platform } from 'react-native'
 import { extendTheme } from 'native-base'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 
@@ -8,11 +9,11 @@ export default theme = extendTheme({
   components: {
     Button: {
       defaultProps: {
-        py: wp(2),
-        px: wp(3.5),
+        py: Platform.OS === 'ios' ? wp(3) : wp(2),
+        px: Platform.OS === 'ios' ? wp(4) : wp(3.5),
         borderRadius: '20',
         borderColor: 'primary.1',
-        _text: { fontSize: wp(3) }
+        _text: { fontSize: Platform.OS === 'ios' ? wp(4) : wp(3) }
       },
     },
     Input: {
@@ -23,12 +24,13 @@ export default theme = extendTheme({
         borderColor: '#8f8f8f'
       },
       _placeholder: {
-        fontSize: wp(3)
+        fontSize: Platform.OS === 'ios' ? wp(4) : wp(3)
       }
     },
     Text: {
       defaultProps: {
-        fontSize: wp(3.2),
+        // fontSize: wp(3.2),
+        fontSize: Platform.OS === 'ios' ? wp(4) : wp(3),
         // fontFamily: 'SourceSansPro'
       }
     },

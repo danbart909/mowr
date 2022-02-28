@@ -13,7 +13,7 @@ export default class Preface extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      view: 'Address'
+      view: 'Login'
     }
   }
 

@@ -9,6 +9,7 @@ import { NativeBaseProvider, Text } from "native-base"
 // import { Font } from 'expo'
 import firebase from './config/firebase'
 import theme from './config/theme'
+import * as SplashScreen from 'expo-splash-screen'
 import { getApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
 import { getDatabase } from 'firebase/database'
@@ -18,7 +19,7 @@ import * as Font from 'expo-font'
 import GlobalState from './context/GlobalState'
 import Preface from './preface/Preface'
 import Home from './components/Home'
-import Settings from './components/Settings'
+// import Settings from './components/Settings'
 import SearchJobs from './components/SearchJobs'
 import CreateJob from './components/CreateJob'
 import JobView from './components/JobView'
@@ -86,6 +87,11 @@ export default class App extends Component {
     }
   }
 
+  // componentDidMount() {
+  //   SplashScreen.preventAutoHideAsync();
+  //   setTimeout(SplashScreen.hideAsync, 10000);
+  // }
+
   loadFonts = async () => {
     await Font.loadAsync({
       'Karla': require('./assets/fonts/Karla.ttf'),
@@ -123,10 +129,10 @@ export default class App extends Component {
           name='Manage Jobs'
           component={ManageJobs}
         />
-        <Drawer.Screen
+        {/* <Drawer.Screen
           name='Settings'
           component={Settings}
-        />
+        /> */}
         <Drawer.Screen
           name='About'
           component={About}
@@ -168,10 +174,10 @@ export default class App extends Component {
   loggedOutMenuItems = () => {
     return (
       <>
-        <Drawer.Screen
+        {/* <Drawer.Screen
           name='Settings'
           component={Settings}
-        />
+        /> */}
         <Drawer.Screen
           name='About'
           component={About}
@@ -232,18 +238,18 @@ export default class App extends Component {
                 name='Home'
                 component={Home}
               />
+              <Drawer.Screen
+                name='Search Jobs'
+                component={SearchJobs}
+                options={{
+                  // drawerItemStyle: { height: 0, width: 0 },
+                  // headerLeft: () => <BackButton screen={'SearchJobs'} />
+                }}
+              />
               {this.state.loggedIn ? this.userMenuItems() : this.loggedOutMenuItems()}
               <Drawer.Screen
                 name='Test'
                 component={Test}
-                options={{
-                  drawerItemStyle: { height: 0, width: 0 },
-                  // headerLeft: () => <BackButton screen={'SearchJobs'} />
-                }}
-              />
-              <Drawer.Screen
-                name='Search Jobs'
-                component={SearchJobs}
                 options={{
                   drawerItemStyle: { height: 0, width: 0 },
                   // headerLeft: () => <BackButton screen={'SearchJobs'} />

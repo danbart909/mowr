@@ -4,13 +4,17 @@ export default {
   expo: {
     name: "mowr",
     slug: "mowr",
-    version: "1.0.0",
+    version: "1.0.1",
     orientation: "portrait",
     icon: "./assets/icon.png",
+    // icon: "./assets/icon.jpg",
     splash: {
       image: "./assets/splash.png",
-      resizeMode: "contain",
-      backgroundColor: "#ffffff"
+      // image: "./assets/splash.jpg",
+      // resizeMode: "contain",
+      resizeMode: "cover",
+      // backgroundColor: "#ffffff"
+      backgroundColor: "#48821b"
     },
     updates: {
       fallbackToCacheTimeout: 0
@@ -19,10 +23,11 @@ export default {
       "**/*"
     ],
     ios: {
+      bundleIdentifier: "com.mower",
       supportsTablet: true
     },
     android: {
-      // package: 'com.mower',
+      package: 'com.mower',
       // googleServicesFile: "./google-services.json",
       config: {
         googleMaps: {
@@ -30,9 +35,13 @@ export default {
         }
       },
       adaptiveIcon: {
-        foregroundImage: "./assets/adaptive-icon.png",
-        backgroundColor: "#FFFFFF"
-      }
+        foregroundImage: "./assets/icon.png",
+        // foregroundImage: "./assets/icon.jpg",
+        // backgroundColor: "#ffffff"
+        backgroundColor: "#48821b"
+      },
+      softwareKeyboardLayoutMode: "pan",
+      versionCode: 1
     },
     web: {
       "favicon": "./assets/favicon.png"

@@ -83,7 +83,7 @@ export default class ManageJobs extends Component {
           >
             <Row alignItems='flex-start' pt={wp(2)}>
               <Center>
-                <Text fontSize={wp(6)}>#{index+1}</Text>
+                <Text fontSize={wp(7)}>#{index+1}</Text>
               </Center>
               <Box
                 flex='1'
@@ -91,7 +91,7 @@ export default class ManageJobs extends Component {
                 pb={wp(2)}
                 px={wp(2)}
               >
-                <Text fontSize={wp(3.5)} noOfLines={2}>{item.title}</Text>
+                <Text fontSize={Platform.OS === 'ios' ? wp(6) : wp(3.5)} noOfLines={2}>{item.title}</Text>
               </Box>
               <Center py={wp(1)}>
                 <Text
@@ -102,7 +102,7 @@ export default class ManageJobs extends Component {
             </Row>
 
             <Box py={wp(5)}>
-              <Text noOfLines={6}>{item.description}</Text>
+              <Text noOfLines={5}>{item.description}</Text>
             </Box>
 
             <Row justifyContent='space-between'>
@@ -116,7 +116,7 @@ export default class ManageJobs extends Component {
                 >Creation Date</Text>
                 <Text
                   pt={wp(1)}
-                  lineHeight={wp(3.5)}
+                  lineHeight={Platform.OS === 'ios' ? wp(6) : wp(3.5)}
                 >{format(new Date(item.creationDate.seconds*1000), 'E, PP')}</Text>
               </Box>
               <Box
@@ -130,7 +130,7 @@ export default class ManageJobs extends Component {
                 <Text
                   pt={wp(1)}
                   textAlign='right'
-                  lineHeight={wp(3.5)}
+                  lineHeight={Platform.OS === 'ios' ? wp(6) : wp(3.5)}
                 >{format(new Date(item.endDate.seconds*1000), 'E, PPp')}</Text>
               </Box>
             </Row>
