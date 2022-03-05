@@ -115,7 +115,7 @@ export default class Home extends Component {
             <Text color='white'>- Fixed some spelling errors on the Report a Bug page. If you find any more spelling errors, please let me know!</Text>
             <Text color='white'>- Removed all but one of the placeholder jobs. I think if I remove them all, all power in a 5 mile radius will get knocked out so I'm just going to keep one in there for now.</Text>
             <Text color='white'>- I'm not sure if this is just a glitch on my emulator, but it appears the scrollbar on iOS is showing up near the left side of the homepage. Can someone let me know if it shows up like this on an actual iPhone?</Text>
-            <Text color='white'>-Thanks for downloading! If you have any ideas or suggestions for me feel free to let me know!</Text>
+            <Text color='white'>- Thanks for downloading! If you have any ideas or suggestions for me feel free to let me know!</Text>
           </Stack>
         </Center>
       </ScrollView>
