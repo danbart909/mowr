@@ -26,7 +26,9 @@ export default {
       bundleIdentifier: "com.wrkr",
       supportsTablet: true,
       infoPlist: {
-        NSLocationWhenInUseUsageDescription: "The user's location is used to set their address in their profile. Their information is used in no other way. It is set once at startup so that they won't have to enter in an address for each job they want to create."
+        NSLocationWhenInUseUsageDescription: "The user's location is used to set their address in their profile. Their information is used in no other way. It is set once at startup so that they won't have to enter in an address for each job they want to create.",
+        CFBundleShortVersionString: "1.0.2",
+        CFBundleVersion: "1.0.2"
       }
     },
     android: {
