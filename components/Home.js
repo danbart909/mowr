@@ -108,7 +108,7 @@ export default class Home extends Component {
             bg='primary.1'
             borderRadius='40'
           >
-            <Text color='white' textAlign='center' mt={wp(3)} bold>wrkr v1.0.2</Text>
+            <Text color='white' textAlign='center' mt={wp(3)} bold>wrkr v1.2</Text>
             <Text color='white' textAlign='center' mt={wp(3)} underline mb={wp(4)}>Release Notes:</Text>
             <Text color='white'>- Fixed the keyboard for iOS so users can set their phone number on signup.</Text>
             <Text color='white'>- Fixed the date/time picker for iOS so users can create a job.</Text>
