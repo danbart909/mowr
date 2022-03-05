@@ -25,7 +25,7 @@ export default {
     ios: {
       bundleIdentifier: "com.wrkr",
       supportsTablet: true,
-      buildNumber: 1.2,
+      buildNumber: "1.2",
       infoPlist: {
         NSLocationWhenInUseUsageDescription: "The user's location is used to set their address in their profile. Their information is used in no other way. It is set once at startup so that they won't have to enter in an address for each job they want to create."
       }
