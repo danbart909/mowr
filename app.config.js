@@ -2,9 +2,9 @@ import 'dotenv/config';
 
 export default {
   expo: {
-    name: "mowr",
-    slug: "mowr",
-    version: "1.0.1",
+    name: "wrkr",
+    slug: "wrkr",
+    version: "1.0.2",
     orientation: "portrait",
     icon: "./assets/icon.png",
     // icon: "./assets/icon.jpg",
@@ -23,11 +23,14 @@ export default {
       "**/*"
     ],
     ios: {
-      bundleIdentifier: "com.mower",
-      supportsTablet: true
+      bundleIdentifier: "com.wrkr",
+      supportsTablet: true,
+      infoPlist: {
+        NSLocationWhenInUseUsageDescription: "The user's location is used to set their address in their profile. Their information is used in no other way. It is set once at startup so that they won't have to enter in an address for each job they want to create."
+      }
     },
     android: {
-      package: 'com.mower',
+      package: 'com.wrkr',
       // googleServicesFile: "./google-services.json",
       config: {
         googleMaps: {
@@ -41,7 +44,7 @@ export default {
         backgroundColor: "#48821b"
       },
       softwareKeyboardLayoutMode: "pan",
-      versionCode: 1
+      versionCode: 2
     },
     web: {
       "favicon": "./assets/favicon.png"

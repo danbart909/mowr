@@ -40,6 +40,7 @@ export default class GlobalState extends Component {
         phone: ''
       },
       job: {
+        uid: '',
         id: '',
         userId: '',
         userName: '',
@@ -250,6 +251,7 @@ export default class GlobalState extends Component {
           fire: this.props.fire,
           navigation: this.props.navigation,
           isFocused: this.props.isFocused,
+          // toast: this.props.toast,
           user: this.state.user,
           userJobs: this.state.userJobs,
           jobSearchResults: this.state.jobSearchResults,

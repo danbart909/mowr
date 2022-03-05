@@ -15,7 +15,8 @@ export default class Signup extends Component {
       password: '',
       passwordConfirm: '',
       busy: false,
-      error: false
+      error: false,
+      errorMessage: ''
     }
   }
 
@@ -38,11 +39,11 @@ export default class Signup extends Component {
             .then(async () => {
               await this.createMirror()
               await this.context.refresh()
-              this.setState({ busy: false, error: false }, () => this.props.setView('Phone'))
+              this.setState({ busy: false, error: false, errorMessage: '' }, () => this.props.setView('Phone'))
             })
-            .catch(e => this.setState({ busy: false, error: true }, () => console.log('error updating during registration', e)))
+            .catch(e => this.setState({ busy: false, error: true, errorMessage: e.message }, () => console.log('error updating during registration', e)))
         })
-        .catch(e => this.setState({ busy: false, error: true }, () => console.log('registration error', e)))
+        .catch(e => this.setState({ busy: false, error: true, errorMessage: e.message }, () => console.log('registration error', e)))
     }
   }
 
@@ -66,7 +67,7 @@ export default class Signup extends Component {
 
   render() {
 
-    let { displayName, email, password, passwordComfirm, busy, error } = this.state
+    let { displayName, email, password, passwordComfirm, busy, error, errorMessage } = this.state
 
     if (busy) {
       return (
@@ -174,7 +175,7 @@ export default class Signup extends Component {
             justifyContent='flex-end'
             alignItems='center'
           >
-            <Text pb={wp(1)}>
+            <Text pb={wp(1)} textAlign='center'>
               Already have an account?
             </Text>
     
@@ -182,6 +183,8 @@ export default class Signup extends Component {
               bold
               underline
               color='green.600'
+              fontSize={wp(4)}
+              textAlign='center'
               onPress={() => this.props.setView('Login')}
             >
               Press Here to Login
@@ -200,7 +203,7 @@ export default class Signup extends Component {
                 bg='white'
                 p={wp(3)}
                 borderRadius='40'
-              >An error occured. Please try again.</Text>
+              >{errorMessage}</Text>
             </Box>
           }
   

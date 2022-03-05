@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { Platform } from 'react-native'
 import Context from '../context/Context.js'
 import { Box, Button, Center, Factory, FormControl, Heading, Input, Row, ScrollView, Select, Stack, Spinner, TextArea, Text } from 'native-base'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
@@ -6,25 +7,6 @@ import DateTimePicker from '@react-native-community/datetimepicker'
 import { collection, doc, setDoc, addDoc, getDoc, Timestamp } from 'firebase/firestore'
 import { format, parseISO, toString } from 'date-fns'
 import Gradient from '../config/gradient'
-// import { LinearGradient } from 'expo-linear-gradient'
-
-// const Gradient = (props) => {
-//   const LG = Factory(LinearGradient);
-//   return (
-//     <LG
-//       position='absolute'
-//       h='100%'
-//       w='100%'
-//       // colors={['#ffffff', '#bfbfbf']} // 8c8c8c
-//       colors={['#bfbfbf', '#ffffff']} // bfbfbf
-//       start={{ x: 1, y: 1 }}
-//       end={{ x: 0, y: 0 }}
-//       borderRadius='40'
-//       alignSelf='center'
-//       {...props}
-//     />
-//   )
-// }
 
 export default class CreateJob extends Component {
   constructor(props) {
@@ -36,6 +18,7 @@ export default class CreateJob extends Component {
       tip: '',
       endDate: '',
       endTime: '',
+      endDateTime: new Date(),
       pickerMode: 'date',
       firstCheck: false,
       busy: false,
@@ -49,15 +32,21 @@ export default class CreateJob extends Component {
   componentDidMount() {
   }
 
+  combineDateAndTime = () => {
+    let { endDate, endTime } = this.state
+
+    this.setState({ endDateTime: new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(), endTime.getHours(), endTime.getMinutes()) })
+  }
+
   submit = async () => {
     let { user, fire } = this.context
-    let { title, description, type, tip, endDate, endTime } = this.state
+    let { title, description, type, tip, endDate, endTime, endDateTime } = this.state
     let { address, phone, email, uid, name, latitude, longitude } = user
 
     if (endDate === '') { alert('Please select an End Date') }
     else if (endTime === '') { alert('Please select a Time after you select a Date./\n/If you do not want to select a time, please select 12:00 PM (Noon)') }
 
-    let endDateAndTime = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(), endTime.getHours(), endTime.getMinutes())
+    // let endDateAndTime = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(), endTime.getHours(), endTime.getMinutes())
 
     if (title === '') { alert('Please enter a Title') }
     else if (description === '') { alert('Please enter a Description') }
@@ -79,7 +68,7 @@ export default class CreateJob extends Component {
         creationDate: new Date(),
         type: type,
         tip: parseInt(tip),
-        endDate: endDateAndTime,
+        endDate: endDateTime,
       })
         .then(async (x) => {
           this.setState({
@@ -107,7 +96,7 @@ export default class CreateJob extends Component {
   render() {
 
     let { address, phone } = this.context.user
-    let { title, description, type, tip, endDate, endTime, showDatePicker, pickerMode, busy, error } = this.state
+    let { title, description, type, tip, endDate, endTime, endDateTime, showDatePicker, pickerMode, busy, error } = this.state
 
     return (
       <ScrollView
@@ -127,7 +116,7 @@ export default class CreateJob extends Component {
               <Text pb={wp(1)}>Title</Text>
               <Input
                 // w={wp(70)}
-                fontSize={wp(2.5)}
+                fontSize={Platform.OS === 'ios' ? wp(3.6) : wp(2.5)}
                 bg='white'
                 onChangeText={(x) => this.setState({ title: x })}
                 value={title}
@@ -138,8 +127,8 @@ export default class CreateJob extends Component {
                 <Text py={wp(1)}>Tip</Text>
                 <Input
                   // w={wp(70)}
-                  fontSize={wp(2.5)}
-                  placeholder='Please use numbers only'
+                  fontSize={Platform.OS === 'ios' ? wp(3.6) : wp(2.5)}
+                  placeholder='Numbers only please'
                   bg='white'
                   onChangeText={(x) => this.setState({ tip: x })}
                   value={tip}
@@ -149,7 +138,7 @@ export default class CreateJob extends Component {
                 <Text py={wp(1)}>Type</Text>
                 <Select
                   bg='white'
-                  fontSize={wp(2.5)}
+                  fontSize={Platform.OS === 'ios' ? wp(3.6) : wp(2.5)}
                   selectedValue={type}
                   onValueChange={(x) => this.setState({ type: x })}
                   ref='type'
@@ -167,23 +156,47 @@ export default class CreateJob extends Component {
                 // w={wp(70)}
                 p={wp(2)}
                 bg='white'
-                fontSize={wp(2.5)}
+                fontSize={Platform.OS === 'ios' ? wp(3.6) : wp(2.5)}
                 onChangeText={(x) => this.setState({ description: x })}
                 value={description}
               />
             </Box>
             <Box>
-              <Text py={wp(1)}>Deadline</Text>
+              <Button
+                w='50%'
+                my={wp(4)}
+                p={wp(1)}
+                alignSelf='center'
+                textAlign='center'
+                onPress={() => this.setState({ showDatePicker: true })}
+                _text={{ color: 'white' }}
+              >Deadline</Button>
               <Input
                 // w={wp(70)}
+                // p={Platform.OS === 'ios' ? wp(4) : 0}
+                // p={wp(3)}
                 bg='white'
-                fontSize={wp(2.5)}
+                fontSize={Platform.OS === 'ios' ? wp(3.6) : wp(2.5)}
                 variant='rounded'
-                onFocus={() => this.setState({ showDatePicker: true })}
+                // onFocus={() => this.setState({ showDatePicker: true })}
                 caretHidden={true}
-                value={(endDate !== '' && endTime !== '') ? `${new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(), endTime.getHours(), endTime.getMinutes())}` : 'Press Here to Set a Date and Time'}
+                value={(endDate !== '' && endTime !== '') ? `${endDateTime}` : 'Press the Button Above to Set a Date and Time'}
               />
             </Box>
+            {showDatePicker && (
+              <DateTimePicker
+                value={endDateTime}
+                mode={pickerMode}
+                // mode={Platform.OS === 'ios' ? 'datetime' : pickerMode}
+                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                minuteInterval={5}
+                onChange={async (event, date) => {
+                  pickerMode === 'date' ?
+                  this.setState({ pickerMode: 'time', endDate: new Date(date)}) :
+                  this.setState({ pickerMode: 'date', showDatePicker: false, endTime: new Date(date)}, () => this.combineDateAndTime())
+                }}
+              />
+            )}
           </Stack>
   
           <Box
@@ -205,18 +218,6 @@ export default class CreateJob extends Component {
             onPress={() => this.submit()}
           >Create Job</Button>
 
-        {showDatePicker && (
-          <DateTimePicker
-            value={new Date()}
-            mode={pickerMode}
-            minuteInterval={5}
-            onChange={(event, date) => {
-              pickerMode === 'date' ?
-              this.setState({ pickerMode: 'time', endDate: new Date(date)}) :
-              this.setState({ pickerMode: 'date', showDatePicker: false, endTime: new Date(date)})
-            }}
-          />
-        )}
 
       </ScrollView>
     )

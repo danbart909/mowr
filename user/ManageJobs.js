@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import Context from '../context/Context.js'
+import { Platform } from 'react-native'
 import { Box, Button, Center, FlatList, Flex, Heading, Row, ScrollView, Spinner, Stack, Text } from 'native-base'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'

@@ -1,12 +1,13 @@
 import React, { Component } from 'react'
 import Context from '../context/Context.js'
+import { Platform } from 'react-native'
 import { Box, Button, Column, Center, Factory, FlatList, FormControl, Heading, Input, Modal, Row, ScrollView, Spinner, Stack, Text } from 'native-base'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons'
 import { doc, setDoc } from 'firebase/firestore'
 import Constants from 'expo-constants'
-import { getCurrentPositionAsync, geocodeAsync, getForegroundPermissionsAsync } from 'expo-location'
+import { getCurrentPositionAsync, geocodeAsync, getForegroundPermissionsAsync, requestForegroundPermissionsAsync } from 'expo-location'
 import Geocoder from 'react-native-geocoding'
 import MapView, { Marker } from 'react-native-maps'
 import axios from 'react-native-axios'
@@ -41,7 +42,7 @@ export default class Address extends Component {
 
     this.setState({ busy: true, error: 0 })
 
-    let status = await getForegroundPermissionsAsync()
+    let status = await requestForegroundPermissionsAsync()
     if (status.granted) {
       await geocodeAsync(address)
       .then(x => {
@@ -203,8 +204,8 @@ export default class Address extends Component {
       borderWidth={user.address ? null : '1'}
       onPress={() => user.address ? this.finish() : alert('Please Enter an Address')}
     >
-      <Text color={user.address ? 'white' : 'coolGray.400'} >
-        Continue to Mowr Homepage
+      <Text color={user.address ? 'white' : 'coolGray.400'} textAlign='center'>
+        Continue to wrkr Homepage
       </Text>
     </Button>
     } if (error === 1) {
@@ -317,7 +318,7 @@ export default class Address extends Component {
           >
             <Box
               position='absolute'
-              top={user.address ? hp(24.5) : hp(22)}
+              top={user.address ? (Platform.OS === 'ios' ? hp(25.4) : hp(24.6)) : (Platform.OS === 'ios' ? hp(23.4) : hp(22))}
               left={wp(11)}
               w={wp(70)}
               h='auto'

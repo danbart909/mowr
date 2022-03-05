@@ -11,7 +11,7 @@ export default theme = extendTheme({
       defaultProps: {
         py: Platform.OS === 'ios' ? wp(3) : wp(2),
         px: Platform.OS === 'ios' ? wp(4) : wp(3.5),
-        borderRadius: '20',
+        borderRadius: '40',
         borderColor: 'primary.1',
         _text: { fontSize: Platform.OS === 'ios' ? wp(4) : wp(3) }
       },
@@ -23,9 +23,6 @@ export default theme = extendTheme({
         pr: wp(1),
         borderColor: '#8f8f8f'
       },
-      _placeholder: {
-        fontSize: Platform.OS === 'ios' ? wp(4) : wp(3)
-      }
     },
     Text: {
       defaultProps: {

@@ -31,11 +31,6 @@ import UserJobView from './user/UserJobView'
 import Location from './user/Location'
 import Test from './components/Test'
 
-// import TestJobView from './test/TestJobView'
-// import TestProfile from './test/TestProfile'
-// import TestSearchJobs from './test/TestSearchJobs'
-// import TestCreateJob from './test/TestCreateJob'
-
 let Stack = createNativeStackNavigator()
 let Drawer = createDrawerNavigator()
 let app = getApp()
@@ -65,6 +60,7 @@ const BackButton = (props) => {
 const ContextWithHooks = (props) => {
   let navigation = useNavigation()
   let isFocused = useIsFocused()
+  // let toast = useToast()
   return (
     <GlobalState
       {...props}
@@ -74,6 +70,7 @@ const ContextWithHooks = (props) => {
       fire={fire}
       navigation={navigation}
       isFocused={isFocused}
+      // toast={toast}
     />
   )
 }
@@ -103,6 +100,8 @@ export default class App extends Component {
       'Heebo': require('./assets/fonts/Heebo.ttf'),
       // 'Hahmlet': require('./assets/fonts/Hahmlet.ttf'),
       // 'Arimo': require('./assets/fonts/Arimo.ttf'),
+      'TimesNewRoman': require('./assets/fonts/TimesNewRoman.ttf'),
+      'TimesNewRomanItalic': require('./assets/fonts/TimesNewRomanItalic.ttf'),
       'Titillium': require('./assets/fonts/TitilliumWeb.ttf'),
       'SourceSansPro': require('./assets/fonts/SourceSansPro.ttf'),
       'PTSans': require('./assets/fonts/PTSans.ttf'),
@@ -219,7 +218,7 @@ export default class App extends Component {
         >
           <NativeBaseProvider theme={theme}>
             <Drawer.Navigator
-              initialRouteName='Home'
+              // initialRouteName='Home'
               screenOptions={{
                 headerTitleAlign: 'center',
                 headerStyle: {

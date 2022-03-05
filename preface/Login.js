@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import Context from '../context/Context.js'
 import { Box, Button, Center, Column, FormControl, Heading, Input, Spinner, Row, ScrollView, Stack, Text } from 'native-base'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
+import { signInWithEmailAndPassword } from 'firebase/auth'
 import Gradient from '../config/gradient'
 
 export default class Login extends Component {
@@ -11,7 +12,9 @@ export default class Login extends Component {
       email: '',
       password: '',
       busy: false,
-      error: false
+      error: false,
+      errorMessage: '',
+      toast: false,
     }
   }
 
@@ -23,15 +26,23 @@ export default class Login extends Component {
       Alert.alert('Enter details to login!')
     } else {
       this.setState({ busy: true })
-      this.context.login(email, password)
-        .then(() => this.setState({ busy: false, error: false }, () => this.context.navigation.navigate('Home')))
-        .catch(e => this.setState({ busy: false, error: true }, () => console.log('error logging in', e)))
+      signInWithEmailAndPassword(this.context.auth, email, password)
+        .then(x => {
+          this.setState({ busy: false, error: false, errorMessage: '' })
+          this.context.refresh()
+
+          this.context.navigation.navigate('Home')
+        })
+        .catch(e => {
+          console.log('error logging in', e, e.message)
+          this.setState({ busy: false, error: true, errorMessage: e.message })
+        })
     }
   }
 
   render() {
 
-    let { email, password, busy, error } = this.state
+    let { email, password, busy, error, errorMessage } = this.state
 
     if (busy) {
       return (
@@ -124,7 +135,7 @@ export default class Login extends Component {
             flex='2'
             justifyContent='flex-end'
           >
-            <Text pb={wp(1)}>
+            <Text pb={wp(1)} textAlign='center'>
               Don't have an account?
             </Text>
     
@@ -132,6 +143,8 @@ export default class Login extends Component {
               bold
               underline
               color='primary.1'
+              fontSize={wp(4)}
+              textAlign='center'
               onPress={() => this.props.setView('Signup')}
               // onPress={() => this.props.setView('Address')}
             >
@@ -152,7 +165,7 @@ export default class Login extends Component {
               bg='white'
               p={wp(3)}
               borderRadius='40'
-            >An error occured. Please try again.</Text>
+            >{errorMessage}</Text>
           </Box>
         }
       </>

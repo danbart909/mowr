@@ -1,11 +1,11 @@
+import React, { Component } from 'react'
 import { format } from 'date-fns'
 import { Box, Button, Center, FormControl, Heading, Input, Modal, TextArea, Row, ScrollView, Spinner, Stack, Text } from 'native-base'
-import React, { Component } from 'react'
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen'
-import DateTimePicker from '@react-native-community/datetimepicker'
 import Context from '../context/Context.js'
 import { collection, doc, setDoc, addDoc, getDoc, getDocs, query, where, orderBy, limit, deleteDoc } from 'firebase/firestore'
 import Gradient from '../config/gradient'
+import DateTimePicker from '@react-native-community/datetimepicker'
 
 export default class UserJobView extends Component {
   constructor(props) {
@@ -28,6 +28,7 @@ export default class UserJobView extends Component {
       
       newDate: '',
       newTime: '',
+      endDateTime: new Date(),
       timeShow: false,
       timeBusy: false,
       timeError: false,
@@ -43,9 +44,15 @@ export default class UserJobView extends Component {
     // this.setState({ titleNew: title, tipNew: tip, descNew: description, phoneNew: phone })
   }
 
+  combineDateAndTime = () => {
+    let { newDate, newTime } = this.state
+
+    this.setState({ endDateTime: new Date(newDate.getFullYear(), newDate.getMonth(), newDate.getDate(), newTime.getHours(), newTime.getMinutes()) })
+  }
+
   update = async (x) => {
     let { fire, job } = this.context
-    let { newDate, newTime } = this.state
+    let { newDate, newTime, endDateTime } = this.state
 
     if (x.x === 'Tip') { x.new = parseInt(x.new) }
     if (x.x === 'Tip' && typeof(x.new) !== 'number') {
@@ -54,9 +61,8 @@ export default class UserJobView extends Component {
       this.setState({ [x.busyName]: true, [x.errorName]: false })
 
       if (x.x === 'Deadline') {
-      let endDateAndTime = new Date(newDate.getFullYear(), newDate.getMonth(), newDate.getDate(), newTime.getHours(), newTime.getMinutes())
         await setDoc(doc(fire, 'jobs', job.id), {
-          endDate: endDateAndTime
+          endDate: endDateTime
         }, { merge: true })
         .then(() => this.setState({ [x.busyName]: false, [x.showName]: false }, () => this.context.refreshUserJobs()))
         .catch(e => console.log('updating error', e))
@@ -72,7 +78,7 @@ export default class UserJobView extends Component {
 
   delete = async () => {
     let { fire, job } = this.context
-    let emptyJob = { uid: '', address: '', creationDate: new Date(), description: '', email: '', endDate: new Date(), latitude: 0, longitude: 0, userName: '', phone: '', userId: '', tip: '', title: '', type: '' }
+    let emptyJob = { id: '', uid: '', address: '', creationDate: '', description: '', email: '', endDate: '', latitude: 0, longitude: 0, userName: '', phone: '', userId: '', tip: '', title: '', type: '' }
 
     await deleteDoc(doc(fire, 'jobs', job.id))
       .then(async () => {
@@ -146,7 +152,7 @@ export default class UserJobView extends Component {
   }
 
   renderInput = (x) => {
-    let { newDate, newTime } = this.state
+    let { newDate, newTime, showDatePicker, endDateTime, pickerMode } = this.state
     if (x.x === 'Title') {
       return (
         <Input
@@ -174,14 +180,42 @@ export default class UserJobView extends Component {
       )
     } else if (x.x === 'Deadline') {
       return (
-        <Input
-          // w={wp(70)}
-          bg='white'
-          variant='rounded'
-          onFocus={() => this.setState({ showDatePicker: true })}
-          caretHidden={true}
-          value={(newDate !== '' && newTime !== '') ? `${newDate} at ${newTime}` : 'Press Here to Set a Date and Time'}
-        />
+        <>
+          <Button
+            w='50%'
+            my={wp(4)}
+            p={wp(1)}
+            alignSelf='center'
+            textAlign='center'
+            onPress={() => this.setState({ showDatePicker: true })}
+            _text={{ color: 'white' }}
+          >Deadline</Button>
+          <Input
+            // w={wp(70)}
+            // p={Platform.OS === 'ios' ? wp(4) : 0}
+            // p={wp(3)}
+            bg='white'
+            fontSize={Platform.OS === 'ios' ? wp(3.6) : wp(2.5)}
+            variant='rounded'
+            // onFocus={() => this.setState({ showDatePicker: true })}
+            caretHidden={true}
+            value={(newDate !== '' && newTime !== '') ? `${endDateTime}` : 'Press the Button Above to Set a Date and Time'}
+          />
+          {showDatePicker && (
+            <DateTimePicker
+              value={endDateTime}
+              mode={pickerMode}
+              // mode={Platform.OS === 'ios' ? 'datetime' : pickerMode}
+              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+              minuteInterval={5}
+              onChange={async (event, date) => {
+                pickerMode === 'date' ?
+                this.setState({ pickerMode: 'time', newDate: new Date(date)}) :
+                this.setState({ pickerMode: 'date', showDatePicker: false, newTime: new Date(date)}, () => this.combineDateAndTime())
+              }}
+            />
+          )}
+        </>
       )
     }
   }
@@ -189,12 +223,30 @@ export default class UserJobView extends Component {
   renderList = () => {
     let { job } = this.context
     let html = []
+    let formatCreationDate = () => {
+      if (job.creationDate) {
+        // console.log('creationDate 1', job.creationDate.seconds)
+        return format(new Date(job.creationDate.seconds*1000), 'E, PP')
+      } else {
+        // console.log('creationDate 2', job.creationDate.seconds)
+        return format(new Date(), 'E, PP')
+      }
+    }
+    let formatEndDate = () => {
+      if (job.endDate) {
+        // console.log('endDate 1', job.endDate.seconds)
+        return format(new Date(job.endDate.seconds*1000), 'E, PPp')
+      } else {
+        // console.log('endDate 2', job.endDate.seconds)
+        return format(new Date(), 'E, PPp')
+      }
+    }
     let list = [
       { name: 'Title', value: job.title, show: 'titleShow', busy: 'titleBusy', error: 'titleError' },
       { name: 'Tip', value: `$ ${job.tip}`, show: 'tipShow', busy: 'tipBusy', error: 'tipError' },
       { name: 'Description', value: job.description, show: 'descShow', busy: 'descBusy', error: 'descError' },
-      { name: 'Creation Date', value: format(new Date(job.creationDate.seconds*1000), 'E, PP'), show: '', busy: '', error: '' },
-      { name: 'Deadline', value: format(new Date(job.endDate.seconds*1000), 'E, PPp'), show: 'timeShow', busy: 'timeBusy', error: 'timeError' },
+      { name: 'Creation Date', value: formatCreationDate(), show: '', busy: '', error: '' },
+      { name: 'Deadline', value: formatEndDate(), show: 'timeShow', busy: 'timeBusy', error: 'timeError' },
       { name: 'Type', value: job.type, show: '', busy: '', error: '' },
       { name: 'Address', value: job.address.replace(/([,][\s])/, `\n`), show: '', busy: '', error: '' },
       { name: 'Phone', value: job.phone, show: '', busy: '', error: '' },
@@ -279,7 +331,7 @@ export default class UserJobView extends Component {
   
           {this.modals()}
   
-          {showDatePicker && (
+          {/* {showDatePicker && (
             <DateTimePicker
               value={new Date()}
               mode={pickerMode}
@@ -290,7 +342,7 @@ export default class UserJobView extends Component {
                 this.setState({ pickerMode: 'date', showDatePicker: false, newTime: new Date(date)})
               }}
             />
-          )}
+          )} */}
 
       </ScrollView>
     )

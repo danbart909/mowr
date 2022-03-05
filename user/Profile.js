@@ -308,7 +308,8 @@ export default class Profile extends Component {
           <Gradient>
             <Stack
               space={wp(10)}
-              p={wp(3)}
+              pt={wp(5)}
+              px={wp(4)}
               mt={wp(1)}
             >
   

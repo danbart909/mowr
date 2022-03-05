@@ -89,7 +89,7 @@ export default class Phone extends Component {
           <Heading
             flex='1'
             pt={wp(1)}
-          >Enter Your Phone Number</Heading>
+          >Phone Number</Heading>
   
           <Stack
             flex='2'
@@ -97,10 +97,10 @@ export default class Phone extends Component {
           >
             <Text pb={wp(1)}>Phone:</Text>
             <Input
-              type='password'
+              type='phone'
               placeholder='XXX-XXX-XXXX'
-              keyboardType='phone-pad'
-              textContentType='telephoneNumber'
+              // keyboardType='phone-pad'
+              // textContentType='telephoneNumber'
               w={wp(50)}
               bg='white'
               onChangeText={(x) => this.setState({ phone: x })}

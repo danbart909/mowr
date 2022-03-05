@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import Context from '../context/Context.js'
-import { Box, Button, Center, Heading, Factory, FlatList, Input, Modal, Spinner, Text, Select, Stack, Row, Switch } from 'native-base'
-import { ScrollView } from 'react-native'
+import { Box, Button, Center, Heading, Factory, FlatList, Input, Modal, ScrollView, Spinner, Text, Select, Stack, Row, Switch } from 'native-base'
+import { Platform } from 'react-native'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faArrowUp } from '@fortawesome/free-solid-svg-icons'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
@@ -220,14 +220,15 @@ export default class SearchJobs extends Component {
           <Gradient
             h='95%'
             w='95%'
-            p={wp(1.5)}
+            p={wp(3)}
+            pt={wp(5)}
             justifyContent='space-between'
             alignItems='stretch'
             // borderWidth='1'
           >
             <Row
               alignItems='flex-start'
-              my={wp(1)}
+              // my={wp(2)}
               // borderWidth='1'
               // borderBottomWidth='1'
             >
@@ -236,7 +237,7 @@ export default class SearchJobs extends Component {
                 // p={wp(1)}
                 // borderWidth='1'
               >
-                <Text fontSize={wp(4)}>{jobWindow.title}</Text>
+                <Text fontSize={wp(4)} lineHeight={wp(4)} noOfLines={3}>{jobWindow.title}</Text>
               </Box>
               <Box
                 flex='3'
@@ -254,16 +255,20 @@ export default class SearchJobs extends Component {
             >
               <Box
                 alignItems='flex-start'
+                justifyContent='center'
+                lineHeight={wp(2)}
+                flex='1'
                 // borderWidth='1'
               >
-                <Text>{`${this.calcDistance(jobWindow.latitude, jobWindow.longitude)}`}</Text>
+                <Text lineHeight={wp(4)}>{`${this.calcDistance(jobWindow.latitude, jobWindow.longitude)}`}</Text>
               </Box>
               <Box
                 alignItems='flex-end'
+                flex='1'
                 // borderWidth='1'
               >
-                <Text borderBottomWidth='1' textAlign='right'>Job Poster</Text>
-                <Text>{jobWindow.userName}</Text>
+                <Text borderBottomWidth='1' textAlign='right'>Job Poster:</Text>
+                <Text lineHeight={wp(4)} textAlign='right'>{jobWindow.userName}</Text>
               </Box>
             </Row>
   
@@ -275,16 +280,19 @@ export default class SearchJobs extends Component {
             >
               <Box
                 alignItems='flex-start'
+                // flex='1'
                 // borderWidth='1'
               >
-                <Text borderBottomWidth='1'>Type</Text>
+                <Text borderBottomWidth='1'>Type:</Text>
                 <Text>{jobWindow.type}</Text>
               </Box>
               <Box
                 alignItems='flex-end'
+                justifyContent='center'
+                // flex='2'
                 // borderWidth='1'
               >
-                <Text textAlign='right' lineHeight={wp(4)} maxWidth={wp(40)}>{jobWindow.address.replace(/([,][\s])/, `\n`)}</Text>
+                <Text textAlign='right' lineHeight={wp(4)} maxWidth={wp(40)} noOfLines={3}>{jobWindow.address.replace(/([,][\s])/, `\n`)}</Text>
               </Box>
             </Row>
   
@@ -298,15 +306,15 @@ export default class SearchJobs extends Component {
                 alignItems='flex-start'
                 // borderWidth='1'
               >
-                <Text borderBottomWidth='1' pb={wp(.5)}>Creation Date</Text>
-                <Text lineHeight={wp(3.2)} pt={wp(.5)}>{format(new Date(jobWindow.creationDate.seconds*1000), 'E, PP')}</Text>
+                <Text borderBottomWidth='1' pb={wp(.5)}>Created:</Text>
+                <Text pt={wp(.5)} lineHeight={wp(4)}>{format(new Date(jobWindow.creationDate.seconds*1000), 'E, PP')}</Text>
               </Box>
               <Box
                 flex='1'
                 alignItems='flex-end'
                 // borderWidth='1'
               >
-                <Text borderBottomWidth='1' pb={wp(.5)}>Deadline</Text>
+                <Text borderBottomWidth='1' pb={wp(.5)}>Deadline:</Text>
                 <Text textAlign='right' pt={wp(.5)} lineHeight={wp(4)}>{format(new Date(jobWindow.endDate.seconds*1000), 'E, PPp')}</Text>
               </Box>
             </Row>
@@ -607,7 +615,12 @@ export default class SearchJobs extends Component {
               <Select
                 selectedValue={sortBy}
                 accessibilityLabel='Sort By'
-                onValueChange={x => this.setState({ sortBy: x })}
+                onValueChange={x => {
+                  x === 'distance' ? this.setState({ sortBy: x, sortDirection: 'asc' }) :
+                  x === 'tip' ? this.setState({ sortBy: x, sortDirection: 'desc' }) :
+                  x === 'creationDate' ? this.setState({ sortBy: x, sortDirection: 'desc' }) :
+                  x === 'endDate' ? this.setState({ sortBy: x, sortDirection: 'asc' }) : null
+                }}
                 w='90%'
                 // variant='underlined'
                 // borderColor='black'
@@ -620,28 +633,27 @@ export default class SearchJobs extends Component {
                 <Select.Item p={wp(3)} label='Ending Date' value='endDate'/>
               </Select>
             </Box>
+            
             <Box
               flex='1'
               alignItems='center'
               // borderWidth='1'
             >
               <Text>Order By:</Text>
-              <Row
-                justifyContent='space-evenly'
-                px={wp(5)}
+              <Select
+                selectedValue={this.state.sortDirection}
+                accessibilityLabel='Sort Direction'
+                onValueChange={x => this.setState({ sortDirection: x })}
+                w='90%'
+                // borderColor='black'
+                bg='white'
                 // borderWidth='1'
               >
-                <Text alignSelf='center' pr={wp(6)}>asc</Text>
-                <Switch
-                  // size='sm'
-                  marginLeft='0'
-                  offTrackColor='green.700'
-                  offThumbColor='green.300'
-                  onChange={() => this.switchOrder()}
-                />
-                <Text alignSelf='center' pl={wp(5)}>desc</Text>
-              </Row>
+                <Select.Item p={wp(3)} label='Ascending' value='asc'/>
+                <Select.Item p={wp(3)} label='Decending' value='desc'/>
+              </Select>
             </Box>
+
             <Box
               flex='1'
               alignItems='center'

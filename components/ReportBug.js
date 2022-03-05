@@ -76,7 +76,7 @@ export default class ReportBug extends Component {
             // borderWidth='1'
           >
 
-            <Text textAlign='center' px={wp(15)}>Use the form below to report any bugs and/or brokenness you encounter when using the app. The more detail you include, the higher the likelyhood we'll be able to fix it.</Text>
+            <Text textAlign='center' px={wp(15)}>Use the form below to report any bugs and/or brokenness you encounter when using the app. The more detail you include, the higher the likelihood we'll be able to fix it.</Text>
 
             <Center>
               <Stack>
@@ -87,6 +87,7 @@ export default class ReportBug extends Component {
                   mt={wp(1)}
                   bg='white'
                   value={email}
+                  fontSize={Platform.OS === 'ios' ? wp(3.6) : wp(2.5)}
                   onChangeText={x => this.setState({ email: x })}
                 />
               </Stack>
@@ -94,12 +95,13 @@ export default class ReportBug extends Component {
               <Stack mt={wp(4)}>
                 <Text textAlign='center'>Message:</Text>
                 <TextArea
-                  placeholder='Please include details such as what you were trying to get the app to do and what error (if any) you recieved, and/or what your last action was.'
+                  placeholder='Please include details such as what you were trying to get the app to do and what error (if any) you received, and/or what your last action was.'
                   h={hp(20)}
                   w={wp(75)}
                   p={wp(2)}
                   mt={wp(1)}
                   bg='white'
+                  fontSize={Platform.OS === 'ios' ? wp(3.6) : wp(2.5)}
                   onChangeText={x => this.setState({ message: x })}
                   value={message}
                 />
