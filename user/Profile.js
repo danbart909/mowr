@@ -323,134 +323,136 @@ export default class Profile extends Component {
 
     return (
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-        <Box
-          flex='1'
-          // p={wp(5)}
-          bg='primary.1'
-        >
-          <ScrollView>
-            <LinearGradient
-              colors={['#289d15', '#ffffff']}
-              start={{ x: 1, y: 1 }}
-              end={{ x: 0, y: 0 }}
-            >
-              <Stack
-                space={wp(10)}
-                pt={wp(5)}
-                px={wp(4)}
-                mt={wp(1)}
+        <ScrollView>
+          <Box
+            flex='1'
+            // p={wp(5)}
+            bg='primary.1'
+          >
+            <ScrollView>
+              <LinearGradient
+                colors={['#289d15', '#ffffff']}
+                start={{ x: 1, y: 1 }}
+                end={{ x: 0, y: 0 }}
               >
-    
-                <Stack space={wp(2)}>
-                  <Row
-                    pb={wp(1)}
-                    justifyContent='space-between'
-                    borderBottomWidth='1'
-                  >
-                    <Heading py={wp(1)}>Name</Heading>
-                    <Text
-                      px={wp(2)}
-                      py={wp(1)}
-                      mr={wp(1)}
-                      mt={wp(1)}
-                      color='darkgreen'
-                      borderColor='primary.1'
-                      borderWidth='1'
-                      onPress={() => this.setState({ nameShow: true })}
-                    >Edit</Text>
-                  </Row>
-                  <Text>{user.name}</Text>
-                </Stack>
-    
-                <Stack space={wp(2)}>
-                  <Row
-                    pb={wp(1)}
-                    justifyContent='space-between'
-                    borderBottomWidth='1'
-                  >
-                    <Heading py={wp(1)}>Email</Heading>
-                    <Text
-                      px={wp(2)}
-                      py={wp(1)}
-                      mr={wp(1)}
-                      mt={wp(1)}
-                      color='darkgreen'
-                      borderColor='primary.1'
-                      borderWidth='1'
-                      onPress={() => this.setState({ showEmail: true })}
-                    >Edit</Text>
-                  </Row>
-                  <Text>{user.email}</Text>
-                </Stack>
-    
-                <Stack space={wp(2)}>
-                  <Row
-                    pb={wp(1)}
-                    justifyContent='space-between'
-                    borderBottomWidth='1'
-                  >
-                    <Heading py={wp(1)}>Phone</Heading>
-                    <Text
-                      px={wp(2)}
-                      py={wp(1)}
-                      mr={wp(1)}
-                      mt={wp(1)}
-                      color='darkgreen'
-                      borderColor='primary.1'
-                      borderWidth='1'
-                      onPress={() => this.setState({ showPhone: true })}
-                    >Edit</Text>
-                  </Row>
-                  <Text>{user.phone}</Text>
-                </Stack>
-    
-                <Stack space={wp(2)}>
-                  <Row
-                    pb={wp(1)}
-                    justifyContent='space-between'
-                    borderBottomWidth='1'
-                  >
-                    <Heading py={wp(1)}>Address</Heading>
-                    <Text
-                      px={wp(2)}
-                      py={wp(1)}
-                      mr={wp(1)}
-                      mt={wp(1)}
-                      color='darkgreen'
-                      borderColor='primary.1'
-                      borderWidth='1'
-                      onPress={() => this.context.navigation.navigate('Location')}
-                    >Edit</Text>
-                  </Row>
-                  <Text>{user.address.replace(/([,][\s])/, `\n`)}</Text>
-                </Stack>
-                
                 <Stack
-                  mt={wp(2)}
-                  mb={wp(6)}
-                  w='60%'
-                  space={wp(3)}
-                  justifyContent='space-evenly'
-                  alignSelf='center'
-                  // borderWidth='1'
+                  space={wp(10)}
+                  pt={wp(5)}
+                  px={wp(4)}
+                  mt={wp(1)}
                 >
-                  <Button
-                    onPress={() => this.context.navigation.navigate('Manage Jobs')}
-                  >Manage Your Jobs</Button>
-                  <Button
-                    onPress={() => this.setState({ showPassword: true })}
-                  >Change Password</Button>
-                  <Button
-                    // variant='outline'
-                    onPress={() => this.context.logout()}
-                  >Logout</Button>
+      
+                  <Stack space={wp(2)}>
+                    <Row
+                      pb={wp(1)}
+                      justifyContent='space-between'
+                      borderBottomWidth='1'
+                    >
+                      <Heading py={wp(1)} fontSize={wp(7)}>Name</Heading>
+                      <Text
+                        px={wp(2)}
+                        py={wp(1)}
+                        mr={wp(1)}
+                        mt={wp(1)}
+                        color='darkgreen'
+                        borderColor='primary.1'
+                        borderWidth='1'
+                        onPress={() => this.setState({ nameShow: true })}
+                      >Edit</Text>
+                    </Row>
+                    <Text>{user.name}</Text>
+                  </Stack>
+      
+                  <Stack space={wp(2)}>
+                    <Row
+                      pb={wp(1)}
+                      justifyContent='space-between'
+                      borderBottomWidth='1'
+                    >
+                      <Heading py={wp(1)} fontSize={wp(7)}>Email</Heading>
+                      <Text
+                        px={wp(2)}
+                        py={wp(1)}
+                        mr={wp(1)}
+                        mt={wp(1)}
+                        color='darkgreen'
+                        borderColor='primary.1'
+                        borderWidth='1'
+                        onPress={() => this.setState({ showEmail: true })}
+                      >Edit</Text>
+                    </Row>
+                    <Text>{user.email}</Text>
+                  </Stack>
+      
+                  <Stack space={wp(2)}>
+                    <Row
+                      pb={wp(1)}
+                      justifyContent='space-between'
+                      borderBottomWidth='1'
+                    >
+                      <Heading py={wp(1)} fontSize={wp(7)}>Phone</Heading>
+                      <Text
+                        px={wp(2)}
+                        py={wp(1)}
+                        mr={wp(1)}
+                        mt={wp(1)}
+                        color='darkgreen'
+                        borderColor='primary.1'
+                        borderWidth='1'
+                        onPress={() => this.setState({ showPhone: true })}
+                      >Edit</Text>
+                    </Row>
+                    <Text>{user.phone}</Text>
+                  </Stack>
+      
+                  <Stack space={wp(2)}>
+                    <Row
+                      pb={wp(1)}
+                      justifyContent='space-between'
+                      borderBottomWidth='1'
+                    >
+                      <Heading py={wp(1)} fontSize={wp(7)}>Address</Heading>
+                      <Text
+                        px={wp(2)}
+                        py={wp(1)}
+                        mr={wp(1)}
+                        mt={wp(1)}
+                        color='darkgreen'
+                        borderColor='primary.1'
+                        borderWidth='1'
+                        onPress={() => this.context.navigation.navigate('Location')}
+                      >Edit</Text>
+                    </Row>
+                    <Text>{user.address.replace(/([,][\s])/, `\n`)}</Text>
+                  </Stack>
+                  
+                  <Stack
+                    mt={wp(2)}
+                    mb={wp(6)}
+                    w='60%'
+                    space={wp(3)}
+                    justifyContent='space-evenly'
+                    alignSelf='center'
+                    // borderWidth='1'
+                  >
+                    <Button
+                      onPress={() => this.context.navigation.navigate('Manage Jobs')}
+                    >Manage Your Jobs</Button>
+                    <Button
+                      onPress={() => this.setState({ showPassword: true })}
+                    >Change Password</Button>
+                    <Button
+                      // variant='outline'
+                      onPress={() => this.context.logout()}
+                    >Logout</Button>
+                  </Stack>
+      
                 </Stack>
-    
-              </Stack>
-            </LinearGradient>
-          </ScrollView>
-          {this.modals()}
-        </Box>
+              </LinearGradient>
+            </ScrollView>
+            {this.modals()}
+          </Box>
+        </ScrollView>
       </TouchableWithoutFeedback>
     )
   }

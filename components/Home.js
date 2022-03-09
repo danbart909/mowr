@@ -80,7 +80,7 @@ export default class Home extends Component {
               <Row
                 flex='1'
                 alignItems='center'
-                justifyContent='space-between'
+                justifyContent='space-evenly'
               >
                 <WText>Find Community Help</WText>
                 <Button
@@ -133,6 +133,7 @@ export default class Home extends Component {
               mx={wp(0.5)}
               p={wp(1)}
               // mr={wp(1)}
+              justifyContent='center'
               borderRadius='40'
               bg='primary.100'
             >
@@ -148,6 +149,7 @@ export default class Home extends Component {
               my={wp(2)}
               mx={wp(0.5)}
               p={wp(0.5)}
+              justifyContent='center'
               borderRadius='40'
               bg='primary.100'
             >

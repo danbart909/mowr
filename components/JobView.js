@@ -3,7 +3,7 @@ import Context from '../context/Context.js'
 import { Box, Button, Center, Divider, Heading, Row, FlatList, ScrollView, Spinner, Stack, Text } from 'native-base'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { format } from 'date-fns'
-import Gradient from '../config/gradient'
+import { LinearGradient } from 'expo-linear-gradient'
 
 export default class JobView extends Component {
   constructor(props) {
@@ -46,7 +46,7 @@ export default class JobView extends Component {
             borderBottomWidth='1'
             alignItems='flex-start'
           >
-            <Heading py={wp(1)}>{x.x}</Heading>
+            <Heading py={wp(1)} fontSize={wp(7)}>{x.x}</Heading>
           </Row>
           <Box
             flex='2'
@@ -76,17 +76,13 @@ export default class JobView extends Component {
   render() {
     return (
       <ScrollView bg='primary.1'>
-        <Gradient
-          // w='90%'
-          // space={wp(2)}
-          m={wp(4)}
-          p={wp(3)}
-          // bg='white'
-          // borderWidth='1'
-          // borderRadius='20'
+        <LinearGradient
+          colors={['#289d15', '#ffffff']}
+          start={{ x: 1, y: 1 }}
+          end={{ x: 0, y: 0 }}
         >
           {this.renderList()}
-        </Gradient>
+        </LinearGradient>
       </ScrollView>
     )
   }

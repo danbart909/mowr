@@ -61,7 +61,8 @@ export default class CreateJob extends Component {
 
     // let endDateAndTime = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(), endTime.getHours(), endTime.getMinutes())
 
-    if (title === '') { alert('Please enter a Title') }
+    if (user.address === '' || user.phone === '') { alert("You don't have a phone number or address saved. Both are needed to create a job. Please go to the Profile page in the menu to set them.") }
+    else if (title === '') { alert('Please enter a Title') }
     else if (description === '') { alert('Please enter a Description') }
     else if (type === '') { alert('Please select a Type of Job') }
     else if (tip === '') { alert('Please enter a Tip.') }
@@ -222,9 +223,11 @@ export default class CreateJob extends Component {
               p={wp(3)}
             >
               <Text fontSize={wp(4)}>Your Address:</Text>
-              <Text py={wp(1)}>{address.replace(/([,][\s])/, `\n`)}</Text>
+              <Text py={wp(1)} fontSize={wp(3)}>{address ? address.replace(/([,][\s])/, `\n`) : 'No Address! Please go to your Profile to set an address.'}</Text>
+              {address ? null : <Text bold underline onPress={() => this.context.navigation.navigate('Profile')}>Profile</Text>}
               <Text fontSize={wp(4)} py={wp(1)}>Your Phone Number:</Text>
-              <Text>{phone}</Text>
+              <Text fontSize={wp(3)}>{phone ? phone : 'No Phone Number! Please go to your Profile to set a phone number'}</Text>
+              {phone ? null : <Text bold underline onPress={() => this.context.navigation.navigate('Profile')}>Profile</Text>}
             </Box>
   
             { error && <Text textAlign='center' color='red.400'>An error occured. Please try again.</Text> }

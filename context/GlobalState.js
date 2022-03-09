@@ -242,9 +242,9 @@ export default class GlobalState extends Component {
     // this.props.navigation.navigate('Preface')
 
     // console.log(Dimensions.get("window"))
-    console.log(wp(50))
-    console.log(hp(50))
-    console.log(cp(50))
+    // console.log(wp(50))
+    // console.log(hp(50))
+    // console.log(cp(50))
   }
   
   render() {

@@ -6,7 +6,7 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faArrowUp } from '@fortawesome/free-solid-svg-icons'
 import { format } from 'date-fns'
-import Gradient from '../config/gradient'
+import { LinearGradient } from 'expo-linear-gradient'
 import { TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView } from 'react-native'
 
 export default class ManageJobs extends Component {
@@ -41,6 +41,7 @@ export default class ManageJobs extends Component {
     let { busy, error } = this.state
     let { userJobs } = this.context
 
+
     if (busy) {
       return (
         <Center pt={hp(40)}>
@@ -71,93 +72,104 @@ export default class ManageJobs extends Component {
       )
     }
 
-    return (
-      <FlatList
-        data={userJobs}
-        keyExtractor={item => item.id}
-        ref='list'
-        // refreshing={false}
-        // onRefresh={() => this.checkForJobs()}
-        renderItem={({item, index}) => (
-          <Gradient
-            m={wp(4)}
-            px={wp(4)}
-          >
-            <Row alignItems='flex-start' pt={wp(2)}>
-              <Center>
-                <Text fontSize={wp(7)}>#{index+1}</Text>
-              </Center>
-              <Box
-                flex='1'
-                pt={wp(1)}
-                pb={wp(2)}
-                px={wp(2)}
-              >
-                <Text fontSize={Platform.OS === 'ios' ? wp(6) : wp(3.5)} noOfLines={2}>{item.title}</Text>
-              </Box>
-              <Center py={wp(1)}>
-                <Text
-                  fontSize={wp(4)}
-                  textAlign='right'
-                >${item.tip}</Text>
-              </Center>
-            </Row>
+    let html = []
+    let i = 0
 
-            <Box py={wp(5)}>
-              <Text noOfLines={5}>{item.description}</Text>
-            </Box>
-
-            <Row justifyContent='space-between'>
-              <Box
-                w={wp(42)}
-                alignItems='flex-start'
-              >
-                <Text
-                  pb={wp(1)}
-                  borderBottomWidth='1'
-                >Creation Date</Text>
-                <Text
-                  pt={wp(1)}
-                  lineHeight={Platform.OS === 'ios' ? wp(6) : wp(3.5)}
-                >{format(new Date(item.creationDate.seconds*1000), 'E, PP')}</Text>
-              </Box>
-              <Box
-                w={wp(42)}
-                alignItems='flex-end'
-              >
-                <Text
-                  pb={wp(1)}
-                  borderBottomWidth='1'                
-                >Deadline</Text>
-                <Text
-                  pt={wp(1)}
-                  textAlign='right'
-                  lineHeight={Platform.OS === 'ios' ? wp(6) : wp(3.5)}
-                >{format(new Date(item.endDate.seconds*1000), 'E, PPp')}</Text>
-              </Box>
-            </Row>
-
+    userJobs.map(x => {
+      i++
+      html.push(
+    <Box key={`${i}`}>
+    <Box
+      my={wp(4)}
+      px={wp(4)}
+      // bg='white'
+      // borderWidth='1'
+      // key={`${i}`}
+    >
+      <LinearGradient
+        colors={['#289d15', '#ffffff']}
+        start={{ x: 1, y: 1 }}
+        end={{ x: 0, y: 0 }}
+      >
+        <Box p={wp(4)} borderWidth='1'>
+          <Row alignItems='flex-start' pt={wp(2)}>
             <Center>
-              <Button
-                my={wp(5)}
-                onPress={() => this.viewJob(item)}
-              >VIEW JOB</Button>
+              <Text fontSize={wp(7)}>#{i}</Text>
             </Center>
-            
-          </Gradient>
-        )}
-      />
-    )
+            <Box
+              flex='1'
+              pt={wp(1)}
+              pb={wp(2)}
+              px={wp(2)}
+            >
+              <Text fontSize={Platform.OS === 'ios' ? wp(6) : wp(3.5)} noOfLines={2}>{x.title}</Text>
+            </Box>
+            <Center py={wp(1)}>
+              <Text
+                fontSize={wp(4)}
+                textAlign='right'
+              >${x.tip}</Text>
+            </Center>
+          </Row>
+  
+          <Box py={wp(5)}>
+            <Text noOfLines={5}>{x.description}</Text>
+          </Box>
+  
+          <Row justifyContent='space-between'>
+            <Box
+              w={wp(42)}
+              alignItems='flex-start'
+            >
+              <Text
+                pb={wp(1)}
+                borderBottomWidth='1'
+              >Creation Date</Text>
+              <Text
+                pt={wp(1)}
+                lineHeight={Platform.OS === 'ios' ? wp(6) : wp(3.5)}
+              >{format(new Date(x.creationDate.seconds*1000), 'E, PP')}</Text>
+            </Box>
+            <Box
+              w={wp(42)}
+              alignItems='flex-end'
+            >
+              <Text
+                pb={wp(1)}
+                borderBottomWidth='1'                
+              >Deadline</Text>
+              <Text
+                pt={wp(1)}
+                textAlign='right'
+                lineHeight={Platform.OS === 'ios' ? wp(6) : wp(3.5)}
+              >{format(new Date(x.endDate.seconds*1000), 'E, PPp')}</Text>
+            </Box>
+          </Row>
+  
+          <Center>
+            <Button
+              my={wp(5)}
+              onPress={() => this.viewJob(x)}
+            >VIEW JOB</Button>
+          </Center>
+        </Box>
+    </LinearGradient>
+        </Box>
+      </Box>
+      )
+    })
+
+    return html
   }
 
   render() {
     return (
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-        <Box flex='1' bg='primary.1'>
+        <ScrollView bg='primary.1'>
   
           {this.renderList()}
   
-          { this.context.userJobs.length >= 3 && <Button
+          {/* { this.context.userJobs.length >= 3 && <Button
             position='absolute'
             justifyContent='center'
             alignItems='center'
@@ -171,9 +183,9 @@ export default class ManageJobs extends Component {
             onPress={() => this.refs.list.scrollToIndex({ index: 0 })}
           >
             <FontAwesomeIcon icon={faArrowUp} size={wp(4)}/>
-          </Button> }
+          </Button> } */}
   
-        </Box>
+        </ScrollView>
       </TouchableWithoutFeedback>
     )
   }

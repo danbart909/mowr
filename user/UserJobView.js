@@ -4,7 +4,7 @@ import { Box, Button, Center, FormControl, Heading, Input, Modal, TextArea, Row,
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen'
 import Context from '../context/Context.js'
 import { collection, doc, setDoc, addDoc, getDoc, getDocs, query, where, orderBy, limit, deleteDoc } from 'firebase/firestore'
-import Gradient from '../config/gradient'
+import { LinearGradient } from 'expo-linear-gradient'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView } from 'react-native'
 
@@ -113,9 +113,8 @@ export default class UserJobView extends Component {
 
     list.map(x => {
       html.push(
-        <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+        <TouchableWithoutFeedback key={x.x} onPress={() => Keyboard.dismiss()}>
           <Modal
-            key={x.x}
             isOpen={x.show}
             onClose={() => this.setState({ [x.showName]: false })}
           >
@@ -267,6 +266,7 @@ export default class UserJobView extends Component {
           key={x.name}
           w='100%'
           mb={wp(5)}
+          p={wp(3)}
           // flex='1'
           // borderWidth='1'
         >
@@ -278,7 +278,7 @@ export default class UserJobView extends Component {
             borderBottomWidth='1'
             alignItems='flex-start'
           >
-            <Heading py={wp(1)}>{x.name}</Heading>
+            <Heading py={wp(1)} fontSize={wp(7)}>{x.name}</Heading>
             {x.show ?
               <Text
                 bold
@@ -325,18 +325,24 @@ export default class UserJobView extends Component {
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <ScrollView bg='primary.1'>
   
-            <Gradient
+            <Box
               m={wp(4)}
-              p={wp(3)}
+              borderWidth='1'
             >
-              {this.renderList()}
-              <Button
-                w={wp(60)}
-                my={wp(5)}
-                alignSelf='center'
-                onPress={() => this.delete()}
-              >Delete</Button>
-            </Gradient>
+              <LinearGradient
+                colors={['#289d15', '#ffffff']}
+                start={{ x: 1, y: 1 }}
+                end={{ x: 0, y: 0 }}
+              >
+                {this.renderList()}
+                <Button
+                  w={wp(60)}
+                  my={wp(5)}
+                  alignSelf='center'
+                  onPress={() => this.delete()}
+                >Delete</Button>
+              </LinearGradient>
+            </Box>
     
             {this.modals()}
     

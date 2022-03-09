@@ -28,7 +28,7 @@ export default theme = extendTheme({
     Text: {
       defaultProps: {
         // fontSize: wp(3.2),
-        fontSize: Platform.OS === 'ios' ? wp(6) : wp(5),
+        fontSize: Platform.OS === 'ios' ? wp(5.5) : wp(4.5),
         // lineHeight: wp(5)
         // fontFamily: 'SourceSansPro'
       }
