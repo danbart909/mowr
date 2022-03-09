@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
 import Context from '../context/Context'
-import { LinearGradient } from 'expo-linear-gradient'
 import { Box, Button, Center, Factory, FormControl, Heading, Input, Modal, ScrollView, Stack, Text } from 'native-base'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { EmailAuthProvider, updatePassword, updateEmail, updateProfile, reauthenticateWithCredential } from 'firebase/auth'
 import { doc, setDoc } from 'firebase/firestore'
-import Gradient from '../config/gradient'
+import { TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView } from 'react-native'
+import { LinearGradient } from 'expo-linear-gradient'
 
 export default class Profile extends Component {
   constructor(props) {
@@ -37,10 +37,25 @@ export default class Profile extends Component {
       loginError: false,
 
       emailOrPassword: '',
+      keyboard: false,
     }
   }
 
   static contextType = Context
+
+  componentDidMount () {
+    this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () =>
+      this.setState({ keyboard: true })
+    )
+    this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () =>
+      this.setState({ keyboard: false }
+    ))
+  }
+    
+  componentWillUnmount () {
+    this.keyboardDidShowListener.remove();
+    this.keyboardDidHideListener.remove();
+  }
 
   reauthenticate = () => {
     let { auth, user } = this.context
@@ -203,29 +218,80 @@ export default class Profile extends Component {
 
     list.map(x => {
       html.push(
+        <TouchableWithoutFeedback key={x.x} onPress={() => Keyboard.dismiss()}>
+          <Modal
+            isOpen={x.show}
+            onClose={() => this.setState({ [x.showName]: false })}
+          >
+            <Modal.Content w={wp(80)}>
+              <Modal.CloseButton />
+              <Modal.Header>Edit Profile</Modal.Header>
+              <Modal.Body>
+                <FormControl>
+                  <FormControl.Label>{`${x.x}`}</FormControl.Label>
+                  { x.x === 'Phone' ?
+                  <Input
+                    // autoFocus
+                    onEndEditing={() => Keyboard.dismiss()}
+                    value={x.new}
+                    placeholder='XXX-XXX-XXXX'
+                    onChangeText={y => this.setState({ [x.newName]: y })}
+                  />
+                  : <Input
+                    // autoFocus
+                    onEndEditing={() => Keyboard.dismiss()}
+                    value={x.new}
+                    onChangeText={y => this.setState({ [x.newName]: y })}
+                  /> }
+                </FormControl>
+              </Modal.Body>
+              <Button.Group
+                space={wp(2)}
+                alignSelf='flex-end'
+                pr={wp(2)}
+                pb={wp(2)}
+              >
+                <Button
+                  variant='ghost'
+                  onPress={() => this.setState({ [x.showName]: false })}
+                >Cancel</Button>
+                <Button
+                  isLoading={x.busy}
+                  onPress={() => {
+                    x.x === 'Name' ? this.updateDisplayName() :
+                    x.x === 'Email' ? this.updateEmail() :
+                    x.x === 'Phone' ? this.updatePhone() :
+                    x.x === 'Address' ? this.updateAddress() :
+                    this.updatePassword()
+                  }}
+                >{x.busy ? '' : 'Save'}</Button>
+              </Button.Group>
+            </Modal.Content>
+          </Modal>
+        </TouchableWithoutFeedback>
+      )
+    })
+
+    html.push(
+      <TouchableWithoutFeedback key={1} onPress={() => Keyboard.dismiss()}>
         <Modal
-          key={x.x}
-          isOpen={x.show}
-          onClose={() => this.setState({ [x.showName]: false })}
+          isOpen={showLogin}
+          onClose={() => this.setState({ showLogin: false })}
         >
-          <Modal.Content w={wp(80)}>
+          <Modal.Content
+            w={wp(80)}
+            borderRadius='3'
+          >
             <Modal.CloseButton />
-            <Modal.Header>Edit Profile</Modal.Header>
+            <Modal.Header>Verify Login</Modal.Header>
             <Modal.Body>
               <FormControl>
-                <FormControl.Label>{`${x.x}`}</FormControl.Label>
-                { x.x === 'Phone' ?
+                <FormControl.Label>Please Re-Enter Your Password</FormControl.Label>
                 <Input
-                  value={x.new}
-                  placeholder='XXX-XXX-XXXX'
-                  keyboardType='phone-pad'
-                  textContentType='telephoneNumber'
-                  onChangeText={y => this.setState({ [x.newName]: y })}
+                  onEndEditing={() => Keyboard.dismiss()}
+                  value={loginPassword}
+                  onChangeText={y => this.setState({ loginPassword: y })}
                 />
-                : <Input
-                  value={x.new}
-                  onChangeText={y => this.setState({ [x.newName]: y })}
-                /> }
               </FormControl>
             </Modal.Body>
             <Button.Group
@@ -236,59 +302,16 @@ export default class Profile extends Component {
             >
               <Button
                 variant='ghost'
-                onPress={() => this.setState({ [x.showName]: false })}
+                onPress={() => this.setState({ showLogin: false })}
               >Cancel</Button>
               <Button
-                isLoading={x.busy}
-                onPress={() => {
-                  x.x === 'Name' ? this.updateDisplayName() :
-                  x.x === 'Email' ? this.updateEmail() :
-                  x.x === 'Phone' ? this.updatePhone() :
-                  x.x === 'Address' ? this.updateAddress() :
-                  this.updatePassword()
-                }}
-              >{x.busy ? '' : 'Save'}</Button>
+                isLoading={loginBusy}
+                onPress={() => this.reauthenticate()}
+              >{loginBusy ? '' : 'Save'}</Button>
             </Button.Group>
           </Modal.Content>
         </Modal>
-      )
-    })
-
-    html.push(
-      <Modal
-        key={1}
-        isOpen={showLogin}
-        onClose={() => this.setState({ showLogin: false })}
-      >
-        <Modal.Content w={wp(80)}>
-          <Modal.CloseButton />
-          <Modal.Header>Verify Login</Modal.Header>
-          <Modal.Body>
-            <FormControl>
-              <FormControl.Label>Please Re-Enter Your Password</FormControl.Label>
-              <Input
-                value={loginPassword}
-                onChangeText={y => this.setState({ loginPassword: y })}
-              />
-            </FormControl>
-          </Modal.Body>
-          <Button.Group
-            space={wp(2)}
-            alignSelf='flex-end'
-            pr={wp(2)}
-            pb={wp(2)}
-          >
-            <Button
-              variant='ghost'
-              onPress={() => this.setState({ showLogin: false })}
-            >Cancel</Button>
-            <Button
-              isLoading={loginBusy}
-              onPress={() => this.reauthenticate()}
-            >{loginBusy ? '' : 'Save'}</Button>
-          </Button.Group>
-        </Modal.Content>
-      </Modal>
+      </TouchableWithoutFeedback>
     )
 
     return html
@@ -299,126 +322,136 @@ export default class Profile extends Component {
     let { user } = this.context
 
     return (
-      <Box
-        flex='1'
-        p={wp(5)}
-        bg='primary.1'
-      >
-        <ScrollView>
-          <Gradient>
-            <Stack
-              space={wp(10)}
-              pt={wp(5)}
-              px={wp(4)}
-              mt={wp(1)}
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+        <Box
+          flex='1'
+          // p={wp(5)}
+          bg='primary.1'
+        >
+          <ScrollView>
+            <LinearGradient
+              colors={['#289d15', '#ffffff']}
+              start={{ x: 1, y: 1 }}
+              end={{ x: 0, y: 0 }}
             >
-  
-              <Stack space={wp(2)}>
-                <Row
-                  pb={wp(1)}
-                  justifyContent='space-between'
-                  borderBottomWidth='1'
-                >
-                  <Heading py={wp(1)}>Name</Heading>
-                  <Text
-                    px={wp(2)}
-                    // py={wp(.5)}
-                    mr={wp(1)}
-                    color='primary.1'
-                    borderColor='primary.1'
-                    borderWidth='1'
-                    onPress={() => this.setState({ nameShow: true })}
-                  >Edit</Text>
-                </Row>
-                <Text>{user.name}</Text>
-              </Stack>
-  
-              <Stack space={wp(2)}>
-                <Row
-                  pb={wp(1)}
-                  justifyContent='space-between'
-                  borderBottomWidth='1'
-                >
-                  <Heading py={wp(1)}>Email</Heading>
-                  <Text
-                    px={wp(2)}
-                    py={wp(.5)}
-                    mr={wp(1)}
-                    color='primary.1'
-                    borderColor='primary.1'
-                    borderWidth='1'
-                    onPress={() => this.setState({ showEmail: true })}
-                  >Edit</Text>
-                </Row>
-                <Text>{user.email}</Text>
-              </Stack>
-  
-              <Stack space={wp(2)}>
-                <Row
-                  pb={wp(1)}
-                  justifyContent='space-between'
-                  borderBottomWidth='1'
-                >
-                  <Heading py={wp(1)}>Phone</Heading>
-                  <Text
-                    px={wp(2)}
-                    py={wp(.5)}
-                    mr={wp(1)}
-                    color='primary.1'
-                    borderColor='primary.1'
-                    borderWidth='1'
-                    onPress={() => this.setState({ showPhone: true })}
-                  >Edit</Text>
-                </Row>
-                <Text>{user.phone}</Text>
-              </Stack>
-  
-              <Stack space={wp(2)}>
-                <Row
-                  pb={wp(1)}
-                  justifyContent='space-between'
-                  borderBottomWidth='1'
-                >
-                  <Heading py={wp(1)}>Address</Heading>
-                  <Text
-                    px={wp(2)}
-                    py={wp(.5)}
-                    mr={wp(1)}
-                    color='primary.1'
-                    borderColor='primary.1'
-                    borderWidth='1'
-                    onPress={() => this.context.navigation.navigate('Location')}
-                  >Edit</Text>
-                </Row>
-                <Text>{user.address.replace(/([,][\s])/, `\n`)}</Text>
-              </Stack>
-              
               <Stack
-                mt={wp(2)}
-                mb={wp(6)}
-                w='60%'
-                space={wp(3)}
-                justifyContent='space-evenly'
-                alignSelf='center'
-                // borderWidth='1'
+                space={wp(10)}
+                pt={wp(5)}
+                px={wp(4)}
+                mt={wp(1)}
               >
-                <Button
-                  onPress={() => this.context.navigation.navigate('Manage Jobs')}
-                >Manage Your Jobs</Button>
-                <Button
-                  onPress={() => this.setState({ showPassword: true })}
-                >Change Password</Button>
-                <Button
-                  variant='outline'
-                  onPress={() => this.context.logout()}
-                >Logout</Button>
+    
+                <Stack space={wp(2)}>
+                  <Row
+                    pb={wp(1)}
+                    justifyContent='space-between'
+                    borderBottomWidth='1'
+                  >
+                    <Heading py={wp(1)}>Name</Heading>
+                    <Text
+                      px={wp(2)}
+                      py={wp(1)}
+                      mr={wp(1)}
+                      mt={wp(1)}
+                      color='darkgreen'
+                      borderColor='primary.1'
+                      borderWidth='1'
+                      onPress={() => this.setState({ nameShow: true })}
+                    >Edit</Text>
+                  </Row>
+                  <Text>{user.name}</Text>
+                </Stack>
+    
+                <Stack space={wp(2)}>
+                  <Row
+                    pb={wp(1)}
+                    justifyContent='space-between'
+                    borderBottomWidth='1'
+                  >
+                    <Heading py={wp(1)}>Email</Heading>
+                    <Text
+                      px={wp(2)}
+                      py={wp(1)}
+                      mr={wp(1)}
+                      mt={wp(1)}
+                      color='darkgreen'
+                      borderColor='primary.1'
+                      borderWidth='1'
+                      onPress={() => this.setState({ showEmail: true })}
+                    >Edit</Text>
+                  </Row>
+                  <Text>{user.email}</Text>
+                </Stack>
+    
+                <Stack space={wp(2)}>
+                  <Row
+                    pb={wp(1)}
+                    justifyContent='space-between'
+                    borderBottomWidth='1'
+                  >
+                    <Heading py={wp(1)}>Phone</Heading>
+                    <Text
+                      px={wp(2)}
+                      py={wp(1)}
+                      mr={wp(1)}
+                      mt={wp(1)}
+                      color='darkgreen'
+                      borderColor='primary.1'
+                      borderWidth='1'
+                      onPress={() => this.setState({ showPhone: true })}
+                    >Edit</Text>
+                  </Row>
+                  <Text>{user.phone}</Text>
+                </Stack>
+    
+                <Stack space={wp(2)}>
+                  <Row
+                    pb={wp(1)}
+                    justifyContent='space-between'
+                    borderBottomWidth='1'
+                  >
+                    <Heading py={wp(1)}>Address</Heading>
+                    <Text
+                      px={wp(2)}
+                      py={wp(1)}
+                      mr={wp(1)}
+                      mt={wp(1)}
+                      color='darkgreen'
+                      borderColor='primary.1'
+                      borderWidth='1'
+                      onPress={() => this.context.navigation.navigate('Location')}
+                    >Edit</Text>
+                  </Row>
+                  <Text>{user.address.replace(/([,][\s])/, `\n`)}</Text>
+                </Stack>
+                
+                <Stack
+                  mt={wp(2)}
+                  mb={wp(6)}
+                  w='60%'
+                  space={wp(3)}
+                  justifyContent='space-evenly'
+                  alignSelf='center'
+                  // borderWidth='1'
+                >
+                  <Button
+                    onPress={() => this.context.navigation.navigate('Manage Jobs')}
+                  >Manage Your Jobs</Button>
+                  <Button
+                    onPress={() => this.setState({ showPassword: true })}
+                  >Change Password</Button>
+                  <Button
+                    // variant='outline'
+                    onPress={() => this.context.logout()}
+                  >Logout</Button>
+                </Stack>
+    
               </Stack>
-  
-            </Stack>
-          </Gradient>
-        </ScrollView>
-        {this.modals()}
-      </Box>
+            </LinearGradient>
+          </ScrollView>
+          {this.modals()}
+        </Box>
+      </TouchableWithoutFeedback>
     )
   }
 }

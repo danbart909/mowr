@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 // import 'react-native-gesture-handler'
-import { LogBox } from 'react-native'
+import { LogBox, Keyboard } from 'react-native'
 import { StatusBar } from 'expo-status-bar'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { createDrawerNavigator } from '@react-navigation/drawer'
@@ -30,6 +30,7 @@ import ManageJobs from './user/ManageJobs'
 import UserJobView from './user/UserJobView'
 import Location from './user/Location'
 import Test from './components/Test'
+import Info from './components/Info'
 
 let Stack = createNativeStackNavigator()
 let Drawer = createDrawerNavigator()
@@ -60,7 +61,6 @@ const BackButton = (props) => {
 const ContextWithHooks = (props) => {
   let navigation = useNavigation()
   let isFocused = useIsFocused()
-  // let toast = useToast()
   return (
     <GlobalState
       {...props}
@@ -70,7 +70,6 @@ const ContextWithHooks = (props) => {
       fire={fire}
       navigation={navigation}
       isFocused={isFocused}
-      // toast={toast}
     />
   )
 }
@@ -85,8 +84,8 @@ export default class App extends Component {
   }
 
   // componentDidMount() {
-  //   SplashScreen.preventAutoHideAsync();
-  //   setTimeout(SplashScreen.hideAsync, 10000);
+    // SplashScreen.preventAutoHideAsync();
+    // setTimeout(SplashScreen.hideAsync, 10000);
   // }
 
   loadFonts = async () => {
@@ -127,10 +126,14 @@ export default class App extends Component {
         <Drawer.Screen
           name='Manage Jobs'
           component={ManageJobs}
-        />
+        /> 
         {/* <Drawer.Screen
           name='Settings'
           component={Settings}
+        /> */}
+        {/* <Drawer.Screen
+          name='Info'
+          component={Info}
         /> */}
         <Drawer.Screen
           name='About'
@@ -177,6 +180,10 @@ export default class App extends Component {
           name='Settings'
           component={Settings}
         /> */}
+        {/* <Drawer.Screen
+          name='Info'
+          component={Info}
+        /> */}
         <Drawer.Screen
           name='About'
           component={About}
@@ -215,6 +222,7 @@ export default class App extends Component {
       <NavigationContainer>
         <ContextWithHooks
           setLoggedInStatus={x => this.setState({ loggedIn: x })}
+          keyboard={this.state.keyboard}
         >
           <NativeBaseProvider theme={theme}>
             <Drawer.Navigator
@@ -237,6 +245,10 @@ export default class App extends Component {
                 name='Home'
                 component={Home}
               />
+              <Drawer.Screen
+          name='Info'
+          component={Info}
+        />
               <Drawer.Screen
                 name='Search Jobs'
                 component={SearchJobs}

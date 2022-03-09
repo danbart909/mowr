@@ -6,7 +6,8 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { collection, doc, setDoc, addDoc, getDoc, Timestamp } from 'firebase/firestore'
 import { format, parseISO, toString } from 'date-fns'
-import Gradient from '../config/gradient'
+import { TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView } from 'react-native'
+import { LinearGradient } from 'expo-linear-gradient'
 
 export default class CreateJob extends Component {
   constructor(props) {
@@ -24,12 +25,24 @@ export default class CreateJob extends Component {
       busy: false,
       error: false,
       showDatePicker: false,
+      keyboard: false,
     }
   }
 
   static contextType = Context
 
-  componentDidMount() {
+  componentDidMount () {
+    this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () =>
+      this.setState({ keyboard: true })
+    )
+    this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () =>
+      this.setState({ keyboard: false }
+    ))
+  }
+    
+  componentWillUnmount () {
+    this.keyboardDidShowListener.remove();
+    this.keyboardDidHideListener.remove();
   }
 
   combineDateAndTime = () => {
@@ -99,212 +112,134 @@ export default class CreateJob extends Component {
     let { title, description, type, tip, endDate, endTime, endDateTime, showDatePicker, pickerMode, busy, error } = this.state
 
     return (
-      <ScrollView
-        p={wp(5)}
-        bg='primary.1'
-      >
-
-        <Gradient
-          position='absolute'
-          h='100%'
-          w='100%'
-        />
-          <Stack
-            p={wp(3)}
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+        <ScrollView
+          // p={wp(5)}
+          bg='primary.1'
+        >
+  
+          <LinearGradient
+            colors={['#289d15', '#ffffff']}
+            start={{ x: 1, y: 1 }}
+            end={{ x: 0, y: 0 }}
           >
-            <Box>
-              <Text pb={wp(1)}>Title</Text>
-              <Input
-                // w={wp(70)}
-                fontSize={Platform.OS === 'ios' ? wp(3.6) : wp(2.5)}
-                bg='white'
-                onChangeText={(x) => this.setState({ title: x })}
-                value={title}
-              />
-            </Box>
-            <Row>
-              <Box flex='1' mr={wp(1)}>
-                <Text py={wp(1)}>Tip</Text>
+            <Stack
+              p={wp(3)}
+            >
+              <Box>
+                <Text pb={wp(1)}>Title</Text>
                 <Input
+                  // autoFocus
                   // w={wp(70)}
+                  onEndEditing={() => Keyboard.dismiss()}
                   fontSize={Platform.OS === 'ios' ? wp(3.6) : wp(2.5)}
-                  placeholder='Numbers only please'
                   bg='white'
-                  onChangeText={(x) => this.setState({ tip: x })}
-                  value={tip}
+                  onChangeText={(x) => this.setState({ title: x })}
+                  value={title}
                 />
               </Box>
-              <Box flex='1' ml={wp(1)}>
-                <Text py={wp(1)}>Type</Text>
-                <Select
+              <Row>
+                <Box flex='1' mr={wp(1)}>
+                  <Text py={wp(1)}>Tip</Text>
+                  <Input
+                    // w={wp(70)}
+                    onEndEditing={() => Keyboard.dismiss()}
+                    fontSize={Platform.OS === 'ios' ? wp(3.6) : wp(2.5)}
+                    placeholder='Numbers only please'
+                    bg='white'
+                    onChangeText={(x) => this.setState({ tip: x })}
+                    value={tip}
+                  />
+                </Box>
+                <Box flex='1' ml={wp(1)}>
+                  <Text py={wp(1)}>Type</Text>
+                  <Select
+                    bg='white'
+                    fontSize={Platform.OS === 'ios' ? wp(3.6) : wp(2.5)}
+                    selectedValue={type}
+                    onValueChange={(x) => this.setState({ type: x })}
+                    ref='type'
+                    _item={{ backgroundColor: 'white' }}
+                  >
+                    <Select.Item p={wp(3)} label='Yardwork' value='Yardwork' />
+                    <Select.Item p={wp(3)} label='Child Care' value='Child Care' />
+                    <Select.Item p={wp(3)} label='Other' value='Other' />
+                  </Select>
+                </Box>
+              </Row>
+              <Box>
+                <Text py={wp(1)}>Description</Text>
+                <TextArea
+                  h={wp(40)}
+                  // w={wp(70)}
+                  p={wp(2)}
                   bg='white'
                   fontSize={Platform.OS === 'ios' ? wp(3.6) : wp(2.5)}
-                  selectedValue={type}
-                  onValueChange={(x) => this.setState({ type: x })}
-                  ref='type'
-                >
-                  <Select.Item p={wp(3)} label='Yardwork' value='Yardwork' />
-                  <Select.Item p={wp(3)} label='Child Care' value='Child Care' />
-                  <Select.Item p={wp(3)} label='Other' value='Other' />
-                </Select>
+                  onChangeText={(x) => this.setState({ description: x })}
+                  value={description}
+                />
               </Box>
-            </Row>
-            <Box>
-              <Text py={wp(1)}>Description</Text>
-              <TextArea
-                h={wp(40)}
-                // w={wp(70)}
-                p={wp(2)}
-                bg='white'
-                fontSize={Platform.OS === 'ios' ? wp(3.6) : wp(2.5)}
-                onChangeText={(x) => this.setState({ description: x })}
-                value={description}
-              />
+              <Box>
+                <Button
+                  w='50%'
+                  my={wp(4)}
+                  p={wp(1)}
+                  alignSelf='center'
+                  textAlign='center'
+                  onPress={() => this.setState({ showDatePicker: true })}
+                  _text={{ color: 'white' }}
+                >Deadline</Button>
+                <Input
+                  // w={wp(70)}
+                  // p={Platform.OS === 'ios' ? wp(4) : 0}
+                  // p={wp(3)}
+                  onEndEditing={() => Keyboard.dismiss()}
+                  bg='white'
+                  fontSize={Platform.OS === 'ios' ? wp(3.6) : wp(2.5)}
+                  variant='rounded'
+                  // onFocus={() => this.setState({ showDatePicker: true })}
+                  caretHidden={true}
+                  value={(endDate !== '' && endTime !== '') ? `${endDateTime}` : 'Press the Button Above to Set a Date and Time'}
+                />
+              </Box>
+              {showDatePicker && (
+                <DateTimePicker
+                  value={endDateTime}
+                  mode={pickerMode}
+                  // mode={Platform.OS === 'ios' ? 'datetime' : pickerMode}
+                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                  minuteInterval={5}
+                  onChange={async (event, date) => {
+                    pickerMode === 'date' ?
+                    this.setState({ pickerMode: 'time', endDate: new Date(date)}) :
+                    this.setState({ pickerMode: 'date', showDatePicker: false, endTime: new Date(date)}, () => this.combineDateAndTime())
+                  }}
+                />
+              )}
+            </Stack>
+    
+            <Box
+              p={wp(3)}
+            >
+              <Text fontSize={wp(4)}>Your Address:</Text>
+              <Text py={wp(1)}>{address.replace(/([,][\s])/, `\n`)}</Text>
+              <Text fontSize={wp(4)} py={wp(1)}>Your Phone Number:</Text>
+              <Text>{phone}</Text>
             </Box>
-            <Box>
-              <Button
-                w='50%'
-                my={wp(4)}
-                p={wp(1)}
-                alignSelf='center'
-                textAlign='center'
-                onPress={() => this.setState({ showDatePicker: true })}
-                _text={{ color: 'white' }}
-              >Deadline</Button>
-              <Input
-                // w={wp(70)}
-                // p={Platform.OS === 'ios' ? wp(4) : 0}
-                // p={wp(3)}
-                bg='white'
-                fontSize={Platform.OS === 'ios' ? wp(3.6) : wp(2.5)}
-                variant='rounded'
-                // onFocus={() => this.setState({ showDatePicker: true })}
-                caretHidden={true}
-                value={(endDate !== '' && endTime !== '') ? `${endDateTime}` : 'Press the Button Above to Set a Date and Time'}
-              />
-            </Box>
-            {showDatePicker && (
-              <DateTimePicker
-                value={endDateTime}
-                mode={pickerMode}
-                // mode={Platform.OS === 'ios' ? 'datetime' : pickerMode}
-                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                minuteInterval={5}
-                onChange={async (event, date) => {
-                  pickerMode === 'date' ?
-                  this.setState({ pickerMode: 'time', endDate: new Date(date)}) :
-                  this.setState({ pickerMode: 'date', showDatePicker: false, endTime: new Date(date)}, () => this.combineDateAndTime())
-                }}
-              />
-            )}
-          </Stack>
   
-          <Box
-            p={wp(3)}
-          >
-            <Text fontSize={wp(4)}>Your Address:</Text>
-            <Text py={wp(1)}>{address.replace(/([,][\s])/, `\n`)}</Text>
-            <Text fontSize={wp(4)} py={wp(1)}>Your Phone Number:</Text>
-            <Text>{phone}</Text>
-          </Box>
+            { error && <Text textAlign='center' color='red.400'>An error occured. Please try again.</Text> }
+    
+            <Button
+              isLoading={busy}
+              w='80%'
+              m={wp(5)}
+              alignSelf='center'
+              onPress={() => this.submit()}
+            >Create Job</Button>
 
-          { error && <Text textAlign='center' color='red.400'>An error occured. Please try again.</Text> }
-  
-          <Button
-            isLoading={busy}
-            w='80%'
-            m={wp(5)}
-            alignSelf='center'
-            onPress={() => this.submit()}
-          >Create Job</Button>
-
-
-      </ScrollView>
+          </LinearGradient>  
+        </ScrollView>
+      </TouchableWithoutFeedback>
     )
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// renderList = () => {
-//   let html = []
-//   let i = 0
-//   let { type, title, description, tip, endDate, endTime } = this.state
-//   let list = [
-//     // { x: type, y: 'Type', z: 'type' },
-//     { x: title, y: 'Title', z: 'title'},
-//     { x: description, y: 'Description', z: 'description'},
-//     { x: tip, y: 'Tip', z: 'tip'},
-//     { x: endDate, y: 'Deadline', z: 'endDate'},
-//   ]
-
-//   list.map(x => {
-//     html.push(
-//       <Box key={i++}>
-//         <Text pb={wp(1)}>{x.y}</Text>
-//         { x.z === 'type' ?
-//           <Select
-//             bg='white'
-//             selectedValue={type}
-//             onValueChange={(k) => this.setState({ type: k })}
-//             ref='type'
-//           >
-//             <Select.Item p={wp(3)} label='Yardwork' value='Yardwork' />
-//             <Select.Item p={wp(3)} label='Child Care' value='Child Care' />
-//             <Select.Item p={wp(3)} label='Other' value='Other' />
-//           </Select> :
-//         x.z === 'description' ?
-//           <TextArea
-//             h={wp(40)}
-//             // w={wp(70)}
-//             p={wp(2)}
-//             bg='white'
-//             onChangeText={(k) => this.setState({ description: k })}
-//             value={description}
-//           /> :
-//         x.z === 'endDate' ?
-//           <Input
-//             // w={wp(70)}
-//             bg='white'
-//             variant='rounded'
-//             onFocus={() => this.setState({ showDatePicker: true })}
-//             caretHidden={true}
-//             value={(endDate !== '' && endTime !== '') ? `${endDate} at ${endTime}` : 'Press Here to Set a Date and Time'}
-//           /> :
-//           <Input
-//             // w={wp(70)}
-//             bg='white'
-//             onChangeText={(k) => this.setState({ [x.z]: k })}
-//             value={x.x}
-//           />
-//         }
-//       </Box>
-//     )
-//   })
-
-//   return (
-//     <Stack
-//       p={wp(3)}
-//       mt={wp(2)}
-//     >
-//       {html}
-//     </Stack>
-//   )
-// }

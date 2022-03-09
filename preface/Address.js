@@ -11,7 +11,7 @@ import { getCurrentPositionAsync, geocodeAsync, getForegroundPermissionsAsync, r
 import Geocoder from 'react-native-geocoding'
 import MapView, { Marker } from 'react-native-maps'
 import axios from 'react-native-axios'
-import Gradient from '../config/gradient'
+import { LinearGradient } from 'expo-linear-gradient'
 
 const { civicAPIKey, mapAPIKey } = Constants.manifest.extra
 Geocoder.init(civicAPIKey)
@@ -160,7 +160,14 @@ export default class Address extends Component {
     let html = []
 
     if (this.state.busy) {
-      html = <Spinner my={wp(1.29)} size='lg'/>
+      html = <>
+        <Center
+          borderWidth='5'
+          borderColor='primary.1'
+        >
+          <Spinner my={wp(1.29)} size='lg'/>
+        </Center>
+      </>
     } else {
       html = <>
         <Button
@@ -205,7 +212,7 @@ export default class Address extends Component {
       onPress={() => user.address ? this.finish() : alert('Please Enter an Address')}
     >
       <Text color={user.address ? 'white' : 'coolGray.400'} textAlign='center'>
-        Continue to wrkr Homepage
+        Complete Setup
       </Text>
     </Button>
     } if (error === 1) {
@@ -233,124 +240,125 @@ export default class Address extends Component {
 
     return (
       <>
-        <Gradient
-          position='absolute'
-          h='90%'
-          w='85%'
-          borderWidth='3'
-          borderColor='primary.1'
-        />
-
-        <Stack
-          h='90%'
-          w='85%'
-          alignItems='center'
+        <LinearGradient
+          colors={['#289d15', '#ffffff']}
+          start={{ x: 1, y: 1 }}
+          end={{ x: 0, y: 0 }}
         >
-  
-          <Stack
-            px={wp(3)}
-            space={wp(3)}
-            mb={wp(5)}
-            // borderWidth='1'
+
+          <Box
+            h={hp(85)}
+            w={wp(90)}
+            alignItems='center'
           >
-  
-            <Heading pt={wp(5)} textAlign='center'>Enter Your Address</Heading>
-  
-            <Row
-              // w='100%'
-              justifyContent='space-between'
-              alignItems='flex-start'
+    
+            <Stack
+              px={wp(3)}
+              space={wp(3)}
+              mb={wp(5)}
               // borderWidth='1'
             >
-              <Box flex='4'>
-                <Text>Your saved address:</Text>
-              </Box>
-              <Box flex='7'>
-                <Text textAlign='right'>{user.address ? user.address.replace(/([,][\s])/, `\n`) : 'No Address Saved'}</Text>
-              </Box>
-            </Row>
-  
-              <Box>
-                <Text pb={wp(1)}>Address:</Text>
-                <Input
-                  w={wp(78)}
-                  bg='white'
-                  alignSelf='center'
-                  onChangeText={(x) => this.changeInputByTyping(x)}
-                  value={address}
+    
+              <Heading pt={wp(5)} textAlign='center'>Enter Your Address</Heading>
+    
+              <Row
+                // w='100%'
+                justifyContent='space-between'
+                alignItems='flex-start'
+                // borderWidth='1'
+              >
+                <Box flex='4'>
+                  <Text lineHeight={wp(5)}>Your saved address:</Text>
+                </Box>
+                <Box flex='7'>
+                  <Text textAlign='right'>{user.address ? user.address.replace(/([,][\s])/, `\n`) : 'No Address Saved'}</Text>
+                </Box>
+              </Row>
+    
+                <Box>
+                  <Text pb={wp(1)}>Address:</Text>
+                  <Input
+                    // autoFocus
+                    onEndEditing={() => Keyboard.dismiss()}
+                    w={wp(78)}
+                    bg='white'
+                    alignSelf='center'
+                    onChangeText={(x) => this.changeInputByTyping(x)}
+                    value={address}
+                  />
+                </Box>
+    
+              {this.buttons()}
+    
+              <Center>
+                {this.errorMessageOrButton()}
+              </Center>
+    
+            </Stack>
+    
+            <ScrollView>
+              <MapView
+                style={{ height: hp(42), width: wp(84) }}
+                scrollEnabled={false}
+                // loadingEnabled
+                region={{
+                  latitude: latitude,
+                  longitude: longitude,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.01,
+                }}
+              >
+                <Marker
+                  coordinate={{ latitude: latitude, longitude: longitude }}
                 />
-              </Box>
-  
-            {this.buttons()}
-  
-            <Center>
-              {this.errorMessageOrButton()}
-            </Center>
-  
-          </Stack>
-  
-          <ScrollView>
-            <MapView
-              style={{ height: hp(42), width: wp(84) }}
-              scrollEnabled={false}
-              // loadingEnabled
-              region={{
-                latitude: latitude,
-                longitude: longitude,
-                latitudeDelta: 0.01,
-                longitudeDelta: 0.01,
-              }}
-            >
-              <Marker
-                coordinate={{ latitude: latitude, longitude: longitude }}
-              />
-            </MapView>
-          </ScrollView>
-  
-          { autoShow &&
-          <Box
-            position='absolute'
-            h={hp(100)}
-            w={wp(100)}
-            mt={wp(-7)}
-            zIndex='5'
-            onStartShouldSetResponder={() => this.setState({ autoShow: false })}
-          >
+              </MapView>
+            </ScrollView>
+    
+            { autoShow &&
             <Box
               position='absolute'
-              top={user.address ? (Platform.OS === 'ios' ? hp(25.4) : hp(24.6)) : (Platform.OS === 'ios' ? hp(23.4) : hp(22))}
-              left={wp(11)}
-              w={wp(70)}
-              h='auto'
-              bg='white'
-              // borderWidth='1'
-              zIndex='10'
+              h={hp(100)}
+              w={wp(100)}
+              mt={wp(-7)}
+              zIndex='5'
+              onStartShouldSetResponder={() => this.setState({ autoShow: false })}
             >
-              <FlatList
-                data={autoResults}
-                keyExtractor={y => y}
-                renderItem={x => {
-                  return (
-                    <Box
-                      w='100%'
-                      p='10'
-                      borderBottomColor='gray.400'
-                      borderBottomWidth='1'
-                    >
-                      <Text
+              <Box
+                position='absolute'
+                top={user.address ? (Platform.OS === 'ios' ? hp(25.4) : hp(24.6)) : (Platform.OS === 'ios' ? hp(23.4) : hp(25))}
+                left={wp(11)}
+                w={wp(70)}
+                h='auto'
+                bg='white'
+                // borderWidth='1'
+                zIndex='10'
+              >
+                <FlatList
+                  data={autoResults}
+                  keyExtractor={y => y}
+                  renderItem={x => {
+                    return (
+                      <Box
                         w='100%'
-                        onPress={() => this.changeInputByPressing(x.item)}
+                        p='10'
+                        borderBottomColor='gray.400'
+                        borderBottomWidth='1'
                       >
-                        {x.item}
-                      </Text>
-                    </Box>
-                  )
-                }}
-              />
-            </Box>
-          </Box> }
-  
-        </Stack>
+                        <Text
+                          w='100%'
+                          onPress={() => this.changeInputByPressing(x.item)}
+                        >
+                          {x.item}
+                        </Text>
+                      </Box>
+                    )
+                  }}
+                />
+              </Box>
+            </Box> }
+    
+          </Box>
+        </LinearGradient>
       </>
     )
   }

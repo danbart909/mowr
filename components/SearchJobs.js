@@ -11,7 +11,8 @@ import MapView, { Marker } from 'react-native-maps'
 import { getDistance } from 'geolib'
 import { format } from 'date-fns'
 import { collection, doc, getDoc, getDocs, query, orderBy, where } from 'firebase/firestore'
-import Gradient from '../config/gradient'
+import { LinearGradient } from 'expo-linear-gradient'
+import { TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView } from 'react-native'
 
 const { civicAPIKey } = Constants.manifest.extra
 Geocoder.init(civicAPIKey)
@@ -28,10 +29,25 @@ export default class SearchJobs extends Component {
       error: false,
       inputZip: '',
       showPageSelectModal: false,
+      keyboard: false,
     }
   }
 
   static contextType = Context
+
+  componentDidMount () {
+    this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () =>
+      this.setState({ keyboard: true })
+    )
+    this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () =>
+      this.setState({ keyboard: false }
+    ))
+  }
+    
+  componentWillUnmount () {
+    this.keyboardDidShowListener.remove()
+    this.keyboardDidHideListener.remove()
+  }
 
   search = async () => {
     let { zip } = this.context
@@ -40,6 +56,7 @@ export default class SearchJobs extends Component {
     if (zip === '') {
       alert('Please Enter a Zip Code')
     } else {
+      Keyboard.dismiss()
       this.setState({ busy: true, error: false })
 
       inputZip !== '' && await this.geocode()
@@ -204,7 +221,7 @@ export default class SearchJobs extends Component {
             bg='white'
             borderRadius='40'
           >
-            <Text>An error occurred, please try again.</Text>
+            <SText>An error occurred, please try again.</SText>
           </Center>
         </Center>
       )
@@ -217,121 +234,129 @@ export default class SearchJobs extends Component {
           justifyContent='center'
           // borderWidth='1'
         >
-          <Gradient
-            h='95%'
-            w='95%'
-            p={wp(3)}
-            pt={wp(5)}
-            justifyContent='space-between'
-            alignItems='stretch'
-            // borderWidth='1'
+          <LinearGradient
+            colors={['#289d15', '#ffffff']}
+            start={{ x: 1, y: 1 }}
+            end={{ x: 0, y: 0 }}
           >
-            <Row
-              alignItems='flex-start'
-              // my={wp(2)}
-              // borderWidth='1'
-              // borderBottomWidth='1'
-            >
-              <Box
-                flex='8'
-                // p={wp(1)}
-                // borderWidth='1'
-              >
-                <Text fontSize={wp(4)} lineHeight={wp(4)} noOfLines={3}>{jobWindow.title}</Text>
-              </Box>
-              <Box
-                flex='3'
-                // p={wp(1)}
-                // borderWidth='1'
-              >
-                <Text fontSize={wp(4)} textAlign='right'>${jobWindow.tip}</Text>
-              </Box>
-            </Row>
-  
-            <Row
-              // px={wp(2)}
+            <Box
+              // h={hp(95)}
+              // w={wp(95)}
+              h='100%'
+              w='100%'
+              p={wp(3)}
+              pt={wp(5)}
               justifyContent='space-between'
+              alignItems='stretch'
               // borderWidth='1'
             >
-              <Box
+              <Row
                 alignItems='flex-start'
-                justifyContent='center'
-                lineHeight={wp(2)}
-                flex='1'
+                // my={wp(2)}
+                // borderWidth='1'
+                // borderBottomWidth='1'
+              >
+                <Box
+                  flex='8'
+                  // p={wp(1)}
+                  // borderWidth='1'
+                >
+                  <SText lineHeight={wp(4)} noOfLines={3}>{jobWindow.title}</SText>
+                </Box>
+                <Box
+                  flex='3'
+                  // p={wp(1)}
+                  // borderWidth='1'
+                >
+                  <SText textAlign='right'>${jobWindow.tip}</SText>
+                </Box>
+              </Row>
+    
+              <Row
+                // px={wp(2)}
+                justifyContent='space-between'
                 // borderWidth='1'
               >
-                <Text lineHeight={wp(4)}>{`${this.calcDistance(jobWindow.latitude, jobWindow.longitude)}`}</Text>
-              </Box>
-              <Box
-                alignItems='flex-end'
-                flex='1'
+                <Box
+                  alignItems='flex-start'
+                  justifyContent='center'
+                  lineHeight={wp(2)}
+                  flex='1'
+                  // borderWidth='1'
+                >
+                  <SText lineHeight={wp(4)}>{`${this.calcDistance(jobWindow.latitude, jobWindow.longitude)}`}</SText>
+                </Box>
+                <Box
+                  alignItems='flex-end'
+                  flex='1'
+                  // borderWidth='1'
+                >
+                  <SText borderBottomWidth='1' textAlign='right'>Job Poster:</SText>
+                  <SText lineHeight={wp(4)} textAlign='right'>{jobWindow.userName}</SText>
+                </Box>
+              </Row>
+    
+              <Row
+                justifyContent='space-between'
+                // px={wp(2)}
+                mb={wp(2)}
                 // borderWidth='1'
               >
-                <Text borderBottomWidth='1' textAlign='right'>Job Poster:</Text>
-                <Text lineHeight={wp(4)} textAlign='right'>{jobWindow.userName}</Text>
-              </Box>
-            </Row>
-  
-            <Row
-              justifyContent='space-between'
-              // px={wp(2)}
-              mb={wp(2)}
-              // borderWidth='1'
-            >
-              <Box
-                alignItems='flex-start'
-                // flex='1'
+                <Box
+                  alignItems='flex-start'
+                  // flex='1'
+                  // borderWidth='1'
+                >
+                  <SText borderBottomWidth='1'>Type:</SText>
+                  <SText>{jobWindow.type}</SText>
+                </Box>
+                <Box
+                  alignItems='flex-end'
+                  justifyContent='center'
+                  // flex='2'
+                  // borderWidth='1'
+                >
+                  <SText textAlign='right' lineHeight={wp(4)} maxWidth={wp(40)} noOfLines={3}>{jobWindow.address.replace(/([,][\s])/, `\n`)}</SText>
+                </Box>
+              </Row>
+    
+              <Row
+                justifyContent='space-between'
+                // px={wp(2)}
                 // borderWidth='1'
               >
-                <Text borderBottomWidth='1'>Type:</Text>
-                <Text>{jobWindow.type}</Text>
-              </Box>
-              <Box
-                alignItems='flex-end'
-                justifyContent='center'
-                // flex='2'
+                <Box
+                  flex='1'
+                  alignItems='flex-start'
+                  // borderWidth='1'
+                >
+                  <SText borderBottomWidth='1' pb={wp(.5)}>Created:</SText>
+                  <SText pt={wp(.5)} lineHeight={wp(4)}>{format(new Date(jobWindow.creationDate.seconds*1000), 'E, PP')}</SText>
+                </Box>
+                <Box
+                  flex='1'
+                  alignItems='flex-end'
+                  // borderWidth='1'
+                >
+                  <SText borderBottomWidth='1' pb={wp(.5)}>Deadline:</SText>
+                  <SText textAlign='right' pt={wp(.5)} lineHeight={wp(4)}>{format(new Date(jobWindow.endDate.seconds*1000), 'E, PPp')}</SText>
+                </Box>
+              </Row>
+    
+              <Center
                 // borderWidth='1'
               >
-                <Text textAlign='right' lineHeight={wp(4)} maxWidth={wp(40)} noOfLines={3}>{jobWindow.address.replace(/([,][\s])/, `\n`)}</Text>
-              </Box>
-            </Row>
-  
-            <Row
-              justifyContent='space-between'
-              // px={wp(2)}
-              // borderWidth='1'
-            >
-              <Box
-                flex='1'
-                alignItems='flex-start'
-                // borderWidth='1'
-              >
-                <Text borderBottomWidth='1' pb={wp(.5)}>Created:</Text>
-                <Text pt={wp(.5)} lineHeight={wp(4)}>{format(new Date(jobWindow.creationDate.seconds*1000), 'E, PP')}</Text>
-              </Box>
-              <Box
-                flex='1'
-                alignItems='flex-end'
-                // borderWidth='1'
-              >
-                <Text borderBottomWidth='1' pb={wp(.5)}>Deadline:</Text>
-                <Text textAlign='right' pt={wp(.5)} lineHeight={wp(4)}>{format(new Date(jobWindow.endDate.seconds*1000), 'E, PPp')}</Text>
-              </Box>
-            </Row>
-  
-            <Center
-              // borderWidth='1'
-            >
-              <Button
-                my={wp(1.5)}
-                onPress={async () => {
-                  this.context.updateContext('job', jobWindow)
-                  this.context.navigation.navigate('Job View')
-                }}
-                >VIEW JOB</Button>
-            </Center>
-          
-          </Gradient>
+                <Button
+                  my={wp(1.5)}
+                  onPress={async () => {
+                    this.context.updateContext('job', jobWindow)
+                    this.context.navigation.navigate('Job View')
+                  }}
+                  >VIEW JOB</Button>
+              </Center>
+            
+            </Box>
+          </LinearGradient>
         </Center>
       )
     } else if (jobWindow.title === '' && jobSearchResults.length !== 0) {
@@ -348,7 +373,7 @@ export default class SearchJobs extends Component {
             bg='white'
             borderRadius='40'
           >
-            <Text textAlign='center'>Select a job to the left to see more about it here.</Text>
+            <SText textAlign='center'>Select a job to the left to see more about it here.</SText>
           </Center>
         </Center>
       )
@@ -358,15 +383,15 @@ export default class SearchJobs extends Component {
           flex='1'
           justifyContent='center'
         >
-          <Gradient
+          <Box
             flex='1'
             justifyContent='center'
             w='90%'
             my={wp(2)}
             p={wp(2)}
           >
-            <Text textAlign='center'>No job to display.</Text>
-          </Gradient>
+            <SText textAlign='center'>No job to display.</SText>
+          </Box>
         </Center>
       )
     }
@@ -419,7 +444,7 @@ export default class SearchJobs extends Component {
               borderBottomWidth='1'
               bg={selectedJob(item) ? 'primary.101' : 'white'}
             >
-              <Text
+              <SText
                 flex='5'
                 p={wp(1)}
                 // pl={wp(2)}
@@ -427,8 +452,8 @@ export default class SearchJobs extends Component {
                 color={selectedJob(item) ? 'white' : 'black'}
                 onPress={() => this.context.updateContext('jobWindow', item)}
                 // borderWidth='1'
-              >#{(pagination.current*5)+(index+1)}: {item.title}</Text>
-              <Text
+              >#{(pagination.current*5)+(index+1)}: {item.title}</SText>
+              <SText
                 flex='1'
                 p={wp(1)}
                 textAlign='right'
@@ -436,7 +461,7 @@ export default class SearchJobs extends Component {
                 color={selectedJob(item) ? 'white' : 'black'}
                 onPress={() => this.context.updateContext('jobWindow', item)}
                 // borderWidth='1'
-              >{excerpt(item)}</Text>
+              >{excerpt(item)}</SText>
             </Stack>
           )}
         />
@@ -449,10 +474,10 @@ export default class SearchJobs extends Component {
           bg='primary.1'
           justifyContent='center'
         >
-          <Text
+          <SText
             textAlign='center'
             color='white'
-          >Search for jobs to see a list of them here.</Text>
+          >Search for jobs to see a list of them here.</SText>
         </Center>
       )
     }
@@ -494,16 +519,16 @@ export default class SearchJobs extends Component {
             borderRightWidth='1'
             onStartShouldSetResponder={() => leftPress()}
           >
-            <Text color='white'>{`<`}</Text>
+            <SText color='white'>{`<`}</SText>
           </Center>
           <Center flex='2'>
-            <Text
+            <SText
               w='100%'
               h='100%'
               pt='10%'
               textAlign='center'
               onPress={() => pages.length > 0 && this.setState({ showPageSelectModal: true })}
-            >{current+1} / {pages.length}</Text>
+            >{current+1} / {pages.length}</SText>
           </Center>
           <Center
             flex='1'
@@ -511,7 +536,7 @@ export default class SearchJobs extends Component {
             borderLeftWidth='1'
             onStartShouldSetResponder={() => rightPress()}
           >
-            <Text color='white'>{`>`}</Text>
+            <SText color='white'>{`>`}</SText>
           </Center>
         </Row>
       </>
@@ -575,181 +600,192 @@ export default class SearchJobs extends Component {
     let { sortBy, sortType } = this.state
 
     return (
-      <>
-        <Stack
-          bg='coolGray.300'
-          py={wp(2)}
-          space={wp(2)}
-          alignItems='center'
-        >
-          <Row
-            justifyContent='space-evenly'
-            w='90%'
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+        <>
+          <Stack
+            bg='coolGray.300'
+            py={wp(2)}
+            space={wp(2)}
             alignItems='center'
           >
-            <Box
-              flex='1'
+            <Row
+              justifyContent='space-evenly'
+              w='90%'
               alignItems='center'
-              // borderWidth='1'
             >
-              <Text pb={wp(1)}>Zip Code:</Text>
-              <Input
-                placeholder='e.g. 30102'
-                w='75%'
-                // my={wp(2)}
-                bg='white'
-                // borderWidth='1'
-                onChangeText={(x) => {
-                  this.setState({ inputZip: x })
-                  this.context.updateContext('zip', x)
-                }}
-                value={zip}
-              />
-            </Box>
-            <Box
-              flex='1'
-              alignItems='center'
-              // borderWidth='1'
-            >
-              <Text pb={wp(1)}>Sort By:</Text>
-              <Select
-                selectedValue={sortBy}
-                accessibilityLabel='Sort By'
-                onValueChange={x => {
-                  x === 'distance' ? this.setState({ sortBy: x, sortDirection: 'asc' }) :
-                  x === 'tip' ? this.setState({ sortBy: x, sortDirection: 'desc' }) :
-                  x === 'creationDate' ? this.setState({ sortBy: x, sortDirection: 'desc' }) :
-                  x === 'endDate' ? this.setState({ sortBy: x, sortDirection: 'asc' }) : null
-                }}
-                w='90%'
-                // variant='underlined'
-                // borderColor='black'
-                bg='white'
-                // borderWidth='1'
-              >
-                <Select.Item p={wp(3)} label='Distance' value='distance'/>
-                <Select.Item p={wp(3)} label='Tip' value='tip'/>
-                <Select.Item p={wp(3)} label='Created Date' value='creationDate'/>
-                <Select.Item p={wp(3)} label='Ending Date' value='endDate'/>
-              </Select>
-            </Box>
-            
-            <Box
-              flex='1'
-              alignItems='center'
-              // borderWidth='1'
-            >
-              <Text>Order By:</Text>
-              <Select
-                selectedValue={this.state.sortDirection}
-                accessibilityLabel='Sort Direction'
-                onValueChange={x => this.setState({ sortDirection: x })}
-                w='90%'
-                // borderColor='black'
-                bg='white'
-                // borderWidth='1'
-              >
-                <Select.Item p={wp(3)} label='Ascending' value='asc'/>
-                <Select.Item p={wp(3)} label='Decending' value='desc'/>
-              </Select>
-            </Box>
-
-            <Box
-              flex='1'
-              alignItems='center'
-              // borderWidth='1'
-            >
-              <Text pb={wp(1)}>Type:</Text>
-              <Select
-                selectedValue={sortType}
-                accessibilityLabel='Sort Type'
-                onValueChange={x => this.setState({ sortType: x })}
-                w='90%'
-                // borderColor='black'
-                bg='white'
-                // borderWidth='1'
-              >
-                <Select.Item p={wp(3)} label='Any' value='Any'/>
-                <Select.Item p={wp(3)} label='Yardwork' value='Yardwork'/>
-                <Select.Item p={wp(3)} label='Child Care' value='Child Care'/>
-                <Select.Item p={wp(3)} label='Other' value='Other'/>
-              </Select>
-            </Box>
-          </Row>
-  
-          <Button
-            onPress={() => this.search()}
-            // my={wp(2)}
-          >SEARCH</Button>
-  
-        </Stack>
-
-        <Stack
-          flex='1'
-          borderTopWidth='1'
-        >
-          <Row
-            flex='5'
-          >
-            <Stack flex='2'>
               <Box
-                flex='8'
+                flex='1'
+                alignItems='center'
+                // borderWidth='1'
+              >
+                <SText pb={wp(1)} fontSize={wp(4)}>Zip Code:</SText>
+                <Input
+                  // autoFocus
+                  placeholder='e.g. 30102'
+                  w='75%'
+                  // my={wp(2)}
+                  bg='white'
+                  // borderWidth='1'
+                  onEndEditing={() => Keyboard.dismiss()}
+                  onChangeText={(x) => {
+                    this.setState({ inputZip: x })
+                    this.context.updateContext('zip', x)
+                  }}
+                  value={zip}
+                />
+              </Box>
+              <Box
+                flex='1'
+                alignItems='center'
+                // borderWidth='1'
+              >
+                <SText pb={wp(1)} fontSize={wp(4)}>Sort By:</SText>
+                <Select
+                  selectedValue={sortBy}
+                  accessibilityLabel='Sort By'
+                  onValueChange={x => {
+                    x === 'distance' ? this.setState({ sortBy: x, sortDirection: 'asc' }) :
+                    x === 'tip' ? this.setState({ sortBy: x, sortDirection: 'desc' }) :
+                    x === 'creationDate' ? this.setState({ sortBy: x, sortDirection: 'desc' }) :
+                    x === 'endDate' ? this.setState({ sortBy: x, sortDirection: 'asc' }) : null
+                  }}
+                  w='90%'
+                  // variant='underlined'
+                  // borderColor='black'
+                  _item={{ backgroundColor: 'white' }}
+                  bg='white'
+                  // borderWidth='1'
+                >
+                  <Select.Item p={wp(3)} label='Distance' value='distance'/>
+                  <Select.Item p={wp(3)} label='Tip' value='tip'/>
+                  <Select.Item p={wp(3)} label='Created Date' value='creationDate'/>
+                  <Select.Item p={wp(3)} label='Ending Date' value='endDate'/>
+                </Select>
+              </Box>
+              
+              <Box
+                flex='1'
+                alignItems='center'
+                // borderWidth='1'
+              >
+                <SText pb={wp(1)} fontSize={wp(4)}>Order By:</SText>
+                <Select
+                  selectedValue={this.state.sortDirection}
+                  accessibilityLabel='Sort Direction'
+                  onValueChange={x => this.setState({ sortDirection: x })}
+                  w='90%'
+                  // borderColor='black'
+                  bg='white'
+                  // borderWidth='1'
+                  _item={{ backgroundColor: 'white' }}
+                >
+                  <Select.Item p={wp(3)} label='Ascending' value='asc'/>
+                  <Select.Item p={wp(3)} label='Decending' value='desc'/>
+                </Select>
+              </Box>
+  
+              <Box
+                flex='1'
+                alignItems='center'
+                // borderWidth='1'
+              >
+                <SText pb={wp(1)} fontSize={wp(4)}>Type:</SText>
+                <Select
+                  selectedValue={sortType}
+                  accessibilityLabel='Sort Type'
+                  onValueChange={x => this.setState({ sortType: x })}
+                  w='90%'
+                  _item={{ backgroundColor: 'white' }}
+                  // borderColor='black'
+                  bg='white'
+                  // borderWidth='1'
+                >
+                  <Select.Item p={wp(3)} label='Any' value='Any'/>
+                  <Select.Item p={wp(3)} label='Yardwork' value='Yardwork'/>
+                  <Select.Item p={wp(3)} label='Child Care' value='Child Care'/>
+                  <Select.Item p={wp(3)} label='Other' value='Other'/>
+                </Select>
+              </Box>
+            </Row>
+    
+            <Button
+              onPress={() => this.search()}
+              // my={wp(2)}
+            >SEARCH</Button>
+    
+          </Stack>
+  
+          <Stack
+            flex='1'
+            borderTopWidth='1'
+          >
+            <Row
+              flex='5'
+            >
+              <Stack flex='2'>
+                <Box
+                  flex='8'
+                  bg='primary.1'
+                >
+                  {this.renderResultsSidebar()}
+                </Box>
+                <Center
+                  flex='1'
+                  borderTopWidth='1'
+                  borderBottomWidth='1'
+                >
+                  {this.renderPagination()}
+                </Center>
+              </Stack>
+              <Box
+                flex='3'
                 bg='primary.1'
               >
-                {this.renderResultsSidebar()}
+                {this.resultsView()}
               </Box>
-              <Center
-                flex='1'
-                borderTopWidth='1'
-                borderBottomWidth='1'
-              >
-                {this.renderPagination()}
-              </Center>
-            </Stack>
+            </Row>
             <Box
-              flex='3'
-              bg='primary.1'
+              flex='4'
             >
-              {this.resultsView()}
+              <MapView
+                style={{ height: '100%', width: '100%' }}
+                // scrollEnabled
+                region={{
+                  latitude: jobWindow.latitude === 0 ? geo.latitude : jobWindow.latitude,
+                  longitude: jobWindow.longitude === 0 ? geo.longitude : jobWindow.longitude,
+                  latitudeDelta: 0.15,
+                  longitudeDelta: 0.15,
+                }}
+              >
+                { this.renderMarkers() }
+              </MapView>
             </Box>
-          </Row>
-          <Box
-            flex='4'
+          </Stack>
+  
+          {this.renderModal()}
+  
+          {/* { this.context.jobSearchResults.length >= 3 && <Button
+            position='absolute'
+            justifyContent='center'
+            alignItems='center'
+            right={wp(5)}
+            bottom={wp(5)}
+            boxSize={wp(10)}
+            bg='white'
+            borderRadius='50'
+            borderColor='primary.1'
+            borderWidth='1'
+            // onPress={() => console.log(this.list.getScrollResponder())}
+            onPress={() => this.list.scrollToIndex({ index: 0 })}
           >
-            <MapView
-              style={{ height: '100%', width: '100%' }}
-              // scrollEnabled
-              region={{
-                latitude: jobWindow.latitude === 0 ? geo.latitude : jobWindow.latitude,
-                longitude: jobWindow.longitude === 0 ? geo.longitude : jobWindow.longitude,
-                latitudeDelta: 0.15,
-                longitudeDelta: 0.15,
-              }}
-            >
-              { this.renderMarkers() }
-            </MapView>
-          </Box>
-        </Stack>
-
-        {this.renderModal()}
-
-        {/* { this.context.jobSearchResults.length >= 3 && <Button
-          position='absolute'
-          justifyContent='center'
-          alignItems='center'
-          right={wp(5)}
-          bottom={wp(5)}
-          boxSize={wp(10)}
-          bg='white'
-          borderRadius='50'
-          borderColor='primary.1'
-          borderWidth='1'
-          // onPress={() => console.log(this.list.getScrollResponder())}
-          onPress={() => this.list.scrollToIndex({ index: 0 })}
-        >
-          <FontAwesomeIcon icon={faArrowUp} size={wp(4)}/>
-        </Button> } */}
-      </>
+            <FontAwesomeIcon icon={faArrowUp} size={wp(4)}/>
+          </Button> } */}
+        </>
+      </TouchableWithoutFeedback>
     )
   }
+}
+
+let SText = (props) => {
+  return <Text fontSize={wp(4)} {...props}>{props.children}</Text>
 }

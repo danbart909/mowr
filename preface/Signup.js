@@ -2,9 +2,10 @@ import React, { Component } from 'react'
 import Context from '../context/Context.js'
 import { Box, Button, Center, Column, FormControl, Heading, Input, Spinner, Row, Stack, Text } from 'native-base'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
+import { Keyboard } from 'react-native'
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
 import { collection, doc, setDoc, addDoc, Timestamp } from 'firebase/firestore'
-import Gradient from '../config/gradient'
+import { LinearGradient } from 'expo-linear-gradient'
 
 export default class Signup extends Component {
   constructor(props) {
@@ -16,7 +17,7 @@ export default class Signup extends Component {
       passwordConfirm: '',
       busy: false,
       error: false,
-      errorMessage: ''
+      errorMessage: '',
     }
   }
 
@@ -71,143 +72,146 @@ export default class Signup extends Component {
 
     if (busy) {
       return (
-        <Gradient
+        <Box
           borderWidth='5'
           borderColor='primary.1'
         >
           <Spinner size={wp(10)} m={wp(10)} color='primary.1'/>
-        </Gradient>
+        </Box>
       )
     }
 
     return (
       <>
-        <Gradient
-          position='absolute'
-          h='60%'
-          w='65%'
-          borderWidth='3'
-          borderColor='primary.1'
-        />
-
-        <Stack
-          h='60%'
-          w='65%'
-          alignItems='center'
-          p={wp(4)}
-          // space={wp(2.5)}
+        <LinearGradient
+          colors={['#289d15', '#ffffff']}
+          start={{ x: 1, y: 1 }}
+          end={{ x: 0, y: 0 }}
         >
-    
-          <Heading
-            flex='1'
-            pt={wp(1)}
-          >Signup</Heading>
-  
           <Stack
-            flex='2'
-            justifyContent='center'
-          >
-            <Text pb={wp(1)}>Name</Text>
-            <Input
-              // placeholder='Name'
-              w={wp(50)}
-              bg='white'
-              onChangeText={(x) => this.setState({ displayName: x })}
-              value={displayName}
-            />
-          </Stack>
-  
-          <Stack
-            flex='2'
-            justifyContent='center'
-          >
-            <Text pb={wp(1)}>Email</Text>
-            <Input
-              // placeholder='Email'
-              w={wp(50)}
-              bg='white'
-              onChangeText={(x) => this.setState({ email: x })}
-              value={email}
-            />
-          </Stack>
-  
-          <Stack
-            flex='2'
-            justifyContent='center'
-          >
-            <Text pb={wp(1)}>Password</Text>
-            <Input
-              // placeholder='Password'
-              type='password'
-              w={wp(50)}
-              bg='white'
-              onChangeText={(x) => this.setState({ password: x })}
-              value={password}
-            />
-          </Stack>
-  
-          <Stack
-            flex='2'
-            justifyContent='center'
-          >
-            <Text pb={wp(1)}>Confirm Password</Text>
-            <Input
-              // placeholder='Confirm Password'
-              type='password'
-              w={wp(50)}
-              bg='white'
-              onChangeText={(x) => this.setState({ passwordConfirm: x })}
-              value={passwordComfirm}
-            />
-          </Stack>
-  
-          <Box
-            flex='2'
-            justifyContent='flex-end'
-          >
-            <Button
-              onPress={() => this.registerUser()}
-            >Sign Up</Button>
-          </Box>
-  
-          <Stack
-            flex='2'
-            justifyContent='flex-end'
+            h={wp(120)}
+            w={wp(65)}
             alignItems='center'
+            p={wp(4)}
+            borderWidth='2'
+            // space={wp(2.5)}
           >
-            <Text pb={wp(1)} textAlign='center'>
-              Already have an account?
-            </Text>
-    
-            <Text
-              bold
-              underline
-              color='green.600'
-              fontSize={wp(4)}
-              textAlign='center'
-              onPress={() => this.props.setView('Login')}
+            <Heading
+              flex='1'
+              pt={wp(1)}
+            >Signup</Heading>
+      
+            <Stack
+              flex='2'
+              justifyContent='center'
             >
-              Press Here to Login
-            </Text>
-          </Stack>
-  
-          { error &&
+              <Text pb={wp(1)}>Name</Text>
+              <Input
+                // placeholder='Name'
+                // autoFocus
+                onEndEditing={() => Keyboard.dismiss()}
+                w={wp(50)}
+                bg='white'
+                onChangeText={(x) => this.setState({ displayName: x })}
+                value={displayName}
+              />
+            </Stack>
+      
+            <Stack
+              flex='2'
+              justifyContent='center'
+            >
+              <Text pb={wp(1)}>Email</Text>
+              <Input
+                // placeholder='Email'
+                onEndEditing={() => Keyboard.dismiss()}
+                w={wp(50)}
+                bg='white'
+                onChangeText={(x) => this.setState({ email: x })}
+                value={email}
+              />
+            </Stack>
+    
+            <Stack
+              flex='2'
+              justifyContent='center'
+            >
+              <Text pb={wp(1)}>Password</Text>
+              <Input
+                // placeholder='Password'
+                onEndEditing={() => Keyboard.dismiss()}
+                type='password'
+                w={wp(50)}
+                bg='white'
+                onChangeText={(x) => this.setState({ password: x })}
+                value={password}
+              />
+            </Stack>
+    
+            <Stack
+              flex='2'
+              justifyContent='center'
+            >
+              <Text pb={wp(1)}>Confirm Password</Text>
+              <Input
+                // placeholder='Confirm Password'
+                onEndEditing={() => Keyboard.dismiss()}
+                type='password'
+                w={wp(50)}
+                bg='white'
+                onChangeText={(x) => this.setState({ passwordConfirm: x })}
+                value={passwordComfirm}
+              />
+            </Stack>
+    
             <Box
-              h='130%'
-              position='absolute'
+              flex='2'
               justifyContent='flex-end'
             >
-              <Text
-                textAlign='center'
-                color='red.700'
-                bg='white'
-                p={wp(3)}
-                borderRadius='40'
-              >{errorMessage}</Text>
+              <Button
+                px={wp(15)}
+                onPress={() => this.registerUser()}
+              >Sign Up</Button>
             </Box>
-          }
-  
-        </Stack>
+      
+            <Stack
+              flex='2'
+              justifyContent='flex-end'
+              alignItems='center'
+            >
+              <Text textAlign='center' fontSize={wp(4)}>
+                Already have an account?
+              </Text>
+      
+              <Text
+                bold
+                underline
+                color='white'
+                fontSize={wp(4)}
+                textAlign='center'
+                onPress={() => this.props.setView('Login')}
+              >
+                Press Here to Login
+              </Text>
+            </Stack>
+      
+            { error &&
+              <Box
+                h='130%'
+                position='absolute'
+                justifyContent='flex-end'
+              >
+                <Text
+                  textAlign='center'
+                  color='red.700'
+                  bg='white'
+                  p={wp(3)}
+                  borderRadius='40'
+                >{errorMessage}</Text>
+              </Box>
+            }
+          </Stack>
+        </LinearGradient>
       </>
     )
   }

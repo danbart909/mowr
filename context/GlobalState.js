@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-// import { Alert, Animated, LayoutAnimation } from 'react-native';
+import { Animated, LayoutAnimation, Dimensions } from 'react-native';
 import Context from './Context.js'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 // import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -11,6 +11,7 @@ import { format, parseISO, parse, lightFormat, formatISO, addHours, isPast, addS
 import Geocoder from 'react-native-geocoding'
 // import { getDistance } from 'geolib';
 // import axios from 'react-native-axios'
+import { cp } from '../config/helper.js';
 
 const { civicAPIKey } = Constants.manifest.extra
 Geocoder.init(civicAPIKey)
@@ -69,7 +70,7 @@ export default class GlobalState extends Component {
         current: 0,
         visibleJobs: [],
         pages: []
-      }
+      },
     }
   }
 
@@ -97,7 +98,7 @@ export default class GlobalState extends Component {
   updateContext = (prop, val) => {
     let state = this.state
     state[prop] = val
-    this.setState(state)
+    this.setState(state), () => console.log(state[prop])
   }
   
   login = async (email, password) => {
@@ -237,8 +238,13 @@ export default class GlobalState extends Component {
     let { app, auth, fire } = this.props
     let { user, jobSearchResults, geo, job } = this.state
 
-    console.log(wp(3))
-    this.props.navigation.navigate('Preface')
+    // console.log(wp(3))
+    // this.props.navigation.navigate('Preface')
+
+    // console.log(Dimensions.get("window"))
+    console.log(wp(50))
+    console.log(hp(50))
+    console.log(cp(50))
   }
   
   render() {
@@ -251,7 +257,6 @@ export default class GlobalState extends Component {
           fire: this.props.fire,
           navigation: this.props.navigation,
           isFocused: this.props.isFocused,
-          // toast: this.props.toast,
           user: this.state.user,
           userJobs: this.state.userJobs,
           jobSearchResults: this.state.jobSearchResults,
@@ -276,30 +281,3 @@ export default class GlobalState extends Component {
     )
   }
 }
-
-    // if (user.email) { arr = Object.keys(this.state.user) }
-    // if (arr.length) {
-    //   if (user.email)
-    //   this.navigate('Home')
-    // }
-
-      // storeData = async () => {
-  //   try {
-  //     let jsonState = JSON.stringify(this.state)
-  //     await AsyncStorage.setItem('@state_Key', jsonState)
-  //     console.log('data saved')
-  //   } catch(e) { console.log('error storing data', e) }
-  // }
-
-  // getData = async () => {
-  //   try {
-  //     let jsonValue = await AsyncStorage.getItem('@state_Key')
-  //     let value = JSON.parse(jsonValue)
-  //     console.log({asyncStorage: value})
-  //     if (value.user !== null) {
-  //       this.setState({
-  //         // stateProperty: value.stateProperty
-  //       })
-  //     }
-  //   } catch(e) { console.log('getData error', e) }
-  // }

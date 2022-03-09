@@ -3,7 +3,7 @@ import Context from '../context/Context.js'
 import { Box, Button, Column, Center, FormControl, Heading, Input, Modal, Spinner, Stack, Text } from 'native-base'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { doc, setDoc } from 'firebase/firestore'
-import Gradient from '../config/gradient'
+import { LinearGradient } from 'expo-linear-gradient'
 
 export default class Phone extends Component {
   constructor(props) {
@@ -60,80 +60,85 @@ export default class Phone extends Component {
 
     if (busy) {
       return (
-        <Gradient
+        <Box
           borderWidth='5'
           borderColor='primary.1'
         >
           <Spinner size={wp(10)} m={wp(10)} color='primary.1'/>
-        </Gradient>
+        </Box>
       )
     }
 
     return (
       <>
-        <Gradient
-          position='absolute'
-          h='27%'
-          w='65%'
-          borderWidth='3'
-          borderColor='primary.1'
-        />
-
-        <Stack
-          h='27%'
-          w='65%'
-          alignItems='center'
-          p={wp(4)}
+        <LinearGradient
+          colors={['#289d15', '#ffffff']}
+          start={{ x: 1, y: 1 }}
+          end={{ x: 0, y: 0 }}
         >
-  
-          <Heading
-            flex='1'
-            pt={wp(1)}
-          >Phone Number</Heading>
-  
           <Stack
-            flex='2'
-            justifyContent='center'
+            h={wp(120)}
+            w={wp(90)}
+            alignItems='center'
+            p={wp(4)}
           >
-            <Text pb={wp(1)}>Phone:</Text>
-            <Input
-              type='phone'
-              placeholder='XXX-XXX-XXXX'
-              // keyboardType='phone-pad'
-              // textContentType='telephoneNumber'
-              w={wp(50)}
-              bg='white'
-              onChangeText={(x) => this.setState({ phone: x })}
-              value={this.state.phone}
-            />
-          </Stack>
+    
+            <Stack
+              flex='2'
+              justifyContent='space-evenly'
+            >
+              <Heading
+                py={wp(1)}
+              >Phone Number</Heading>
   
-          <Box
-            flex='2'
-            justifyContent='flex-end'
-          >
-            <Button
-              onPress={() => this.setPhone()}
-            >Submit</Button>
-          </Box>
-  
-            { error &&
+              <Text>Please provide your phone number. When you create a job, your phone number will be automatically attatched to your job. You can change your phone number at any time on your profile page. <Text color='white'>Address</Text> works like this too, which you'll set on the next page.</Text>
+            </Stack>
+    
+            <Stack
+              flex='1'
+              justifyContent='space-evenly'
+            >
+              <Stack
+                justifyContent='center'
+              >
+                <Text pb={wp(1)}>Phone:</Text>
+                <Input
+                  // autoFocus
+                  placeholder='XXX-XXX-XXXX'
+                  w={wp(50)}
+                  bg='white'
+                  onChangeText={(x) => this.setState({ phone: x })}
+                  value={this.state.phone}
+                />
+              </Stack>
+      
               <Box
-                h='180%'
-                position='absolute'
                 justifyContent='flex-end'
               >
-                <Text
-                  textAlign='center'
-                  color='red.700'
-                  bg='white'
-                  p={wp(3)}
-                  borderRadius='40'
-                >An error occured. Please try again.</Text>
+                <Button
+                  onPress={() => this.setPhone()}
+                >Submit</Button>
               </Box>
-            }
-  
-        </Stack>
+            </Stack>
+    
+              { error &&
+                <Box
+                  h='180%'
+                  position='absolute'
+                  justifyContent='flex-end'
+                >
+                  <Text
+                    textAlign='center'
+                    color='red.700'
+                    bg='white'
+                    p={wp(3)}
+                    borderRadius='40'
+                  >An error occured. Please try again.</Text>
+                </Box>
+              }
+    
+          </Stack>
+        </LinearGradient>
       </>
     )
   }

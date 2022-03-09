@@ -11,6 +11,8 @@ import Geocoder from 'react-native-geocoding'
 import MapView, { Marker } from 'react-native-maps'
 import axios from 'react-native-axios'
 import Gradient from '../config/gradient'
+import { TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView } from 'react-native'
+import { LinearGradient } from 'expo-linear-gradient'
 
 const { civicAPIKey, mapAPIKey } = Constants.manifest.extra
 Geocoder.init(civicAPIKey)
@@ -30,16 +32,29 @@ export default class Location extends Component {
       busy: false,
       error: 0,
       latitude: 0,
-      longitude: 0
+      longitude: 0,
+      keyboard: false,
     }
   }
 
   static contextType = Context
 
-  componentDidMount() {
+  componentDidMount () {
+    this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () =>
+      this.setState({ keyboard: true })
+    )
+    this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () =>
+      this.setState({ keyboard: false }
+    ))
+
     let { user } = this.context
 
     user.latitude && this.setState({ latitude: user.latitude, longitude: user.longitude })
+  }
+    
+  componentWillUnmount () {
+    this.keyboardDidShowListener.remove();
+    this.keyboardDidHideListener.remove();
   }
 
   findCoordinatesUsingForm = async () => {
@@ -232,116 +247,120 @@ export default class Location extends Component {
     let { address, autoResults, autoShow, latitude, longitude } = this.state
 
     return (
-      <>
-        <Box
-          flex='1'
-          p={wp(5)}
-          bg='primary.1'
-        >
-          <Gradient
-            position='absolute'
-            h='27%'
-            w='105%'
-            mt={wp(5)}
-            left={wp(3)}
-            borderWidth='3'
-            borderColor='primary.1'
-          />
-  
-          <Row
-            w='100%'
-            mt={wp(4)}
-            px={wp(4)}
-            pb={wp(3)}
-            justifyContent='space-between'
-            alignItems='flex-start'
-          >
-            <Box flex='4'>
-              <Text>Your saved address:</Text>
-            </Box>
-            <Box flex='7'>
-              <Text textAlign='right'>{user.address ? user.address.replace(/([,][\s])/, `\n`) : 'No Address Saved'}</Text>
-            </Box>
-          </Row>
-
-          <Box>
-            <Text pb={wp(1)} px={wp(4)}>Address:</Text>
-            <Input
-              w={wp(80)}
-              bg='white'
-              alignSelf='center'
-              onChangeText={(x) => this.changeInputByTyping(x)}
-              value={address}
-            />
-          </Box>
-
-          {this.buttons()}
-
-          {this.errorMessage()}
-    
-          <ScrollView mt={wp(25)}>
-            <MapView
-              style={{ height: wp(75), width: '100%' }}
-              scrollEnabled={false}
-              // loadingEnabled
-              region={{
-                latitude: latitude,
-                longitude: longitude,
-                latitudeDelta: 0.01,
-                longitudeDelta: 0.01,
-              }}
-            >
-              <Marker
-                coordinate={{ latitude: latitude, longitude: longitude }}
-              />
-            </MapView>
-          </ScrollView>
-        </Box>
-
-        { autoShow &&
-        <Box
-          flex={1}
-          position='absolute'
-          h={hp(100)}
-          w={wp(100)}
-          zIndex='5'
-          // borderWidth='1'
-          onStartShouldSetResponder={() => this.setState({ autoShow: false })}
-        >
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+        <>
           <Box
-            position='absolute'
-            top={wp(33)}
-            left={wp(10)}
-            w={wp(80)}
-            h='auto'
-            bg='white'
-            // borderWidth='1'
-            zIndex='10'
+            flex='1'
+            justifyContent='flex-start'
+            // p={wp(5)}
+            // bg='primary.1'
           >
-            <FlatList
-              data={autoResults}
-              keyExtractor={y => y}
-              renderItem={x => {
-                return (
-                  <Box
-                    w='100%'
-                    p='10'
-                    borderBottomColor='gray.400'
-                    borderBottomWidth='1'
-                  >
-                    <Text
-                      w='100%'
-                      onPress={() => this.changeInputByPressing(x.item)}
-                    >
-                      {x.item}
-                    </Text>
+    
+            <Box>
+              <LinearGradient
+                colors={['#289d15', '#ffffff']}
+                start={{ x: 1, y: 1 }}
+                end={{ x: 0, y: 0 }}
+              >
+                <Row
+                  w='100%'
+                  mt={wp(4)}
+                  px={wp(4)}
+                  pb={wp(3)}
+                  justifyContent='space-between'
+                  alignItems='flex-start'
+                >
+                  <Box flex='4'>
+                    <Text>Your saved address:</Text>
                   </Box>
-                )
-              }}
-            />
+                  <Box flex='7'>
+                    <Text textAlign='right'>{user.address ? user.address.replace(/([,][\s])/, `\n`) : 'No Address Saved'}</Text>
+                  </Box>
+                </Row>
+      
+                <Box mt={wp(5)}>
+                  <Text pb={wp(1)} px={wp(4)}>Address:</Text>
+                  <Input
+                    // autoFocus
+                    w={wp(80)}
+                    bg='white'
+                    alignSelf='center'
+                    onEndEditing={() => Keyboard.dismiss()}
+                    onChangeText={(x) => this.changeInputByTyping(x)}
+                    value={address}
+                  />
+                </Box>
+      
+                <Box mt={wp(5)}>{this.buttons()}</Box>
+      
+                <Box mt={wp(5)}>{this.errorMessage()}</Box>
+              </LinearGradient>
+            </Box>
+      
+            <Box>
+              <MapView
+                style={{ height: wp(75), width: '100%' }}
+                scrollEnabled={false}
+                // loadingEnabled
+                region={{
+                  latitude: latitude,
+                  longitude: longitude,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.01,
+                }}
+              >
+                <Marker
+                  coordinate={{ latitude: latitude, longitude: longitude }}
+                />
+              </MapView>
+            </Box>
+  
+          { autoShow &&
+          <Box
+            flex={1}
+            position='absolute'
+            h={hp(100)}
+            w={wp(100)}
+            zIndex='5'
+            // borderWidth='1'
+            onStartShouldSetResponder={() => this.setState({ autoShow: false })}
+          >
+            <Box
+              position='absolute'
+              top={wp(35.5)}
+              left={wp(10)}
+              w={wp(80)}
+              h='auto'
+              bg='white'
+              // borderWidth='1'
+              zIndex='10'
+            >
+              <FlatList
+                data={autoResults}
+                keyExtractor={y => y}
+                renderItem={x => {
+                  return (
+                    <Box
+                      w='100%'
+                      p='10'
+                      borderBottomColor='gray.400'
+                      borderBottomWidth='1'
+                    >
+                      <Text
+                        w='100%'
+                        onPress={() => this.changeInputByPressing(x.item)}
+                      >
+                        {x.item}
+                      </Text>
+                    </Box>
+                  )
+                }}
+              />
+            </Box>
+          </Box> }
           </Box>
-        </Box> }
-      </>
+        </>
+      </TouchableWithoutFeedback>
     )
   }
 }

@@ -1,3 +1,4 @@
+import React from 'react'
 import { Platform } from 'react-native'
 import { extendTheme } from 'native-base'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
@@ -9,25 +10,26 @@ export default theme = extendTheme({
   components: {
     Button: {
       defaultProps: {
-        py: Platform.OS === 'ios' ? wp(3) : wp(2),
-        px: Platform.OS === 'ios' ? wp(4) : wp(3.5),
+        py: Platform.OS === 'ios' ? wp(3) : wp(3),
+        px: Platform.OS === 'ios' ? wp(4) : wp(4.5),
         borderRadius: '40',
-        borderColor: 'primary.1',
-        _text: { fontSize: Platform.OS === 'ios' ? wp(4) : wp(3) }
+        backgroundColor: 'darkgreen',
+        // borderColor: 'primary.1',
       },
     },
     Input: {
       defaultProps: {
-        py: wp(0.5),
-        pl: wp(2),
-        pr: wp(1),
-        borderColor: '#8f8f8f'
+        py: Platform.OS === 'ios' ? wp(1.4) : wp(.2),
+        px: hp(1),
+        borderColor: 'darkgreen'
       },
+      // _text: wp(4)
     },
     Text: {
       defaultProps: {
         // fontSize: wp(3.2),
-        fontSize: Platform.OS === 'ios' ? wp(4) : wp(3),
+        fontSize: Platform.OS === 'ios' ? wp(6) : wp(5),
+        // lineHeight: wp(5)
         // fontFamily: 'SourceSansPro'
       }
     },
@@ -57,12 +59,6 @@ export default theme = extendTheme({
         borderTopWidth: '1'
       }
     },
-    // SelectItem: {
-    //   baseStyle: {
-    //     px: wp(2),
-    //     py: wp(1)
-    //   }
-    // }
   },
   space: {
     '1': 1,

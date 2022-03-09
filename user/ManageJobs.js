@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faArrowUp } from '@fortawesome/free-solid-svg-icons'
 import { format } from 'date-fns'
 import Gradient from '../config/gradient'
+import { TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView } from 'react-native'
 
 export default class ManageJobs extends Component {
   constructor(props) {
@@ -151,27 +152,29 @@ export default class ManageJobs extends Component {
 
   render() {
     return (
-      <Box flex='1' bg='primary.1'>
-
-        {this.renderList()}
-
-        { this.context.userJobs.length >= 3 && <Button
-          position='absolute'
-          justifyContent='center'
-          alignItems='center'
-          right={wp(5)}
-          bottom={wp(5)}
-          boxSize={wp(10)}
-          bg='white'
-          borderRadius='50'
-          borderColor='primary.1'
-          borderWidth='1'
-          onPress={() => this.refs.list.scrollToIndex({ index: 0 })}
-        >
-          <FontAwesomeIcon icon={faArrowUp} size={wp(4)}/>
-        </Button> }
-
-      </Box>
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+        <Box flex='1' bg='primary.1'>
+  
+          {this.renderList()}
+  
+          { this.context.userJobs.length >= 3 && <Button
+            position='absolute'
+            justifyContent='center'
+            alignItems='center'
+            right={wp(5)}
+            bottom={wp(5)}
+            boxSize={wp(10)}
+            bg='white'
+            borderRadius='50'
+            borderColor='primary.1'
+            borderWidth='1'
+            onPress={() => this.refs.list.scrollToIndex({ index: 0 })}
+          >
+            <FontAwesomeIcon icon={faArrowUp} size={wp(4)}/>
+          </Button> }
+  
+        </Box>
+      </TouchableWithoutFeedback>
     )
   }
 }

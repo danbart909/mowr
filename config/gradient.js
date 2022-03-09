@@ -11,7 +11,7 @@ const Gradient = (props) => {
       start={{ x: 1, y: 1 }}
       end={{ x: 0, y: 0 }}
       borderRadius='40'
-      {...props}
+      // {...props}
     />
   )
 }

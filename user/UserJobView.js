@@ -6,6 +6,7 @@ import Context from '../context/Context.js'
 import { collection, doc, setDoc, addDoc, getDoc, getDocs, query, where, orderBy, limit, deleteDoc } from 'firebase/firestore'
 import Gradient from '../config/gradient'
 import DateTimePicker from '@react-native-community/datetimepicker'
+import { TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView } from 'react-native'
 
 export default class UserJobView extends Component {
   constructor(props) {
@@ -112,39 +113,41 @@ export default class UserJobView extends Component {
 
     list.map(x => {
       html.push(
-        <Modal
-          key={x.x}
-          isOpen={x.show}
-          onClose={() => this.setState({ [x.showName]: false })}
-        >
-          <Modal.Content w={wp(80)}>
-          <Modal.CloseButton />
-            <Modal.Header>Edit Job</Modal.Header>
-            <Modal.Body>
-              <FormControl>
-                <FormControl.Label>{`${x.x}`}</FormControl.Label>
-                {this.renderInput(x)}
-              </FormControl>
-            </Modal.Body>
-            {x.error && <Text bold alignSelf='center' color='red.600'>An Error Occurred, Please Try Again</Text>}
-            <Button.Group
-              space={wp(2)}
-              alignSelf='flex-end'
-              pr={wp(2)}
-              pb={wp(2)}
-            >
-              <Button
-                variant='ghost'
-                onPress={() => this.setState({ [x.showName]: false, [x.newName]: '' })}
-              >Cancel</Button>
-              <Button
-                // colorScheme={job.completed && 'red'}
-                isLoading={x.busy}
-                onPress={() => this.update(x)}
-              >Save</Button>
-            </Button.Group>
-          </Modal.Content>
-        </Modal>
+        <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+          <Modal
+            key={x.x}
+            isOpen={x.show}
+            onClose={() => this.setState({ [x.showName]: false })}
+          >
+            <Modal.Content w={wp(80)}>
+            <Modal.CloseButton />
+              <Modal.Header>Edit Job</Modal.Header>
+              <Modal.Body>
+                <FormControl>
+                  <FormControl.Label>{`${x.x}`}</FormControl.Label>
+                  {this.renderInput(x)}
+                </FormControl>
+              </Modal.Body>
+              {x.error && <Text bold alignSelf='center' color='red.600'>An Error Occurred, Please Try Again</Text>}
+              <Button.Group
+                space={wp(2)}
+                alignSelf='flex-end'
+                pr={wp(2)}
+                pb={wp(2)}
+              >
+                <Button
+                  variant='ghost'
+                  onPress={() => this.setState({ [x.showName]: false, [x.newName]: '' })}
+                >Cancel</Button>
+                <Button
+                  // colorScheme={job.completed && 'red'}
+                  isLoading={x.busy}
+                  onPress={() => this.update(x)}
+                >Save</Button>
+              </Button.Group>
+            </Modal.Content>
+          </Modal>
+        </TouchableWithoutFeedback>
       )
     })
 
@@ -156,6 +159,8 @@ export default class UserJobView extends Component {
     if (x.x === 'Title') {
       return (
         <Input
+          // autoFocus
+          onEndEditing={() => Keyboard.dismiss()}
           value={x.new}
           onChangeText={y => this.setState({ [x.newName]: y })}
         />
@@ -163,6 +168,8 @@ export default class UserJobView extends Component {
     } else if (x.x === 'Tip') {
       return (
         <Input
+          // autoFocus
+          onEndEditing={() => Keyboard.dismiss()}
           value={x.new}
           onChangeText={y => this.setState({ [x.newName]: y })}
         />
@@ -194,6 +201,7 @@ export default class UserJobView extends Component {
             // w={wp(70)}
             // p={Platform.OS === 'ios' ? wp(4) : 0}
             // p={wp(3)}
+            onEndEditing={() => Keyboard.dismiss()}
             bg='white'
             fontSize={Platform.OS === 'ios' ? wp(3.6) : wp(2.5)}
             variant='rounded'
@@ -314,37 +322,39 @@ export default class UserJobView extends Component {
     let { pickerMode, showDatePicker } = this.state
 
     return (
-      <ScrollView bg='primary.1'>
-
-          <Gradient
-            m={wp(4)}
-            p={wp(3)}
-          >
-            {this.renderList()}
-            <Button
-              w={wp(60)}
-              my={wp(5)}
-              alignSelf='center'
-              onPress={() => this.delete()}
-            >Delete</Button>
-          </Gradient>
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+        <ScrollView bg='primary.1'>
   
-          {this.modals()}
+            <Gradient
+              m={wp(4)}
+              p={wp(3)}
+            >
+              {this.renderList()}
+              <Button
+                w={wp(60)}
+                my={wp(5)}
+                alignSelf='center'
+                onPress={() => this.delete()}
+              >Delete</Button>
+            </Gradient>
+    
+            {this.modals()}
+    
+            {/* {showDatePicker && (
+              <DateTimePicker
+                value={new Date()}
+                mode={pickerMode}
+                minuteInterval={5}
+                onChange={(event, date) => {
+                  pickerMode === 'date' ?
+                  this.setState({ pickerMode: 'time', newDate: new Date(date)}) :
+                  this.setState({ pickerMode: 'date', showDatePicker: false, newTime: new Date(date)})
+                }}
+              />
+            )} */}
   
-          {/* {showDatePicker && (
-            <DateTimePicker
-              value={new Date()}
-              mode={pickerMode}
-              minuteInterval={5}
-              onChange={(event, date) => {
-                pickerMode === 'date' ?
-                this.setState({ pickerMode: 'time', newDate: new Date(date)}) :
-                this.setState({ pickerMode: 'date', showDatePicker: false, newTime: new Date(date)})
-              }}
-            />
-          )} */}
-
-      </ScrollView>
+        </ScrollView>
+      </TouchableWithoutFeedback>
     )
   }
 }

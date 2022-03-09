@@ -7,7 +7,6 @@ export default React.createContext({
   fire: {},
   navigation: {},
   isFocused: {},
-  // toast: {},
   user: {},
   userJobs: [],
   jobSearchResults: [],
