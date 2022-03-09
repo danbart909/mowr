@@ -131,10 +131,10 @@ export default class App extends Component {
           name='Settings'
           component={Settings}
         /> */}
-        {/* <Drawer.Screen
+        <Drawer.Screen
           name='Info'
           component={Info}
-        /> */}
+        />
         <Drawer.Screen
           name='About'
           component={About}
@@ -180,10 +180,10 @@ export default class App extends Component {
           name='Settings'
           component={Settings}
         /> */}
-        {/* <Drawer.Screen
+        <Drawer.Screen
           name='Info'
           component={Info}
-        /> */}
+        />
         <Drawer.Screen
           name='About'
           component={About}
@@ -245,10 +245,10 @@ export default class App extends Component {
                 name='Home'
                 component={Home}
               />
-              <Drawer.Screen
+              {/* <Drawer.Screen
           name='Info'
           component={Info}
-        />
+        /> */}
               <Drawer.Screen
                 name='Search Jobs'
                 component={SearchJobs}
