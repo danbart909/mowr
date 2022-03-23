@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import Context from '../context/Context.js'
 import { Box, Button, Center, Column, FormControl, Heading, Input, Spinner, Row, Stack, Text } from 'native-base'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
-import { Keyboard } from 'react-native'
+import { Platform, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView } from 'react-native'
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
 import { collection, doc, setDoc, addDoc, Timestamp } from 'firebase/firestore'
 import { LinearGradient } from 'expo-linear-gradient'
@@ -75,6 +75,7 @@ export default class Signup extends Component {
         <Box
           borderWidth='5'
           borderColor='primary.1'
+          bg='white'
         >
           <Spinner size={wp(10)} m={wp(10)} color='primary.1'/>
         </Box>
@@ -82,7 +83,7 @@ export default class Signup extends Component {
     }
 
     return (
-      <>
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <LinearGradient
           colors={['#289d15', '#ffffff']}
           start={{ x: 1, y: 1 }}
@@ -105,13 +106,15 @@ export default class Signup extends Component {
               flex='2'
               justifyContent='center'
             >
-              <Text pb={wp(1)}>Name</Text>
+              <Text>Name</Text>
               <Input
                 // placeholder='Name'
                 // autoFocus
-                onEndEditing={() => Keyboard.dismiss()}
+                // onEndEditing={() => Keyboard.dismiss()}
+                fontSize={Platform.OS === 'ios' ? wp(4.5) : wp(3)}
                 w={wp(50)}
                 bg='white'
+                // zIndex='2'
                 onChangeText={(x) => this.setState({ displayName: x })}
                 value={displayName}
               />
@@ -121,10 +124,11 @@ export default class Signup extends Component {
               flex='2'
               justifyContent='center'
             >
-              <Text pb={wp(1)}>Email</Text>
+              <Text>Email</Text>
               <Input
                 // placeholder='Email'
-                onEndEditing={() => Keyboard.dismiss()}
+                // onEndEditing={() => Keyboard.dismiss()}
+                fontSize={Platform.OS === 'ios' ? wp(4.5) : wp(3)}
                 w={wp(50)}
                 bg='white'
                 onChangeText={(x) => this.setState({ email: x })}
@@ -136,10 +140,11 @@ export default class Signup extends Component {
               flex='2'
               justifyContent='center'
             >
-              <Text pb={wp(1)}>Password</Text>
+              <Text>Password</Text>
               <Input
                 // placeholder='Password'
-                onEndEditing={() => Keyboard.dismiss()}
+                // onEndEditing={() => Keyboard.dismiss()}
+                fontSize={Platform.OS === 'ios' ? wp(4.5) : wp(3)}
                 type='password'
                 w={wp(50)}
                 bg='white'
@@ -152,10 +157,11 @@ export default class Signup extends Component {
               flex='2'
               justifyContent='center'
             >
-              <Text pb={wp(1)}>Confirm Password</Text>
+              <Text>Confirm Password</Text>
               <Input
                 // placeholder='Confirm Password'
-                onEndEditing={() => Keyboard.dismiss()}
+                // onEndEditing={() => Keyboard.dismiss()}
+                fontSize={Platform.OS === 'ios' ? wp(4.5) : wp(3)}
                 type='password'
                 w={wp(50)}
                 bg='white'
@@ -212,7 +218,7 @@ export default class Signup extends Component {
             }
           </Stack>
         </LinearGradient>
-      </>
+      </TouchableWithoutFeedback>
     )
   }
 }

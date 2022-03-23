@@ -15,30 +15,33 @@ export default class Preface extends Component {
     super(props)
     this.state = {
       view: 'Signup',
-      keyboard: false
+      // keyboard: false
     }
   }
 
   static contextType = Context
 
-  componentDidMount () {
-    this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () =>
-      this.setState({ keyboard: true })
-    )
-    this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () =>
-      this.setState({ keyboard: false }
-    ))
-  }
+  // componentDidMount () {
+  //   this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () =>
+  //     this.setState({ keyboard: true })
+  //   )
+  //   this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () =>
+  //     this.setState({ keyboard: false }
+  //   ))
+  // }
     
-  componentWillUnmount () {
-    this.keyboardDidShowListener.remove();
-    this.keyboardDidHideListener.remove();
-  }
+  // componentWillUnmount () {
+  //   this.keyboardDidShowListener.remove();
+  //   this.keyboardDidHideListener.remove();
+  // }
 
   render() {
-    let { keyboard } = this.state
+    // let { keyboard } = this.state
     return (
-      <>
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}
+        flex='1'
+        onStartShouldSetResponder={() => Keyboard.dismiss()}
+      >
         <Video
           source={require('../assets/mower1.mp4')}
           ref={(ref) => this.background = ref }
@@ -50,37 +53,32 @@ export default class Preface extends Component {
           // useNativeControls
         />
         <NativeBaseProvider theme={theme}>
-          <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-            <Center flex='1' bottom={keyboard ? hp(23) : 0}>
-              {
-                this.state.view === 'Signup' ?
-                <Signup
-                  setView={(x) => this.setState({ view: x })}
-                  context={this.context}
-                  keyboard={keyboard}
-                /> :
-                this.state.view === 'Phone' ?
-                <Phone
-                  setView={(x) => this.setState({ view: x })}
-                  context={this.context}
-                  keyboard={keyboard}
-                /> :
-                this.state.view === 'Address' ?
-                <Address
-                  setView={(x) => this.setState({ view: x })}
-                  context={this.context}
-                  keyboard={keyboard}
-                /> :
-                <Login
-                  setView={(x) => this.setState({ view: x })}
-                  context={this.context}
-                  keyboard={keyboard}
-                />
-              }
-            </Center>
-          </TouchableWithoutFeedback>
+          {/* <Center flex='1' bottom={keyboard ? hp(18) : 0}> */}
+          <Center flex='1'>
+            {
+              this.state.view === 'Signup' ?
+              <Signup
+                setView={(x) => this.setState({ view: x })}
+                context={this.context}
+              /> :
+              this.state.view === 'Phone' ?
+              <Phone
+                setView={(x) => this.setState({ view: x })}
+                context={this.context}
+              /> :
+              this.state.view === 'Address' ?
+              <Address
+                setView={(x) => this.setState({ view: x })}
+                context={this.context}
+              /> :
+              <Login
+                setView={(x) => this.setState({ view: x })}
+                context={this.context}
+              />
+            }
+          </Center>
         </NativeBaseProvider>
-      </>
+      </KeyboardAvoidingView>
     )
   }
 }

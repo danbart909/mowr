@@ -62,6 +62,8 @@ export default class About extends Component {
                 <WText color='primary.1'>We cannot be held liable for the actions of people who have ill intent. Be wary of any job offers out of the ordinary and prepare for each job approprately.</WText>
 
                 <WText>All financial transactions are handled outside of the app. It is the job poster's responsibility to personally pay the worker for any services rendered. We handle no money ourselves, and we take no cut from any agreements between the worker and the job provider.</WText>
+
+                <WText>wrkr was written with React Native</WText>
                 
                 <WText textAlign='right'>Pretty Good Inc. © 2022</WText>
               </Stack>

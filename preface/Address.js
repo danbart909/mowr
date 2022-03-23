@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import Context from '../context/Context.js'
-import { Platform } from 'react-native'
 import { Box, Button, Column, Center, Factory, FlatList, FormControl, Heading, Input, Modal, Row, ScrollView, Spinner, Stack, Text } from 'native-base'
+import { Platform, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView } from 'react-native'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons'
@@ -164,6 +164,7 @@ export default class Address extends Component {
         <Center
           borderWidth='5'
           borderColor='primary.1'
+          bg='white'
         >
           <Spinner my={wp(1.29)} size='lg'/>
         </Center>
@@ -239,127 +240,130 @@ export default class Address extends Component {
     let { address, autoResults, autoShow, latitude, longitude } = this.state
 
     return (
-      <>
-        <LinearGradient
-          colors={['#289d15', '#ffffff']}
-          start={{ x: 1, y: 1 }}
-          end={{ x: 0, y: 0 }}
-        >
-
-          <Box
-            h={hp(85)}
-            w={wp(90)}
-            alignItems='center'
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+        <>
+          <LinearGradient
+            colors={['#289d15', '#ffffff']}
+            start={{ x: 1, y: 1 }}
+            end={{ x: 0, y: 0 }}
           >
-    
-            <Stack
-              px={wp(3)}
-              space={wp(3)}
-              mb={wp(5)}
-              // borderWidth='1'
+  
+            <Box
+              h={hp(85)}
+              w={wp(90)}
+              alignItems='center'
             >
-    
-              <Heading pt={wp(5)} textAlign='center'>Enter Your Address</Heading>
-    
-              <Row
-                // w='100%'
-                justifyContent='space-between'
-                alignItems='flex-start'
+      
+              <Stack
+                px={wp(3)}
+                space={wp(3)}
+                mb={wp(5)}
                 // borderWidth='1'
               >
-                <Box flex='4'>
-                  <Text lineHeight={wp(5)}>Your saved address:</Text>
-                </Box>
-                <Box flex='7'>
-                  <Text textAlign='right'>{user.address ? user.address.replace(/([,][\s])/, `\n`) : 'No Address Saved'}</Text>
-                </Box>
-              </Row>
-    
-                <Box>
-                  <Text pb={wp(1)}>Address:</Text>
-                  <Input
-                    // autoFocus
-                    onEndEditing={() => Keyboard.dismiss()}
-                    w={wp(78)}
-                    bg='white'
-                    alignSelf='center'
-                    onChangeText={(x) => this.changeInputByTyping(x)}
-                    value={address}
+      
+                <Heading pt={wp(5)} textAlign='center'>Enter Your Address</Heading>
+      
+                <Row
+                  // w='100%'
+                  justifyContent='space-between'
+                  alignItems='flex-start'
+                  // borderWidth='1'
+                >
+                  <Box flex='4'>
+                    <Text lineHeight={wp(5.5)}>Your saved address:</Text>
+                  </Box>
+                  <Box flex='7'>
+                    <Text textAlign='right'>{user.address ? user.address.replace(/([,][\s])/, `\n`) : 'No Address Saved'}</Text>
+                  </Box>
+                </Row>
+      
+                  <Box>
+                    <Text pb={wp(1)}>Address:</Text>
+                    <Input
+                      // autoFocus
+                      onEndEditing={() => Keyboard.dismiss()}
+                      w={wp(78)}
+                      bg='white'
+                      alignSelf='center'
+                      fontSize={Platform.OS === 'ios' ? wp(4.5) : wp(3)}
+                      onChangeText={(x) => this.changeInputByTyping(x)}
+                      value={address}
+                    />
+                  </Box>
+      
+                {this.buttons()}
+      
+                <Center>
+                  {this.errorMessageOrButton()}
+                </Center>
+      
+              </Stack>
+      
+              <ScrollView>
+                <MapView
+                  style={{ height: hp(42), width: wp(84) }}
+                  scrollEnabled={false}
+                  // loadingEnabled
+                  region={{
+                    latitude: latitude,
+                    longitude: longitude,
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.01,
+                  }}
+                >
+                  <Marker
+                    coordinate={{ latitude: latitude, longitude: longitude }}
                   />
-                </Box>
-    
-              {this.buttons()}
-    
-              <Center>
-                {this.errorMessageOrButton()}
-              </Center>
-    
-            </Stack>
-    
-            <ScrollView>
-              <MapView
-                style={{ height: hp(42), width: wp(84) }}
-                scrollEnabled={false}
-                // loadingEnabled
-                region={{
-                  latitude: latitude,
-                  longitude: longitude,
-                  latitudeDelta: 0.01,
-                  longitudeDelta: 0.01,
-                }}
-              >
-                <Marker
-                  coordinate={{ latitude: latitude, longitude: longitude }}
-                />
-              </MapView>
-            </ScrollView>
-    
-            { autoShow &&
-            <Box
-              position='absolute'
-              h={hp(100)}
-              w={wp(100)}
-              mt={wp(-7)}
-              zIndex='5'
-              onStartShouldSetResponder={() => this.setState({ autoShow: false })}
-            >
+                </MapView>
+              </ScrollView>
+      
+              { autoShow &&
               <Box
                 position='absolute'
-                top={user.address ? (Platform.OS === 'ios' ? hp(25.4) : hp(24.6)) : (Platform.OS === 'ios' ? hp(23.4) : hp(25))}
-                left={wp(11)}
-                w={wp(70)}
-                h='auto'
-                bg='white'
-                // borderWidth='1'
-                zIndex='10'
+                h={hp(100)}
+                w={wp(100)}
+                mt={wp(-7)}
+                zIndex='5'
+                onStartShouldSetResponder={() => this.setState({ autoShow: false })}
               >
-                <FlatList
-                  data={autoResults}
-                  keyExtractor={y => y}
-                  renderItem={x => {
-                    return (
-                      <Box
-                        w='100%'
-                        p='10'
-                        borderBottomColor='gray.400'
-                        borderBottomWidth='1'
-                      >
-                        <Text
+                <Box
+                  position='absolute'
+                  top={user.address ? (Platform.OS === 'ios' ? hp(25.4) : hp(24.6)) : (Platform.OS === 'ios' ? hp(23.4) : hp(25))}
+                  left={wp(11)}
+                  w={wp(70)}
+                  h='auto'
+                  bg='white'
+                  // borderWidth='1'
+                  zIndex='10'
+                >
+                  <FlatList
+                    data={autoResults}
+                    keyExtractor={y => y}
+                    renderItem={x => {
+                      return (
+                        <Box
                           w='100%'
-                          onPress={() => this.changeInputByPressing(x.item)}
+                          p='10'
+                          borderBottomColor='gray.400'
+                          borderBottomWidth='1'
                         >
-                          {x.item}
-                        </Text>
-                      </Box>
-                    )
-                  }}
-                />
-              </Box>
-            </Box> }
-    
-          </Box>
-        </LinearGradient>
-      </>
+                          <Text
+                            w='100%'
+                            onPress={() => this.changeInputByPressing(x.item)}
+                          >
+                            {x.item}
+                          </Text>
+                        </Box>
+                      )
+                    }}
+                  />
+                </Box>
+              </Box> }
+      
+            </Box>
+          </LinearGradient>
+        </>
+      </TouchableWithoutFeedback>
     )
   }
 }

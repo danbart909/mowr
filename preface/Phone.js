@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import Context from '../context/Context.js'
 import { Box, Button, Column, Center, FormControl, Heading, Input, Modal, Spinner, Stack, Text } from 'native-base'
+import { Platform, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView } from 'react-native'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { doc, setDoc } from 'firebase/firestore'
 import { LinearGradient } from 'expo-linear-gradient'
@@ -63,6 +64,7 @@ export default class Phone extends Component {
         <Box
           borderWidth='5'
           borderColor='primary.1'
+          bg='white'
         >
           <Spinner size={wp(10)} m={wp(10)} color='primary.1'/>
         </Box>
@@ -70,7 +72,7 @@ export default class Phone extends Component {
     }
 
     return (
-      <>
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <LinearGradient
           colors={['#289d15', '#ffffff']}
           start={{ x: 1, y: 1 }}
@@ -107,6 +109,7 @@ export default class Phone extends Component {
                   placeholder='XXX-XXX-XXXX'
                   w={wp(50)}
                   bg='white'
+                  fontSize={Platform.OS === 'ios' ? wp(4.5) : wp(3)}
                   onChangeText={(x) => this.setState({ phone: x })}
                   value={this.state.phone}
                 />
@@ -139,7 +142,7 @@ export default class Phone extends Component {
     
           </Stack>
         </LinearGradient>
-      </>
+      </TouchableWithoutFeedback>
     )
   }
 }

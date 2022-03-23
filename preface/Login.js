@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import Context from '../context/Context.js'
 import { Box, Button, Center, Column, FormControl, Heading, Input, Spinner, Row, ScrollView, Stack, Text } from 'native-base'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
-import { Keyboard } from 'react-native'
+import { Platform, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView } from 'react-native'
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import { LinearGradient } from 'expo-linear-gradient'
 
@@ -49,6 +49,7 @@ export default class Login extends Component {
         <Box
           borderWidth='5'
           borderColor='primary.1'
+          bg='white'
         >
           <Spinner size={wp(10)} m={wp(10)} color='primary.1'/>
         </Box>
@@ -56,7 +57,7 @@ export default class Login extends Component {
     }
 
     return (
-      <>
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <LinearGradient
           colors={['#289d15', '#ffffff']}
           start={{ x: 1, y: 1 }}
@@ -87,10 +88,11 @@ export default class Login extends Component {
                 <Input
                   // autoFocus
                   // placeholder='Email'
-                  onEndEditing={() => Keyboard.dismiss()}
+                  // onEndEditing={() => Keyboard.dismiss()}
                   w={wp(50)}
                   bg='white'
                   onChangeText={(x) => this.setState({ email: x })}
+                  fontSize={Platform.OS === 'ios' ? wp(4.5) : wp(3)}
                   value={email}
                 />
               </Stack>
@@ -102,11 +104,12 @@ export default class Login extends Component {
                 <Text pb={wp(1)}>Password</Text>
                 <Input
                   // placeholder='Password'
-                  onEndEditing={() => Keyboard.dismiss()}
+                  // onEndEditing={() => Keyboard.dismiss()}
                   type='password'
                   w={wp(50)}
                   bg='white'
                   onChangeText={(x) => this.setState({ password: x })}
+                  fontSize={Platform.OS === 'ios' ? wp(4.5) : wp(3)}
                   value={password}
                 />
               </Stack>
@@ -115,16 +118,16 @@ export default class Login extends Component {
             <Box
               flex='2'
               w='100%'
-              justifyContent='space-between'
+              justifyContent='center'
             >
-              <Text
+              {/* <Text
                 bold
                 underline
                 fontSize={wp(4)}
                 alignSelf='flex-end'
               >
                 Forgot Password?
-              </Text>
+              </Text> */}
       
               <Button
                 px={wp(15)}
@@ -171,7 +174,7 @@ export default class Login extends Component {
             </Box>
           }
         </LinearGradient>
-      </>
+      </TouchableWithoutFeedback>
     )
   }
 }

@@ -10,27 +10,39 @@ export default theme = extendTheme({
   components: {
     Button: {
       defaultProps: {
-        py: Platform.OS === 'ios' ? wp(3) : wp(3),
-        px: Platform.OS === 'ios' ? wp(4) : wp(4.5),
+        py: Platform.OS === 'ios' ? wp(2) : wp(3),
+        px: Platform.OS === 'ios' ? wp(3) : wp(4.5),
         borderRadius: '40',
         backgroundColor: 'darkgreen',
         // borderColor: 'primary.1',
+        _text: {
+          color: 'white',
+          fontSize: Platform.OS === 'ios' ? wp(5.5) : wp(4),
+          textAlign: 'center',
+          fontFamily: 'Karla'
+        },
       },
     },
     Input: {
       defaultProps: {
         py: Platform.OS === 'ios' ? wp(1.4) : wp(.2),
-        px: hp(1),
-        borderColor: 'darkgreen'
+        px: wp(1),
+        borderColor: 'darkgreen',
+        _text: {
+          // color: 'red',
+          fontSize: Platform.OS === 'ios' ? wp(6) : wp(4.5)
+        },
       },
-      // _text: wp(4)
     },
     Text: {
       defaultProps: {
-        // fontSize: wp(3.2),
-        fontSize: Platform.OS === 'ios' ? wp(5.5) : wp(4.5),
-        // lineHeight: wp(5)
-        // fontFamily: 'SourceSansPro'
+        fontSize: Platform.OS === 'ios' ? wp(6) : wp(4.5),
+        // lineHeight: wp(5.5),
+        fontFamily: 'Mukta',
+        // fontFamily: 'Karla',
+        // fontFamily: 'SourceSansPro',
+        // fontFamily: 'NotoSans',
+        // fontFamily: 'Lato',
       }
     },
     ModalHeader: {
@@ -41,8 +53,6 @@ export default theme = extendTheme({
     },
     ModalCloseButton: {
       baseStyle: {
-        // right: wp(2),
-        // top: wp(1.5),
         py: wp(3),
         px: wp(2.5)
       }

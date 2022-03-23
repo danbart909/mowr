@@ -1,9 +1,8 @@
 import React, { Component } from 'react'
 import Context from '../context/Context.js'
-import { Box, Button, Center, Heading, Factory, FlatList, Input, Modal, ScrollView, Spinner, Text, Select, Stack, Row, Switch } from 'native-base'
-import { Platform } from 'react-native'
+import { Box, Button, Checkbox, Center, Heading, Factory, FlatList, Input, Modal, ScrollView, Spinner, Text, Select, Stack, Row, Switch } from 'native-base'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faArrowUp } from '@fortawesome/free-solid-svg-icons'
+import { faArrowUp, faAngleDoubleUp } from '@fortawesome/free-solid-svg-icons'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import Constants from 'expo-constants'
 import Geocoder from 'react-native-geocoding'
@@ -12,7 +11,8 @@ import { getDistance } from 'geolib'
 import { format } from 'date-fns'
 import { collection, doc, getDoc, getDocs, query, orderBy, where } from 'firebase/firestore'
 import { LinearGradient } from 'expo-linear-gradient'
-import { TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView } from 'react-native'
+import { Animated, Platform, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView } from 'react-native'
+import { WText, SText, animHideAndSlideUp, animSlideDownAndShow, heightTo1, heightTo0, fadeInText, fadeOutText } from '../config/helper.js'
 
 const { civicAPIKey } = Constants.manifest.extra
 Geocoder.init(civicAPIKey)
@@ -30,6 +30,12 @@ export default class SearchJobs extends Component {
       inputZip: '',
       showPageSelectModal: false,
       keyboard: false,
+      hideSearch: false,
+      hideMap: false,
+      animBarHeight: new Animated.Value(0),
+      animRotate: new Animated.Value(0),
+      animMapHeight: new Animated.Value(0),
+      animTextOpacity: new Animated.Value(0),
     }
   }
 
@@ -48,6 +54,8 @@ export default class SearchJobs extends Component {
     this.keyboardDidShowListener.remove()
     this.keyboardDidHideListener.remove()
   }
+
+  
 
   search = async () => {
     let { zip } = this.context
@@ -147,7 +155,7 @@ export default class SearchJobs extends Component {
 
     let jobsCopy = [...newJobs]
     while (jobsCopy.length > 0) {
-      pages.push(jobsCopy.splice(0, 5))
+      pages.push(jobsCopy.splice(0, 10))
     }
 
     this.context.updateContext('jobSearchResults', newJobs)
@@ -195,7 +203,10 @@ export default class SearchJobs extends Component {
           <Marker
             key={i}
             coordinate={{ latitude: lat[i], longitude: lng[i] }}
-            onPress={() => this.context.updateContext('jobWindow', this.context.jobSearchResults[i])}
+            onPress={() => {
+              this.changePageOnMarkerPress(this.context.jobSearchResults[i].id)
+              this.context.updateContext('jobWindow', this.context.jobSearchResults[i])
+            }}
           />
         )
       }
@@ -204,9 +215,25 @@ export default class SearchJobs extends Component {
     return html
   }
 
+  changePageOnMarkerPress = (id) => {
+    let { pagination } = this.context
+    let html = []
+    let i = 0
+
+    pagination.pages.map(x => {
+      if (x.find(y => y.id === id)) {
+        pagination.current = i
+        pagination.visibleJobs = pagination.pages[i]
+        this.context.updateContext('pagination', pagination )
+      }
+      i++
+    })
+  }
+
   resultsView = () => {
     let { jobSearchResults, jobWindow } = this.context
-    let { error } = this.state
+    let { error, hideMap, hideSearch, animTextOpacity } = this.state
+    let opacityValue = animTextOpacity.interpolate({ inputRange: [0, 1], outputRange: [0, 1] })
 
     if (error) {
       return (
@@ -229,135 +256,122 @@ export default class SearchJobs extends Component {
 
     if (jobWindow.title) {
       return (
-        <Center
-          flex='1'
-          justifyContent='center'
-          // borderWidth='1'
-        >
-          <LinearGradient
-            colors={['#289d15', '#ffffff']}
-            start={{ x: 1, y: 1 }}
-            end={{ x: 0, y: 0 }}
+        <Box flex='1'>
+          <Box
+            flex='1'
           >
-            <Box
-              // h={hp(95)}
-              // w={wp(95)}
-              h='100%'
-              w='100%'
-              p={wp(3)}
-              pt={wp(5)}
-              justifyContent='space-between'
-              alignItems='stretch'
-              // borderWidth='1'
+            <LinearGradient
+              colors={['#289d15', '#ffffff']}
+              start={{ x: 1, y: 1 }}
+              end={{ x: 0, y: 0 }}
+              style={{ flex: 1, padding: wp(2) }}
             >
               <Row
-                alignItems='flex-start'
-                // my={wp(2)}
+                flex={1.5}
+                alignItems='center'
                 // borderWidth='1'
-                // borderBottomWidth='1'
               >
-                <Box
-                  flex='8'
-                  // p={wp(1)}
-                  // borderWidth='1'
-                >
-                  <SText lineHeight={wp(4)} noOfLines={3}>{jobWindow.title}</SText>
+                <Box flex='8'>
+                  <SText noOfLines={2}>{jobWindow.title}</SText>
                 </Box>
-                <Box
-                  flex='3'
-                  // p={wp(1)}
-                  // borderWidth='1'
-                >
+                <Box flex='3'>
                   <SText textAlign='right'>${jobWindow.tip}</SText>
                 </Box>
               </Row>
     
               <Row
-                // px={wp(2)}
+                flex={2}
                 justifyContent='space-between'
                 // borderWidth='1'
               >
                 <Box
                   alignItems='flex-start'
                   justifyContent='center'
-                  lineHeight={wp(2)}
                   flex='1'
-                  // borderWidth='1'
                 >
-                  <SText lineHeight={wp(4)}>{`${this.calcDistance(jobWindow.latitude, jobWindow.longitude)}`}</SText>
+                  <SText>{`${this.calcDistance(jobWindow.latitude, jobWindow.longitude)}`}</SText>
                 </Box>
                 <Box
                   alignItems='flex-end'
+                  justifyContent='center'
                   flex='1'
-                  // borderWidth='1'
                 >
-                  <SText borderBottomWidth='1' textAlign='right'>Job Poster:</SText>
-                  <SText lineHeight={wp(4)} textAlign='right'>{jobWindow.userName}</SText>
+                  <SText textAlign='right'>Job Poster:</SText>
+                  <SText textAlign='right'>{jobWindow.userName}</SText>
                 </Box>
               </Row>
     
               <Row
+                flex={2}
                 justifyContent='space-between'
-                // px={wp(2)}
-                mb={wp(2)}
                 // borderWidth='1'
+                // mb={wp(1)}
               >
                 <Box
                   alignItems='flex-start'
-                  // flex='1'
-                  // borderWidth='1'
+                  justifyContent='center'
                 >
-                  <SText borderBottomWidth='1'>Type:</SText>
+                  <SText>Type:</SText>
                   <SText>{jobWindow.type}</SText>
                 </Box>
                 <Box
                   alignItems='flex-end'
                   justifyContent='center'
-                  // flex='2'
-                  // borderWidth='1'
                 >
-                  <SText textAlign='right' lineHeight={wp(4)} maxWidth={wp(40)} noOfLines={3}>{jobWindow.address.replace(/([,][\s])/, `\n`)}</SText>
+                  <SText textAlign='right' maxWidth={wp(40)} noOfLines={3}>{jobWindow.address.replace(/([,][\s])/, `\n`)}</SText>
                 </Box>
               </Row>
+
+              {(hideSearch || hideMap) &&
+              <Animated.View
+                flex={2.5}
+                // mb={wp(2)}
+                justifyContent='center'
+                // borderWidth='1'
+                // opacity={animTextOpacity}
+              >
+                <SText noOfLines={(hideSearch && hideMap) ? 8 : 4}>{jobWindow.description}</SText>
+              </Animated.View>}
     
               <Row
+                flex={2}
                 justifyContent='space-between'
-                // px={wp(2)}
+                // mt={wp(2)}
                 // borderWidth='1'
               >
                 <Box
                   flex='1'
                   alignItems='flex-start'
-                  // borderWidth='1'
+                  justifyContent='center'
                 >
-                  <SText borderBottomWidth='1' pb={wp(.5)}>Created:</SText>
-                  <SText pt={wp(.5)} lineHeight={wp(4)}>{format(new Date(jobWindow.creationDate.seconds*1000), 'E, PP')}</SText>
+                  <SText pb={wp(.5)}>Created:</SText>
+                  <SText>{format(new Date(jobWindow.creationDate.seconds*1000), 'E, PP')}</SText>
                 </Box>
                 <Box
                   flex='1'
                   alignItems='flex-end'
-                  // borderWidth='1'
+                  justifyContent='center'
                 >
-                  <SText borderBottomWidth='1' pb={wp(.5)}>Deadline:</SText>
-                  <SText textAlign='right' pt={wp(.5)} lineHeight={wp(4)}>{format(new Date(jobWindow.endDate.seconds*1000), 'E, PPp')}</SText>
+                  <SText pb={wp(.5)}>Deadline:</SText>
+                  <SText textAlign='right'>{format(new Date(jobWindow.endDate.seconds*1000), 'E, PPp')}</SText>
                 </Box>
               </Row>
     
               <Center
+                flex={1.4}
                 // borderWidth='1'
               >
                 <Button
-                  my={wp(1.5)}
                   onPress={async () => {
                     this.context.updateContext('job', jobWindow)
                     this.context.navigation.navigate('Job View')
                   }}
-                  >VIEW JOB</Button>
+                  >View Job</Button>
               </Center>
             
-            </Box>
-          </LinearGradient>
-        </Center>
+            </LinearGradient>
+          </Box>
+        </Box>
       )
     } else if (jobWindow.title === '' && jobSearchResults.length !== 0) {
       return (
@@ -373,7 +387,7 @@ export default class SearchJobs extends Component {
             bg='white'
             borderRadius='40'
           >
-            <SText textAlign='center'>Select a job to the left to see more about it here.</SText>
+            <SText textAlign='center' color='white'>Select a job to the left to see more about it here.</SText>
           </Center>
         </Center>
       )
@@ -390,7 +404,7 @@ export default class SearchJobs extends Component {
             my={wp(2)}
             p={wp(2)}
           >
-            <SText textAlign='center'>No job to display.</SText>
+            <SText textAlign='center' color='white'>No job to display.</SText>
           </Box>
         </Center>
       )
@@ -420,15 +434,7 @@ export default class SearchJobs extends Component {
           justifyContent='center'
           bg='primary.1'
         >
-          {/* <Center
-            alignItems='center'
-            w='95%'
-            h='95%'
-            bg='white'
-            borderRadius='40'
-          > */}
-            <Spinner size={wp(20)} color='white' />
-          {/* </Center> */}
+          <Spinner size={wp(20)} color='white' />
         </Center>
       )
     }
@@ -470,7 +476,7 @@ export default class SearchJobs extends Component {
       return (
         <Center
           flex='1'
-          px={wp(10)}
+          px={wp(2)}
           bg='primary.1'
           justifyContent='center'
         >
@@ -521,13 +527,19 @@ export default class SearchJobs extends Component {
           >
             <SText color='white'>{`<`}</SText>
           </Center>
-          <Center flex='2'>
+          <Center
+            flex='2'
+            justifyContent='center'
+            onStartShouldSetResponder={() => pages.length > 0 && this.setState({ showPageSelectModal: true })}
+          >
             <SText
-              w='100%'
-              h='100%'
-              pt='10%'
+              // w='100%'
+              // h='100%'
+              // pt='10%'
+              // justifyContent='center'
+              // alignItems='center'
               textAlign='center'
-              onPress={() => pages.length > 0 && this.setState({ showPageSelectModal: true })}
+              // onPress={() => pages.length > 0 && this.setState({ showPageSelectModal: true })}
             >{current+1} / {pages.length}</SText>
           </Center>
           <Center
@@ -571,7 +583,7 @@ export default class SearchJobs extends Component {
       >
         <Modal.Content
           maxWidth={wp(50)}
-          maxHeight={wp(75)}
+          maxHeight={hp(75)}
         >
           <Modal.CloseButton />
           <Modal.Header>Select a Page</Modal.Header>
@@ -597,21 +609,28 @@ export default class SearchJobs extends Component {
   render() {
     
     let { zip, geo, jobWindow } = this.context
-    let { sortBy, sortType } = this.state
-
+    let { sortBy, sortType, hideSearch, hideMap, animBarHeight, animRotate, animMapHeight, animTextOpacity } = this.state
+    let barHeightValue = animBarHeight.interpolate({ inputRange: [0, 1], outputRange: [wp(40), 0] })
+    let arrowRotateValue = animRotate.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '180deg'] })
+    let mapHeightValue = animMapHeight.interpolate({ inputRange: [0, 1], outputRange: [wp(42), 0] })
+    
     return (
-      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-        <>
+      <>
+        <Animated.View
+          style={{ maxHeight: barHeightValue }}
+        >
           <Stack
             bg='coolGray.300'
             py={wp(2)}
             space={wp(2)}
             alignItems='center'
+            // borderWidth='2'
           >
             <Row
               justifyContent='space-evenly'
               w='90%'
               alignItems='center'
+              // borderWidth='2'
             >
               <Box
                 flex='1'
@@ -621,9 +640,11 @@ export default class SearchJobs extends Component {
                 <SText pb={wp(1)} fontSize={wp(4)}>Zip Code:</SText>
                 <Input
                   // autoFocus
-                  placeholder='e.g. 30102'
-                  w='75%'
+                  // placeholder='e.g. 30102'
+                  w='90%'
+                  py={wp(1)}
                   // my={wp(2)}
+                  fontSize={Platform.OS === 'ios' ? wp(4.5) : wp(3)}
                   bg='white'
                   // borderWidth='1'
                   onEndEditing={() => Keyboard.dismiss()}
@@ -643,6 +664,8 @@ export default class SearchJobs extends Component {
                 <Select
                   selectedValue={sortBy}
                   accessibilityLabel='Sort By'
+                  p={wp(1)}
+                  fontSize={Platform.OS === 'ios' ? wp(4.5) : wp(3)}
                   onValueChange={x => {
                     x === 'distance' ? this.setState({ sortBy: x, sortDirection: 'asc' }) :
                     x === 'tip' ? this.setState({ sortBy: x, sortDirection: 'desc' }) :
@@ -674,6 +697,8 @@ export default class SearchJobs extends Component {
                   accessibilityLabel='Sort Direction'
                   onValueChange={x => this.setState({ sortDirection: x })}
                   w='90%'
+                  p={wp(1)}
+                  fontSize={Platform.OS === 'ios' ? wp(4.5) : wp(3)}
                   // borderColor='black'
                   bg='white'
                   // borderWidth='1'
@@ -695,6 +720,8 @@ export default class SearchJobs extends Component {
                   accessibilityLabel='Sort Type'
                   onValueChange={x => this.setState({ sortType: x })}
                   w='90%'
+                  p={wp(1)}
+                  fontSize={Platform.OS === 'ios' ? wp(4.5) : wp(3)}
                   _item={{ backgroundColor: 'white' }}
                   // borderColor='black'
                   bg='white'
@@ -707,85 +734,151 @@ export default class SearchJobs extends Component {
                 </Select>
               </Box>
             </Row>
-    
-            <Button
-              onPress={() => this.search()}
-              // my={wp(2)}
-            >SEARCH</Button>
-    
+
           </Stack>
-  
-          <Stack
-            flex='1'
-            borderTopWidth='1'
+
+          <Box
+            bg='coolGray.300'
+            alignItems='center'
           >
-            <Row
-              flex='5'
+            <Box
+              w='30%'
+              bg='darkgreen'
+              borderRadius='35'
             >
-              <Stack flex='2'>
-                <Box
-                  flex='8'
-                  bg='primary.1'
-                >
-                  {this.renderResultsSidebar()}
-                </Box>
-                <Center
-                  flex='1'
-                  borderTopWidth='1'
-                  borderBottomWidth='1'
-                >
-                  {this.renderPagination()}
-                </Center>
-              </Stack>
+              <WText
+                pt={wp(1)}
+                textAlign='center'
+                onPress={() => this.search()}
+                // mx={wp(10)}
+              >Search</WText>
+            </Box>
+          </Box>
+
+        </Animated.View>
+
+        <Row
+          bg='coolGray.300'
+          justifyContent='space-evenly'
+          py={wp(1)}
+        >
+          <Center
+            // flex='1'
+            h={wp(6)}
+            w={wp(10)}
+            bg={hideSearch ? 'primary.101' : 'darkgreen'}
+            alignItems='center'
+            borderRadius='25'
+            onStartShouldSetResponder={() => {
+              if (hideSearch) {
+                animSlideDownAndShow(animBarHeight, animRotate)
+                if (!hideMap) { fadeOutText(animTextOpacity) }
+              } else {
+                animHideAndSlideUp(animBarHeight, animRotate)
+                if (!hideMap) { fadeInText(animTextOpacity) }
+              }
+              this.setState({ hideSearch: !hideSearch })
+            }}
+          >
+            <Animated.View style={{ transform: [{ rotate: arrowRotateValue }] }}>
+              <FontAwesomeIcon
+                icon={faAngleDoubleUp}
+                color='white'
+              />
+            </Animated.View>
+          </Center>
+          <Center w={wp(25)}>
+            <Box
+              pt={wp(.5)}
+              px={wp(2)}
+              bg={hideMap ? 'primary.101' : 'darkgreen'}
+              borderRadius='35'
+            >
+              <WText
+                fontSize={wp(4)}
+                onPress={() => {
+                  if (hideMap) {
+                    heightTo0(animMapHeight)
+                    // if (!hideSearch) { fadeOutText(animTextOpacity) }
+                  } else {
+                    heightTo1(animMapHeight)
+                    // if (!hideSearch) { fadeInText(animTextOpacity) }
+                  }
+                  this.setState({ hideMap: !hideMap })
+                }}
+              >{hideMap ? 'Show Map' : 'Hide Map'}</WText>
+            </Box>
+          </Center>
+        </Row>
+        
+        <Stack
+          flex='1'
+          borderTopWidth='1'
+        >
+          <Row
+            flex='5'
+          >
+            <Stack flex='2' borderRightWidth='1'>
               <Box
-                flex='3'
+                flex='8'
                 bg='primary.1'
               >
-                {this.resultsView()}
+                {this.renderResultsSidebar()}
               </Box>
-            </Row>
-            <Box
-              flex='4'
-            >
-              <MapView
-                style={{ height: '100%', width: '100%' }}
-                // scrollEnabled
-                region={{
-                  latitude: jobWindow.latitude === 0 ? geo.latitude : jobWindow.latitude,
-                  longitude: jobWindow.longitude === 0 ? geo.longitude : jobWindow.longitude,
-                  latitudeDelta: 0.15,
-                  longitudeDelta: 0.15,
-                }}
+              <Center
+                // flex='1'
+                h={wp(10)}
+                borderTopWidth='1'
+                borderBottomWidth='1'
               >
-                { this.renderMarkers() }
-              </MapView>
+                {this.renderPagination()}
+              </Center>
+            </Stack>
+            <Box
+              flex='3'
+              bg='primary.1'
+            >
+              {this.resultsView()}
             </Box>
-          </Stack>
-  
-          {this.renderModal()}
-  
-          {/* { this.context.jobSearchResults.length >= 3 && <Button
-            position='absolute'
-            justifyContent='center'
-            alignItems='center'
-            right={wp(5)}
-            bottom={wp(5)}
-            boxSize={wp(10)}
-            bg='white'
-            borderRadius='50'
-            borderColor='primary.1'
-            borderWidth='1'
-            // onPress={() => console.log(this.list.getScrollResponder())}
-            onPress={() => this.list.scrollToIndex({ index: 0 })}
+          </Row>
+          <Animated.View
+            style={{ maxHeight: mapHeightValue }}
           >
-            <FontAwesomeIcon icon={faArrowUp} size={wp(4)}/>
-          </Button> } */}
-        </>
-      </TouchableWithoutFeedback>
+            <MapView
+              style={{ height: '100%', width: '100%' }}
+              // scrollEnabled
+              region={{
+                latitude: jobWindow.latitude === 0 ? geo.latitude : jobWindow.latitude,
+                longitude: jobWindow.longitude === 0 ? geo.longitude : jobWindow.longitude,
+                latitudeDelta: 0.15,
+                longitudeDelta: 0.15,
+              }}
+            >
+              { this.renderMarkers() }
+            </MapView>
+          </Animated.View>
+        </Stack>
+        
+
+        {this.renderModal()}
+
+        {/* { this.context.jobSearchResults.length >= 3 && <Button
+          position='absolute'
+          justifyContent='center'
+          alignItems='center'
+          right={wp(5)}
+          bottom={wp(5)}
+          boxSize={wp(10)}
+          bg='white'
+          borderRadius='50'
+          borderColor='primary.1'
+          borderWidth='1'
+          // onPress={() => console.log(this.list.getScrollResponder())}
+          onPress={() => this.list.scrollToIndex({ index: 0 })}
+        >
+          <FontAwesomeIcon icon={faArrowUp} size={wp(4)}/>
+        </Button> } */}
+      </>
     )
   }
-}
-
-let SText = (props) => {
-  return <Text fontSize={wp(4)} {...props}>{props.children}</Text>
 }

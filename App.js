@@ -6,6 +6,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { createDrawerNavigator } from '@react-navigation/drawer'
 import { NavigationContainer, useNavigation, useIsFocused, useFocusEffect, useScrollToTop } from '@react-navigation/native'
 import { NativeBaseProvider, Text } from "native-base"
+import { fromBottom } from 'react-navigation-transitions'
 // import { Font } from 'expo'
 import firebase from './config/firebase'
 import theme from './config/theme'
@@ -91,23 +92,13 @@ export default class App extends Component {
   loadFonts = async () => {
     await Font.loadAsync({
       'Karla': require('./assets/fonts/Karla.ttf'),
-      // 'JosefinSans': require('./assets/fonts/JosefinSans.ttf'),
-      // 'WorkSans': require('./assets/fonts/WorkSans.ttf'),
-      // 'Rubik': require('./assets/fonts/Rubik.ttf'),
-      // 'Nunito': require('./assets/fonts/Nunito.ttf'),
-      // 'Mulish': require('./assets/fonts/Mulish.ttf'),
-      'Heebo': require('./assets/fonts/Heebo.ttf'),
-      // 'Hahmlet': require('./assets/fonts/Hahmlet.ttf'),
-      // 'Arimo': require('./assets/fonts/Arimo.ttf'),
-      'TimesNewRoman': require('./assets/fonts/TimesNewRoman.ttf'),
-      'TimesNewRomanItalic': require('./assets/fonts/TimesNewRomanItalic.ttf'),
-      'Titillium': require('./assets/fonts/TitilliumWeb.ttf'),
-      'SourceSansPro': require('./assets/fonts/SourceSansPro.ttf'),
-      'PTSans': require('./assets/fonts/PTSans.ttf'),
-      'NotoSans': require('./assets/fonts/NotoSans.ttf'),
       'Mukta': require('./assets/fonts/Mukta.ttf'),
-      'FiraSans': require('./assets/fonts/FiraSans.ttf'),
-      'Lato': require('./assets/fonts/Lato.ttf'),
+      'CabinSketch': require('./assets/fonts/CabinSketch.ttf'),
+      // 'TimesNewRoman': require('./assets/fonts/TimesNewRoman.ttf'),
+      // 'TimesNewRomanItalic': require('./assets/fonts/TimesNewRomanItalic.ttf'),
+      // 'SourceSansPro': require('./assets/fonts/SourceSansPro.ttf'),
+      // 'NotoSans': require('./assets/fonts/NotoSans.ttf'),
+      // 'Lato': require('./assets/fonts/Lato.ttf'),
     })
     .catch(e => console.log('error loading fonts\n', e, e.message))
   }
@@ -126,11 +117,7 @@ export default class App extends Component {
         <Drawer.Screen
           name='Manage Jobs'
           component={ManageJobs}
-        /> 
-        {/* <Drawer.Screen
-          name='Settings'
-          component={Settings}
-        /> */}
+        />
         <Drawer.Screen
           name='Info'
           component={Info}
@@ -176,10 +163,6 @@ export default class App extends Component {
   loggedOutMenuItems = () => {
     return (
       <>
-        {/* <Drawer.Screen
-          name='Settings'
-          component={Settings}
-        /> */}
         <Drawer.Screen
           name='Info'
           component={Info}
@@ -222,7 +205,7 @@ export default class App extends Component {
       <NavigationContainer>
         <ContextWithHooks
           setLoggedInStatus={x => this.setState({ loggedIn: x })}
-          keyboard={this.state.keyboard}
+          appState={this.state}
         >
           <NativeBaseProvider theme={theme}>
             <Drawer.Navigator
@@ -237,25 +220,25 @@ export default class App extends Component {
                   fontWeight: 'bold',
                 },
                 swipeEnabled: false,
-                // unmountOnBlur: true
-                // drawerPosition: 'right'
+                transitionConfig: () => fromBottom(),
+                // unmountOnBlur: true,
+                // drawerPosition: 'right',
+                drawerActiveBackgroundColor: 'darkgreen',
+                drawerActiveTintColor: 'white',
+                // keyboardDismissMode: 'none'
               }
             }>
               <Drawer.Screen
                 name='Home'
                 component={Home}
               />
-              {/* <Drawer.Screen
-          name='Info'
-          component={Info}
-        /> */}
               <Drawer.Screen
                 name='Search Jobs'
                 component={SearchJobs}
-                options={{
+                // options={{
                   // drawerItemStyle: { height: 0, width: 0 },
                   // headerLeft: () => <BackButton screen={'SearchJobs'} />
-                }}
+                // }}
               />
               {this.state.loggedIn ? this.userMenuItems() : this.loggedOutMenuItems()}
               <Drawer.Screen

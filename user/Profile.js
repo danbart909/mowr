@@ -4,7 +4,7 @@ import { Box, Button, Center, Factory, FormControl, Heading, Input, Modal, Scrol
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { EmailAuthProvider, updatePassword, updateEmail, updateProfile, reauthenticateWithCredential } from 'firebase/auth'
 import { doc, setDoc } from 'firebase/firestore'
-import { TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView } from 'react-native'
+import { Platform, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 
 export default class Profile extends Component {
@@ -218,8 +218,9 @@ export default class Profile extends Component {
 
     list.map(x => {
       html.push(
-        <TouchableWithoutFeedback key={x.x} onPress={() => Keyboard.dismiss()}>
+        // <TouchableWithoutFeedback key={x.x} onPress={() => Keyboard.dismiss()}>
           <Modal
+            key={x.x}
             isOpen={x.show}
             onClose={() => this.setState({ [x.showName]: false })}
           >
@@ -228,10 +229,11 @@ export default class Profile extends Component {
               <Modal.Header>Edit Profile</Modal.Header>
               <Modal.Body>
                 <FormControl>
-                  <FormControl.Label>{`${x.x}`}</FormControl.Label>
+                  <Text>{`${x.x}`}</Text>
                   { x.x === 'Phone' ?
                   <Input
                     // autoFocus
+                    fontSize={Platform.OS === 'ios' ? wp(4.5) : wp(3)}
                     onEndEditing={() => Keyboard.dismiss()}
                     value={x.new}
                     placeholder='XXX-XXX-XXXX'
@@ -239,6 +241,7 @@ export default class Profile extends Component {
                   />
                   : <Input
                     // autoFocus
+                    fontSize={Platform.OS === 'ios' ? wp(4.5) : wp(3)}
                     onEndEditing={() => Keyboard.dismiss()}
                     value={x.new}
                     onChangeText={y => this.setState({ [x.newName]: y })}
@@ -268,13 +271,14 @@ export default class Profile extends Component {
               </Button.Group>
             </Modal.Content>
           </Modal>
-        </TouchableWithoutFeedback>
+        //  </TouchableWithoutFeedback>
       )
     })
 
     html.push(
-      <TouchableWithoutFeedback key={1} onPress={() => Keyboard.dismiss()}>
+      // <TouchableWithoutFeedback key={1} onPress={() => Keyboard.dismiss()}>
         <Modal
+          key={1}
           isOpen={showLogin}
           onClose={() => this.setState({ showLogin: false })}
         >
@@ -283,11 +287,12 @@ export default class Profile extends Component {
             borderRadius='3'
           >
             <Modal.CloseButton />
-            <Modal.Header>Verify Login</Modal.Header>
+            <Modal.Header fontSize={Platform.OS === 'ios' ? wp(4.5) : wp(3)}>Verify Login</Modal.Header>
             <Modal.Body>
               <FormControl>
-                <FormControl.Label>Please Re-Enter Your Password</FormControl.Label>
+                <Text>Please Re-Enter Your Password</Text>
                 <Input
+                  fontSize={Platform.OS === 'ios' ? wp(4.5) : wp(3)}
                   onEndEditing={() => Keyboard.dismiss()}
                   value={loginPassword}
                   onChangeText={y => this.setState({ loginPassword: y })}
@@ -311,7 +316,7 @@ export default class Profile extends Component {
             </Button.Group>
           </Modal.Content>
         </Modal>
-      </TouchableWithoutFeedback>
+      // </TouchableWithoutFeedback>
     )
 
     return html
@@ -322,138 +327,127 @@ export default class Profile extends Component {
     let { user } = this.context
 
     return (
-      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-        <ScrollView>
-          <Box
-            flex='1'
-            // p={wp(5)}
-            bg='primary.1'
+      <ScrollView bg='primary.1'>
+        <LinearGradient
+          colors={['#289d15', '#ffffff']}
+          start={{ x: 1, y: 1 }}
+          end={{ x: 0, y: 0 }}
+        >
+          <Stack
+            space={wp(10)}
+            pt={wp(5)}
+            px={wp(4)}
+            mt={wp(1)}
           >
-            <ScrollView>
-              <LinearGradient
-                colors={['#289d15', '#ffffff']}
-                start={{ x: 1, y: 1 }}
-                end={{ x: 0, y: 0 }}
+            <Stack space={wp(2)}>
+              <Row
+                pb={wp(1)}
+                justifyContent='space-between'
+                borderBottomWidth='1'
               >
-                <Stack
-                  space={wp(10)}
-                  pt={wp(5)}
-                  px={wp(4)}
-                  mt={wp(1)}
-                >
-      
-                  <Stack space={wp(2)}>
-                    <Row
-                      pb={wp(1)}
-                      justifyContent='space-between'
-                      borderBottomWidth='1'
-                    >
-                      <Heading py={wp(1)} fontSize={wp(7)}>Name</Heading>
-                      <Text
-                        px={wp(2)}
-                        py={wp(1)}
-                        mr={wp(1)}
-                        mt={wp(1)}
-                        color='darkgreen'
-                        borderColor='primary.1'
-                        borderWidth='1'
-                        onPress={() => this.setState({ nameShow: true })}
-                      >Edit</Text>
-                    </Row>
-                    <Text>{user.name}</Text>
-                  </Stack>
-      
-                  <Stack space={wp(2)}>
-                    <Row
-                      pb={wp(1)}
-                      justifyContent='space-between'
-                      borderBottomWidth='1'
-                    >
-                      <Heading py={wp(1)} fontSize={wp(7)}>Email</Heading>
-                      <Text
-                        px={wp(2)}
-                        py={wp(1)}
-                        mr={wp(1)}
-                        mt={wp(1)}
-                        color='darkgreen'
-                        borderColor='primary.1'
-                        borderWidth='1'
-                        onPress={() => this.setState({ showEmail: true })}
-                      >Edit</Text>
-                    </Row>
-                    <Text>{user.email}</Text>
-                  </Stack>
-      
-                  <Stack space={wp(2)}>
-                    <Row
-                      pb={wp(1)}
-                      justifyContent='space-between'
-                      borderBottomWidth='1'
-                    >
-                      <Heading py={wp(1)} fontSize={wp(7)}>Phone</Heading>
-                      <Text
-                        px={wp(2)}
-                        py={wp(1)}
-                        mr={wp(1)}
-                        mt={wp(1)}
-                        color='darkgreen'
-                        borderColor='primary.1'
-                        borderWidth='1'
-                        onPress={() => this.setState({ showPhone: true })}
-                      >Edit</Text>
-                    </Row>
-                    <Text>{user.phone}</Text>
-                  </Stack>
-      
-                  <Stack space={wp(2)}>
-                    <Row
-                      pb={wp(1)}
-                      justifyContent='space-between'
-                      borderBottomWidth='1'
-                    >
-                      <Heading py={wp(1)} fontSize={wp(7)}>Address</Heading>
-                      <Text
-                        px={wp(2)}
-                        py={wp(1)}
-                        mr={wp(1)}
-                        mt={wp(1)}
-                        color='darkgreen'
-                        borderColor='primary.1'
-                        borderWidth='1'
-                        onPress={() => this.context.navigation.navigate('Location')}
-                      >Edit</Text>
-                    </Row>
-                    <Text>{user.address.replace(/([,][\s])/, `\n`)}</Text>
-                  </Stack>
-                  
-                  <Stack
-                    mt={wp(2)}
-                    mb={wp(6)}
-                    w='60%'
-                    space={wp(3)}
-                    justifyContent='space-evenly'
-                    alignSelf='center'
-                    // borderWidth='1'
-                  >
-                    <Button
-                      onPress={() => this.context.navigation.navigate('Manage Jobs')}
-                    >Manage Your Jobs</Button>
-                    <Button
-                      onPress={() => this.setState({ showPassword: true })}
-                    >Change Password</Button>
-                    <Button
-                      // variant='outline'
-                      onPress={() => this.context.logout()}
-                    >Logout</Button>
-                  </Stack>
-      
-                </Stack>
-              </LinearGradient>
-            </ScrollView>
-            {this.modals()}
-          </Box>
-        </ScrollView>
-      </TouchableWithoutFeedback>
+                <Heading py={wp(1)} fontSize={wp(7)}>Name</Heading>
+                <Text
+                  px={wp(2)}
+                  pt={wp(1)}
+                  mr={wp(1)}
+                  // mt={wp(2)}
+                  color='darkgreen'
+                  borderColor='primary.1'
+                  borderWidth='1'
+                  onPress={() => this.setState({ nameShow: true })}
+                >Edit</Text>
+              </Row>
+              <Text>{user.name}</Text>
+            </Stack>
+
+            <Stack space={wp(2)}>
+              <Row
+                pb={wp(1)}
+                justifyContent='space-between'
+                borderBottomWidth='1'
+              >
+                <Heading py={wp(1)} fontSize={wp(7)}>Email</Heading>
+                <Text
+                  px={wp(2)}
+                  pt={wp(1)}
+                  mr={wp(1)}
+                  // mt={wp(1)}
+                  color='darkgreen'
+                  borderColor='primary.1'
+                  borderWidth='1'
+                  onPress={() => this.setState({ showEmail: true })}
+                >Edit</Text>
+              </Row>
+              <Text>{user.email}</Text>
+            </Stack>
+
+            <Stack space={wp(2)}>
+              <Row
+                pb={wp(1)}
+                justifyContent='space-between'
+                borderBottomWidth='1'
+              >
+                <Heading py={wp(1)} fontSize={wp(7)}>Phone</Heading>
+                <Text
+                  px={wp(2)}
+                  pt={wp(1)}
+                  mr={wp(1)}
+                  // mt={wp(1)}
+                  color='darkgreen'
+                  borderColor='primary.1'
+                  borderWidth='1'
+                  onPress={() => this.setState({ showPhone: true })}
+                >Edit</Text>
+              </Row>
+              <Text>{user.phone}</Text>
+            </Stack>
+
+            <Stack space={wp(2)}>
+              <Row
+                pb={wp(1)}
+                justifyContent='space-between'
+                borderBottomWidth='1'
+              >
+                <Heading py={wp(1)} fontSize={wp(7)}>Address</Heading>
+                <Text
+                  px={wp(2)}
+                  pt={wp(1)}
+                  mr={wp(1)}
+                  // mt={wp(1)}
+                  color='darkgreen'
+                  borderColor='primary.1'
+                  borderWidth='1'
+                  onPress={() => this.context.navigation.navigate('Location')}
+                >Edit</Text>
+              </Row>
+              <Text>{user.address.replace(/([,][\s])/, `\n`)}</Text>
+            </Stack>
+            
+            <Stack
+              mt={wp(2)}
+              mb={wp(6)}
+              w='60%'
+              space={wp(3)}
+              justifyContent='space-evenly'
+              alignSelf='center'
+              // borderWidth='1'
+            >
+              <Button
+                onPress={() => this.context.navigation.navigate('Manage Jobs')}
+              >Manage Your Jobs</Button>
+              <Button
+                onPress={() => this.setState({ showPassword: true })}
+              >Change Password</Button>
+              <Button
+                // variant='outline'
+                onPress={() => this.context.logout()}
+              >Logout</Button>
+            </Stack>
+
+          </Stack>
+        </LinearGradient>
+        {this.modals()}
+      </ScrollView>
     )
   }
 }

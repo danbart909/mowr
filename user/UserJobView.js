@@ -6,7 +6,7 @@ import Context from '../context/Context.js'
 import { collection, doc, setDoc, addDoc, getDoc, getDocs, query, where, orderBy, limit, deleteDoc } from 'firebase/firestore'
 import { LinearGradient } from 'expo-linear-gradient'
 import DateTimePicker from '@react-native-community/datetimepicker'
-import { TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView } from 'react-native'
+import { Platform, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView } from 'react-native'
 
 export default class UserJobView extends Component {
   constructor(props) {
@@ -253,7 +253,8 @@ export default class UserJobView extends Component {
       { name: 'Tip', value: `$ ${job.tip}`, show: 'tipShow', busy: 'tipBusy', error: 'tipError' },
       { name: 'Description', value: job.description, show: 'descShow', busy: 'descBusy', error: 'descError' },
       { name: 'Creation Date', value: formatCreationDate(), show: '', busy: '', error: '' },
-      { name: 'Deadline', value: formatEndDate(), show: 'timeShow', busy: 'timeBusy', error: 'timeError' },
+      // { name: 'Deadline', value: formatEndDate(), show: 'timeShow', busy: 'timeBusy', error: 'timeError' }, // BROKEN!
+      { name: 'Deadline', value: formatEndDate(), show: '', busy: '', error: '' },
       { name: 'Type', value: job.type, show: '', busy: '', error: '' },
       { name: 'Address', value: job.address.replace(/([,][\s])/, `\n`), show: '', busy: '', error: '' },
       { name: 'Phone', value: job.phone, show: '', busy: '', error: '' },
@@ -322,45 +323,43 @@ export default class UserJobView extends Component {
     let { pickerMode, showDatePicker } = this.state
 
     return (
-      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-        <ScrollView bg='primary.1'>
-  
-            <Box
-              m={wp(4)}
-              borderWidth='1'
-            >
-              <LinearGradient
-                colors={['#289d15', '#ffffff']}
-                start={{ x: 1, y: 1 }}
-                end={{ x: 0, y: 0 }}
-              >
-                {this.renderList()}
-                <Button
-                  w={wp(60)}
-                  my={wp(5)}
-                  alignSelf='center'
-                  onPress={() => this.delete()}
-                >Delete</Button>
-              </LinearGradient>
-            </Box>
-    
-            {this.modals()}
-    
-            {/* {showDatePicker && (
-              <DateTimePicker
-                value={new Date()}
-                mode={pickerMode}
-                minuteInterval={5}
-                onChange={(event, date) => {
-                  pickerMode === 'date' ?
-                  this.setState({ pickerMode: 'time', newDate: new Date(date)}) :
-                  this.setState({ pickerMode: 'date', showDatePicker: false, newTime: new Date(date)})
-                }}
-              />
-            )} */}
-  
-        </ScrollView>
-      </TouchableWithoutFeedback>
+      <ScrollView bg='primary.1'>
+
+        <Box
+          m={wp(4)}
+          borderWidth='1'
+        >
+          <LinearGradient
+            colors={['#289d15', '#ffffff']}
+            start={{ x: 1, y: 1 }}
+            end={{ x: 0, y: 0 }}
+          >
+            {this.renderList()}
+            <Button
+              w={wp(60)}
+              my={wp(5)}
+              alignSelf='center'
+              onPress={() => this.delete()}
+            >Delete</Button>
+          </LinearGradient>
+        </Box>
+
+        {this.modals()}
+
+        {/* {showDatePicker && (
+          <DateTimePicker
+            value={new Date()}
+            mode={pickerMode}
+            minuteInterval={5}
+            onChange={(event, date) => {
+              pickerMode === 'date' ?
+              this.setState({ pickerMode: 'time', newDate: new Date(date)}) :
+              this.setState({ pickerMode: 'date', showDatePicker: false, newTime: new Date(date)})
+            }}
+          />
+        )} */}
+
+      </ScrollView>
     )
   }
 }

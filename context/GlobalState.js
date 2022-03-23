@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Animated, LayoutAnimation, Dimensions } from 'react-native';
+import { Platform, Keyboard, Animated, LayoutAnimation, Dimensions } from 'react-native';
 import Context from './Context.js'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 // import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -7,7 +7,7 @@ import Constants from 'expo-constants';
 import * as SplashScreen from 'expo-splash-screen';
 import { signOut, signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth'
 import { collection, doc, setDoc, addDoc, getDoc, getDocs, query, where, orderBy, limit, Timestamp } from 'firebase/firestore'
-import { format, parseISO, parse, lightFormat, formatISO, addHours, isPast, addSeconds, addMinutes, compareAsc, toDate } from "date-fns";
+import { format, parseISO, parse, lightFormat, formatISO, addHours, isPast, isBefore, addSeconds, addMinutes, compareAsc, toDate, add, sub } from "date-fns";
 import Geocoder from 'react-native-geocoding'
 // import { getDistance } from 'geolib';
 // import axios from 'react-native-axios'
@@ -236,15 +236,19 @@ export default class GlobalState extends Component {
 
   test = async () => {
     let { app, auth, fire } = this.props
-    let { user, jobSearchResults, geo, job } = this.state
+    let { user, jobSearchResults, geo, job, pagination } = this.state
+    let targetID = "Uk7X1W2FeefVhoxKneZb"
+    let html = []
+    let i = 0
 
-    // console.log(wp(3))
-    // this.props.navigation.navigate('Preface')
+    // pagination.pages.map(x => {
+    //   if (x.find(y => y.id === targetID)) { console.log(i) }
+    //   i++
+    // })
+    // console.log(pagination.pages)
 
-    // console.log(Dimensions.get("window"))
-    // console.log(wp(50))
-    // console.log(hp(50))
-    // console.log(cp(50))
+    // console.log(new Date(add(new Date(), { days: 100 })))
+    console.log(new Date(2022, 11, 31, 23, 59, 59))
   }
   
   render() {
@@ -252,6 +256,7 @@ export default class GlobalState extends Component {
       <Context.Provider
         value={{
           app: this.props.app,
+          appState: this.props.appState,
           auth: this.props.auth,
           db: this.props.db,
           fire: this.props.fire,

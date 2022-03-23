@@ -23,14 +23,14 @@ export default class Info extends Component {
         >
           <WText>Please report any errors, bugs, freezes, crashes, or any other malfunctions with the <Text bg='white' color='primary.1' onPress={() => this.context.navigation.navigate('Report a Bug')}>Report a Bug</Text> page. This would help me out a great deal, as I have limited materials to use when it comes to testing how the final result will look on both types of devices. You can use the form to also express any opinions you have or suggest improvements, not just strictly for reporting bugs.</WText>
 
-          <WText
+          {/* <WText
             italic
             fontSize={wp(8)}
             mt={wp(10)}
             lineHeight={wp(10)}
           >I can't get rid of my keyboard! What's the deal?</WText>
 
-          <WText>Work on this issue is ongoing. If your keyboard won't close when you tap outside of it, hopefully pressing the Enter/Return button will help.</WText>
+          <WText>Work on this issue is ongoing. If your keyboard won't close when you tap outside of it, hopefully pressing the Enter/Return button will help.</WText> */}
 
           <WText
             italic
@@ -66,7 +66,7 @@ export default class Info extends Component {
 
           <WText>It is appropriate to pay the person who worked for you.</WText>
 
-          <WText>Naming the payment 'Tips' is meant to imply the job poster would be paying the worker through graditude, rather than through obligation. This would also imply the worker shouldn't demand payment, but should instead focus on serving the person in need not out of self-gain, but out of a desire to help others. Payment is, of course, appropriate for when work is done for another, so the "tip" is meant to give job owners more freedom in setting a price they think the job is worth. When setting the price, try to go under, not over. Giving less than the amount you listed is to be avoided.</WText>
+          <WText>Naming the payment 'Tips' is meant to imply the job poster would be paying the worker through gratitude, rather than through obligation. This would also imply the worker shouldn't demand payment, but should instead focus on serving the person in need not out of self-gain, but out of a desire to help others. Payment is, of course, appropriate for when work is done for another, so the "tip" is meant to give job owners more freedom in setting a price they think the job is worth. When setting the price, try to go under, not over. Giving less than the amount you listed is to be avoided.</WText>
 
           <WText
             italic
