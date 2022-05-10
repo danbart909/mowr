@@ -24,6 +24,7 @@ export default class SearchJobs extends Component {
       sortBy: 'distance',
       sortDirection: 'asc',
       sortType: 'Any',
+      maxRadius: '10',
       sortByForSidebar: 'distance',
       busy: false,
       error: false,
@@ -86,7 +87,7 @@ export default class SearchJobs extends Component {
 
   queryToFirebase = async () => {
     let { fire, geo } = this.context
-    let { sortBy, sortDirection, sortType } = this.state
+    let { sortBy, sortDirection, sortType, maxRadius } = this.state
     let jobs = []
     let rawJobs = []
     let newJobs = []
@@ -152,16 +153,37 @@ export default class SearchJobs extends Component {
       lat.push(x.latitude)
       lng.push(x.longitude)
     })
+    
+    console.log(newJobs)
 
-    let jobsCopy = [...newJobs]
+    let distancedJobs = newJobs.filter(x => parseInt(maxRadius) > this.calcDistanceForFilter(x.latitude, x.longitude))
+
+    console.log(distancedJobs)
+
+    console.log(maxRadius, parseInt(maxRadius))
+
+    console.log(this.calcDistanceForFilter(distancedJobs[0].latitude, distancedJobs[0].longitude))
+
+    let jobsCopy = [...distancedJobs]
     while (jobsCopy.length > 0) {
       pages.push(jobsCopy.splice(0, 10))
     }
 
-    this.context.updateContext('jobSearchResults', newJobs)
-    this.context.updateContext('jobWindow', newJobs[0])
+    this.context.updateContext('jobSearchResults', distancedJobs)
+    this.context.updateContext('jobWindow', distancedJobs[0])
     this.context.updateContext('results', { lat: lat, lng: lng })
     this.context.updateContext('pagination', { current: 0, visibleJobs: pages[0], pages: pages })
+
+    // let jobsCopy = [...newJobs]
+    // while (jobsCopy.length > 0) {
+    //   pages.push(jobsCopy.splice(0, 10))
+    // }
+
+
+    // this.context.updateContext('jobSearchResults', newJobs)
+    // this.context.updateContext('jobWindow', newJobs[0])
+    // this.context.updateContext('results', { lat: lat, lng: lng })
+    // this.context.updateContext('pagination', { current: 0, visibleJobs: pages[0], pages: pages })
 
     this.setState({ sortByForSidebar: sortBy, inputZip: '', busy: false, error: false })
 
@@ -191,6 +213,21 @@ export default class SearchJobs extends Component {
     str = `${milesRounded} miles away`
 
     return str
+  }
+
+  calcDistanceForFilter = (lat, lng) => {
+    let { maxRadius } = this.state
+    let { geo } = this.context
+    let geo1 = { lat: geo.latitude, lng: geo.longitude }
+    let geo2 = { lat: lat, lng: lng }
+    let meters = getDistance(geo1, geo2)
+    let feetBig = meters*3.2808
+    let feetRounded = Math.round(feetBig*100)/100
+    let milesBig = feetBig/5280
+    let milesRounded = Math.round(milesBig*100)/100
+    let str = ``
+
+    return milesRounded
   }
 
   renderMarkers = () => {
@@ -458,7 +495,7 @@ export default class SearchJobs extends Component {
                 color={selectedJob(item) ? 'white' : 'black'}
                 onPress={() => this.context.updateContext('jobWindow', item)}
                 // borderWidth='1'
-              >#{(pagination.current*5)+(index+1)}: {item.title}</SText>
+              >#{(pagination.current*10)+(index+1)}: {item.title}</SText>
               <SText
                 flex='1'
                 p={wp(1)}
@@ -609,7 +646,7 @@ export default class SearchJobs extends Component {
   render() {
     
     let { zip, geo, jobWindow } = this.context
-    let { sortBy, sortType, hideSearch, hideMap, animBarHeight, animRotate, animMapHeight, animTextOpacity } = this.state
+    let { sortBy, sortType, maxRadius, hideSearch, hideMap, animBarHeight, animRotate, animMapHeight, animTextOpacity } = this.state
     let barHeightValue = animBarHeight.interpolate({ inputRange: [0, 1], outputRange: [wp(40), 0] })
     let arrowRotateValue = animRotate.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '180deg'] })
     let mapHeightValue = animMapHeight.interpolate({ inputRange: [0, 1], outputRange: [wp(42), 0] })
@@ -628,7 +665,7 @@ export default class SearchJobs extends Component {
           >
             <Row
               justifyContent='space-evenly'
-              w='90%'
+              w='98%'
               alignItems='center'
               // borderWidth='2'
             >
@@ -637,7 +674,7 @@ export default class SearchJobs extends Component {
                 alignItems='center'
                 // borderWidth='1'
               >
-                <SText pb={wp(1)} fontSize={wp(4)}>Zip Code:</SText>
+                <SText pb={wp(1)} fontSize={wp(4)}>Zip Code</SText>
                 <Input
                   // autoFocus
                   // placeholder='e.g. 30102'
@@ -655,12 +692,41 @@ export default class SearchJobs extends Component {
                   value={zip}
                 />
               </Box>
+
               <Box
                 flex='1'
                 alignItems='center'
                 // borderWidth='1'
               >
-                <SText pb={wp(1)} fontSize={wp(4)}>Sort By:</SText>
+                <SText pb={wp(1)} fontSize={wp(4)}>Radius</SText>
+                <Select
+                  selectedValue={maxRadius}
+                  accessibilityLabel='Max Radius'
+                  p={wp(1)}
+                  fontSize={Platform.OS === 'ios' ? wp(4.5) : wp(3)}
+                  onValueChange={x => this.setState({ maxRadius: x })}
+                  w='90%'
+                  // variant='underlined'
+                  // borderColor='black'
+                  _item={{ backgroundColor: 'white' }}
+                  bg='white'
+                  // borderWidth='1'
+                >
+                  <Select.Item p={wp(3)} label='1 Mile' value='1'/>
+                  <Select.Item p={wp(3)} label='3 Miles' value='3'/>
+                  <Select.Item p={wp(3)} label='5 Miles' value='5'/>
+                  <Select.Item p={wp(3)} label='10 Miles' value='10'/>
+                  <Select.Item p={wp(3)} label='25 Miles' value='25'/>
+                  <Select.Item p={wp(3)} label='All Jobs' value='9000'/>
+                </Select>
+              </Box>
+
+              <Box
+                flex='1'
+                alignItems='center'
+                // borderWidth='1'
+              >
+                <SText pb={wp(1)} fontSize={wp(4)}>Sort By</SText>
                 <Select
                   selectedValue={sortBy}
                   accessibilityLabel='Sort By'
@@ -691,7 +757,7 @@ export default class SearchJobs extends Component {
                 alignItems='center'
                 // borderWidth='1'
               >
-                <SText pb={wp(1)} fontSize={wp(4)}>Order By:</SText>
+                <SText pb={wp(1)} fontSize={wp(4)}>Order By</SText>
                 <Select
                   selectedValue={this.state.sortDirection}
                   accessibilityLabel='Sort Direction'
@@ -714,7 +780,7 @@ export default class SearchJobs extends Component {
                 alignItems='center'
                 // borderWidth='1'
               >
-                <SText pb={wp(1)} fontSize={wp(4)}>Type:</SText>
+                <SText pb={wp(1)} fontSize={wp(4)}>Type</SText>
                 <Select
                   selectedValue={sortType}
                   accessibilityLabel='Sort Type'
@@ -787,7 +853,7 @@ export default class SearchJobs extends Component {
               />
             </Animated.View>
           </Center>
-          <Center w={wp(25)}>
+          { Platform.OS === 'ios' ? null : <Center w={wp(25)}>
             <Box
               pt={wp(.5)}
               px={wp(2)}
@@ -808,7 +874,7 @@ export default class SearchJobs extends Component {
                 }}
               >{hideMap ? 'Show Map' : 'Hide Map'}</WText>
             </Box>
-          </Center>
+          </Center> }
         </Row>
         
         <Stack

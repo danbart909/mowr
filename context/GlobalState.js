@@ -11,7 +11,6 @@ import { format, parseISO, parse, lightFormat, formatISO, addHours, isPast, isBe
 import Geocoder from 'react-native-geocoding'
 // import { getDistance } from 'geolib';
 // import axios from 'react-native-axios'
-import { cp } from '../config/helper.js';
 
 const { civicAPIKey } = Constants.manifest.extra
 Geocoder.init(civicAPIKey)
@@ -199,6 +198,7 @@ export default class GlobalState extends Component {
           phone: ''
         },
         job: {
+          uid: '',
           id: '',
           userId: '',
           userName: '',
@@ -206,8 +206,8 @@ export default class GlobalState extends Component {
           type: '',
           description: '',
           address: '',
-          creationDate: new Date(),
-          endDate: new Date(),
+          creationDate: { nanoseconds: 0, seconds: 0 },
+          endDate: { nanoseconds: 0, seconds: 0 },
           email: '',
           latitude: 0,
           longitude: 0,
@@ -235,20 +235,7 @@ export default class GlobalState extends Component {
   }
 
   test = async () => {
-    let { app, auth, fire } = this.props
-    let { user, jobSearchResults, geo, job, pagination } = this.state
-    let targetID = "Uk7X1W2FeefVhoxKneZb"
-    let html = []
-    let i = 0
 
-    // pagination.pages.map(x => {
-    //   if (x.find(y => y.id === targetID)) { console.log(i) }
-    //   i++
-    // })
-    // console.log(pagination.pages)
-
-    // console.log(new Date(add(new Date(), { days: 100 })))
-    console.log(new Date(2022, 11, 31, 23, 59, 59))
   }
   
   render() {

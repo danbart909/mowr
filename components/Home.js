@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Context from '../context/Context.js'
-import { Platform, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView } from 'react-native'
-import { Box, Button, Flex, Heading, Row, ScrollView, Stack, Text, Center, Divider } from 'native-base'
+import { Animated, Platform, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView } from 'react-native'
+import { Box, Button, Flex, Heading, Row, ScrollView, Stack, Text, Center, Divider, Factory } from 'native-base'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import firebase from '../config/firebase'
 import { collection, doc, getDoc, getDocs, query, orderBy, where, deleteDoc } from 'firebase/firestore'
@@ -13,10 +13,17 @@ import { LinearGradient } from 'expo-linear-gradient'
 // import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 // import { faCalendarAlt, faExclamationCircle, faArrowAltCircleDown } from '@fortawesome/free-solid-svg-icons'
 
+// const Cycle = (props) => {
+//   const TxtCycl = Factory(TextCycle)
+//   return <TxtCycl {...props} />
+// }
+
 export default class Home extends Component {
   constructor(props) {
     super(props);
-    this.state = {}
+    this.state = {
+      textFadeValue: new Animated.Value(0)
+    }
   }
 
   static contextType = Context
@@ -49,9 +56,17 @@ export default class Home extends Component {
     })
   }
 
+  textSwitcher = () => {
+    let { textFadeValue } = this.state
+    let texts = ['Apples', 'Bananas', 'Oranges', 'Limes']
+
+    return <WText>Hungry for <WText opacity={textFadeValue}>{texts}</WText></WText>
+  }
+
   render() {
 
     let { navigation } = this.context
+    let cycleText = ['Burritos', 'Tacos', 'Chalupas', 'Gordidos', 'Tostidos', 'Churros']
     let userName = () => {
       let { name } = this.context.user
       if (name) {
@@ -88,10 +103,11 @@ export default class Home extends Component {
               color='primary.1'
               my={wp(-10)}
               onPress={() => {
-                console.log('press', Platform.OS)
-                // this.context.navigation.navigate('Test')
-                this.context.test()
+                // console.log('press', Platform.OS)
+                // this.context.navigation.navigate('Preface')
+                // this.context.test()
                 // this.oldJobDeleter()
+                // this.context.logout()
               }}
             >wrkr</Text>
           </Center>
@@ -100,7 +116,8 @@ export default class Home extends Component {
             position='absolute'
             right={wp(1)}
             fontSize={wp(3)}
-          >v1.5.0</WText>
+            onPress={() => this.oldJobDeleter()}
+          >v1.5.1</WText>
 
             <Stack
               pt={wp(5)}
@@ -108,7 +125,7 @@ export default class Home extends Component {
               space={wp(2)}
             >
               {userName()}
-              <WText fontSize={wp(5)} textAlign='center'></WText>
+              {/* <WText fontSize={wp(5)} textAlign='center'></WText> */}
               <WText fontSize={wp(5)} textAlign='center'>Looking for some work?</WText>
               <WText fontSize={wp(5)} textAlign='center'>Need help with some work?</WText>
               <WText fontSize={wp(5)} textAlign='center'>Let's help each other out!</WText>
@@ -179,15 +196,10 @@ export default class Home extends Component {
           space={wp(5)}
           bg='white'
         >
-          <Text textAlign='center' fontSize={wp(7)}>Developer Notes v1.5.0</Text>
-          <Text>- Several layout and design changes, from different fonts to improved line spacing and text sizes.</Text>
-          <Text>- Can now only set job deadlines about two months away, but added an option to list a job as a "Standing Offer" that will expire at midnight at the end of the year.</Text>
-          <Text>- Jobs are now automatically deleted 3 days after they expire.</Text>
-          <Text>- Android users can now hide the map and search bar on the Search Jobs page to see more info for each job. iPhone users can hide the search bar but for now they can't hide the map because it keeps causing a crash. It will be enabled at a later date.</Text>
-          <Text>- Keyboard issues should now be fixed. Please let me know if they aren't.</Text>
-          <Divider bg='primary.101'/>
-          <Text>- 1 KNOWN CRASH! When signed in, after viewing a job from the 'Search Jobs' page, if you try to delete a job or logout the app will crash. The changes ARE saved to the database and will take effect when you open it again.</Text>
-          <Text>- If you need me to change your email for you, use the Report a Bug form to let me know what you need it changed FROM and TO.</Text>
+          <Text textAlign='center' fontSize={wp(7)}>Developer Notes v1.5.1</Text>
+          <Text>- All known crashes resolved. Please let me know if you encounter any others.</Text>
+          <Text>- Range setting added to Search Jobs. You can now search for jobs a set distance from the Zip Code you've entered, or choose to search for all jobs everywhere.</Text>
+          <Text>- Beta test of a simple turtle race program can be accessed using the menu.</Text>
         </Stack>
 
         <Stack

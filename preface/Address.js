@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import Context from '../context/Context.js'
 import { Box, Button, Column, Center, Factory, FlatList, FormControl, Heading, Input, Modal, Row, ScrollView, Spinner, Stack, Text } from 'native-base'
-import { Platform, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView } from 'react-native'
+import { Platform, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView, StatusBar } from 'react-native'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons'
@@ -32,6 +32,8 @@ export default class Address extends Component {
       error: 0,
       latitude: 0,
       longitude: 0,
+      autocmpltY: 0,
+      autocmpltX: 0
     }
   }
 
@@ -237,7 +239,7 @@ export default class Address extends Component {
   render() {
 
     let { user } = this.context
-    let { address, autoResults, autoShow, latitude, longitude } = this.state
+    let { address, autoResults, autoShow, latitude, longitude, autocmpltX, autocmpltY } = this.state
 
     return (
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -270,14 +272,14 @@ export default class Address extends Component {
                   // borderWidth='1'
                 >
                   <Box flex='4'>
-                    <Text lineHeight={wp(5.5)}>Your saved address:</Text>
+                    <Text lineHeight={wp(7.5)}>Your saved address:</Text>
                   </Box>
                   <Box flex='7'>
                     <Text textAlign='right'>{user.address ? user.address.replace(/([,][\s])/, `\n`) : 'No Address Saved'}</Text>
                   </Box>
                 </Row>
       
-                  <Box>
+                  <Box onLayout={(e) => this.setState({ autocmpltY: autocmpltY+e.nativeEvent.layout.y, autocmpltX: autocmpltX+e.nativeEvent.layout.x })}>
                     <Text pb={wp(1)}>Address:</Text>
                     <Input
                       // autoFocus
@@ -285,6 +287,7 @@ export default class Address extends Component {
                       w={wp(78)}
                       bg='white'
                       alignSelf='center'
+                      onLayout={(e) => this.setState({ autocmpltY: autocmpltY+e.nativeEvent.layout.y+hp(7), autocmpltX: autocmpltX+e.nativeEvent.layout.x+wp(5) })}
                       fontSize={Platform.OS === 'ios' ? wp(4.5) : wp(3)}
                       onChangeText={(x) => this.changeInputByTyping(x)}
                       value={address}
@@ -328,8 +331,8 @@ export default class Address extends Component {
               >
                 <Box
                   position='absolute'
-                  top={user.address ? (Platform.OS === 'ios' ? hp(25.4) : hp(24.6)) : (Platform.OS === 'ios' ? hp(23.4) : hp(25))}
-                  left={wp(11)}
+                  top={autocmpltY}
+                  left={autocmpltX}
                   w={wp(70)}
                   h='auto'
                   bg='white'

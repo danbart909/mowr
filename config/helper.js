@@ -6,6 +6,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faQuestionCircle } from '@fortawesome/free-regular-svg-icons'
 // import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons'
 
+// const Icon = (props) => {
+//   const FAIcon = Factory(FontAwesomeIcon)
+//   return <FAIcon {...props} />
+// }
+
 export const WText = (props) => {
   return <Text {...props} color='white'>{props.children}</Text>
 }
@@ -79,6 +84,21 @@ export const fadeOutText = (opacity) => {
   Animated.spring(opacity, {
     toValue: 0,
     // duration: 1000,
+    useNativeDriver: false
+  }).start()
+}
+
+export const turtleUp = (posY, duration) => {
+  Animated.timing(posY, {
+    toValue: 1,
+    duration: duration,
+    useNativeDriver: false
+  }).start()
+}
+
+export const turtleReset = (posY) => {
+  Animated.spring(posY, {
+    toValue: 0,
     useNativeDriver: false
   }).start()
 }

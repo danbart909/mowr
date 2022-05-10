@@ -79,7 +79,23 @@ export default class UserJobView extends Component {
 
   delete = async () => {
     let { fire, job } = this.context
-    let emptyJob = { id: '', uid: '', address: '', creationDate: '', description: '', email: '', endDate: '', latitude: 0, longitude: 0, userName: '', phone: '', userId: '', tip: '', title: '', type: '' }
+    let emptyJob = {
+      uid: '',
+      id: '',
+      userId: '',
+      userName: '',
+      title: '',
+      type: '',
+      description: '',
+      address: '',
+      creationDate: { nanoseconds: 0, seconds: 0 },
+      endDate: { nanoseconds: 0, seconds: 0 },
+      email: '',
+      latitude: 0,
+      longitude: 0,
+      tip: 0,
+      phone: ''
+    }
 
     await deleteDoc(doc(fire, 'jobs', job.id))
       .then(async () => {

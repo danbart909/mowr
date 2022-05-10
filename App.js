@@ -32,6 +32,7 @@ import UserJobView from './user/UserJobView'
 import Location from './user/Location'
 import Test from './components/Test'
 import Info from './components/Info'
+import TurtleRace from './components/TurtleRace'
 
 let Stack = createNativeStackNavigator()
 let Drawer = createDrawerNavigator()
@@ -247,6 +248,15 @@ export default class App extends Component {
                 options={{
                   drawerItemStyle: { height: 0, width: 0 },
                   // headerLeft: () => <BackButton screen={'SearchJobs'} />
+                }}
+              />
+              <Drawer.Screen
+                name='Turtle Race'
+                component={TurtleRace}
+                options={{
+                  // headerShown: false,
+                  // drawerItemStyle: { height: 0 },
+                  // headerLeft: () => <></>
                 }}
               />
               <Drawer.Screen

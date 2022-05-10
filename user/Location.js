@@ -277,14 +277,13 @@ export default class Location extends Component {
                   <Text
                     pb={wp(1)}
                     px={wp(4)}
-                    onPress={() => console.log(StatusBar.currentHeight)}
                   >Address:</Text>
                   <Input
                     // autoFocus
                     w={wp(80)}
                     bg='white'
                     alignSelf='center'
-                    onLayout={(e) => this.setState({ autocmpltY: autocmpltY+e.nativeEvent.layout.y, autocmpltX: autocmpltX+e.nativeEvent.layout.x })}
+                    onLayout={(e) => this.setState({ autocmpltY: autocmpltY+e.nativeEvent.layout.y+StatusBar.currentHeight+hp(10), autocmpltX: autocmpltX+e.nativeEvent.layout.x })}
                     fontSize={Platform.OS === 'ios' ? wp(4.5) : wp(3)}
                     onEndEditing={() => Keyboard.dismiss()}
                     onChangeText={(x) => this.changeInputByTyping(x)}

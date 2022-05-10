@@ -92,8 +92,7 @@ export default class Phone extends Component {
               <Heading
                 py={wp(1)}
               >Phone Number</Heading>
-  
-              <Text>Please provide your phone number. When you create a job, your phone number will be automatically attatched to your job. You can change your phone number at any time on your profile page. <Text color='white'>Address</Text> works like this too, which you'll set on the next page.</Text>
+              <Text lineHeight={wp(7)}>Please provide your phone number. When you create a job, your phone number will be automatically attatched to your job. You can change your phone number at any time on your profile page. <Text color='white'>Address</Text> works like this too, which you'll set on the next page.</Text>
             </Stack>
     
             <Stack
