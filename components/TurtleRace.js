@@ -250,16 +250,16 @@ export default class TurtleRace extends Component {
     let { totalCash, raceResults, chosenTurtle, bet, totalGames } = this.state
 
     if ((raceResults[0].name === chosenTurtle) && (raceResults[0].name === 'Inky')) {
-      final = (totalCash + (bet * 2))
+      final = (totalCash + (bet * 1.32))
       this.setState({ winner: true, totalCash: final })
     } else if ((raceResults[0].name === chosenTurtle) && (raceResults[0].name === 'Blinky')) {
-      final = (totalCash + (bet * 3))
+      final = (totalCash + (bet * 1.27))
       this.setState({ winner: true, totalCash: final })
     } else if ((raceResults[0].name === chosenTurtle) && (raceResults[0].name === 'Pinky')) {
-      final = (totalCash + (bet * 4))
+      final = (totalCash + (bet * 1.21))
       this.setState({ winner: true, totalCash: final })
     } else if ((raceResults[0].name === chosenTurtle) && (raceResults[0].name === 'Clyde')) {
-      final = (totalCash + (bet * 5))
+      final = (totalCash + (bet * 1.16))
       this.setState({ winner: true, totalCash: final })
     } else {
       this.setState({ winner: false })
@@ -290,10 +290,10 @@ export default class TurtleRace extends Component {
     let { chosenTurtle, bet } = this.state
     let total = 0
 
-    if (chosenTurtle === 'Inky') total = bet * 6
-    else if (chosenTurtle === 'Blinky') total = bet * 5
-    else if (chosenTurtle === 'Pinky') total = bet * 4
-    else if (chosenTurtle === 'Clyde') total = bet * 3
+    if (chosenTurtle === 'Inky') total = bet * 1.32
+    else if (chosenTurtle === 'Blinky') total = bet * 1.27
+    else if (chosenTurtle === 'Pinky') total = bet * 1.21
+    else if (chosenTurtle === 'Clyde') total = bet * 1.16
     else null
 
     return total.toFixed(2)

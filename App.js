@@ -237,7 +237,7 @@ export default class App extends Component {
                 name='Search Jobs'
                 component={SearchJobs}
                 // options={{
-                  // drawerItemStyle: { height: 0, width: 0 },
+                  // drawerItemStyle: { height: 0 },
                   // headerLeft: () => <BackButton screen={'SearchJobs'} />
                 // }}
               />
@@ -246,7 +246,7 @@ export default class App extends Component {
                 name='Test'
                 component={Test}
                 options={{
-                  drawerItemStyle: { height: 0, width: 0 },
+                  drawerItemStyle: { height: 0 },
                   // headerLeft: () => <BackButton screen={'SearchJobs'} />
                 }}
               />

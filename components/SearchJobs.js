@@ -925,7 +925,6 @@ export default class SearchJobs extends Component {
           </Animated.View>
         </Stack>
         
-
         {this.renderModal()}
 
         {/* { this.context.jobSearchResults.length >= 3 && <Button

@@ -70,7 +70,7 @@ export default class Home extends Component {
     let userName = () => {
       let { name } = this.context.user
       if (name) {
-        return <Box bg='white' borderRadius='30' mb={wp(1)}>
+        return <Box alignSelf='center' w='75%' bg='white' borderRadius='30' mb={wp(1)}>
           <Text pt={wp(1)} color='primary.1' textAlign='center' fontSize={Platform.OS === 'ios' ? wp(4.5) : wp(4)}>Signed in as: {name}</Text>
         </Box>
       } else { null }
@@ -81,6 +81,7 @@ export default class Home extends Component {
       let buttonText = appState.loggedIn ? 'Create a Job' : 'Sign Up'
       return (
         <Button
+          w={'75%'}
           bg='primary.100'
           onPress={() => navigation.navigate(destination)}
         >{buttonText}</Button>
@@ -112,24 +113,24 @@ export default class Home extends Component {
             >wrkr</Text>
           </Center>
 
-          <WText
-            position='absolute'
-            right={wp(1)}
-            fontSize={wp(3)}
-            onPress={() => this.oldJobDeleter()}
-          >v1.5.1</WText>
-
-            <Stack
-              pt={wp(5)}
-              px={wp(5)}
-              space={wp(2)}
-            >
-              {userName()}
-              {/* <WText fontSize={wp(5)} textAlign='center'></WText> */}
-              <WText fontSize={wp(5)} textAlign='center'>Looking for some work?</WText>
-              <WText fontSize={wp(5)} textAlign='center'>Need help with some work?</WText>
-              <WText fontSize={wp(5)} textAlign='center'>Let's help each other out!</WText>
-            </Stack>
+          <Stack
+            w='100%'
+            pt={wp(3)}
+            px={wp(5)}
+            space={wp(2)}
+          >
+            <WText
+              position='absolute'
+              right={wp(1)}
+              fontSize={Platform.OS === 'ios' ? wp(4) : wp(3) }
+              onPress={() => this.oldJobDeleter()}
+            >v1.5.2</WText>
+            {userName()}
+            {/* <WText fontSize={wp(5)} textAlign='center'></WText> */}
+            <WText fontSize={wp(5)} textAlign='center'>Looking for some work?</WText>
+            <WText fontSize={wp(5)} textAlign='center'>Need help with some work?</WText>
+            <WText fontSize={wp(5)} textAlign='center'>Let's help each other out!</WText>
+          </Stack>
         </Center>
 
         <Stack
@@ -141,8 +142,12 @@ export default class Home extends Component {
             alignItems='center'
             justifyContent='space-evenly'
           >
-            <WText>Find Community Help</WText>
-            {userButton()}
+            <Box flex='1'>
+              <WText textAlign='center'>Find Community Help</WText>
+            </Box>
+            <Center flex='1'>
+              {userButton()}
+            </Center>
           </Row>
           <Box
             flex='1'
@@ -155,11 +160,16 @@ export default class Home extends Component {
             alignItems='center'
             justifyContent='space-between'
           >
-            <WText mr={wp(1)}>Find Community Work</WText>
-            <Button
-              bg='primary.100'
-              onPress={() => this.context.navigation.navigate('Search Jobs')}
-            >Search Jobs</Button>
+            <Box flex='1'>
+              <WText textAlign='center'>Find Community Work</WText>
+            </Box>
+            <Center flex='1'>
+              <Button
+                w={'75%'}
+                bg='primary.100'
+                onPress={() => this.context.navigation.navigate('Search Jobs')}
+              >Search Jobs</Button>
+            </Center>
           </Row>
         </Stack>
 
@@ -188,7 +198,6 @@ export default class Home extends Component {
           space={wp(4)}
         >
           <WText>With wrkr, anybody can create a job and it will be visible to anyone who is willing to help. We do not employ any workers ourselves and it exists purely as a convient way to help foster connections in the community. If you have a job that needs doing (mow a lawn, babysit, skim a pool), post it here and you may just find there are plenty of people out there who want to help. For more information, please press one of the buttons above.</WText>
-          <WText>This app is in the early stages and some things may still be broken. Please be patient, as I am constantly working to improve this app.</WText>
         </Stack>
 
         <Stack
@@ -196,10 +205,8 @@ export default class Home extends Component {
           space={wp(5)}
           bg='white'
         >
-          <Text textAlign='center' fontSize={wp(7)}>Developer Notes v1.5.1</Text>
-          <Text>- All known crashes resolved. Please let me know if you encounter any others.</Text>
-          <Text>- Range setting added to Search Jobs. You can now search for jobs a set distance from the Zip Code you've entered, or choose to search for all jobs everywhere.</Text>
-          <Text>- Beta test of a simple turtle race program can be accessed using the menu.</Text>
+          <Text textAlign='center' fontSize={wp(7)}>Developer Notes v1.5.2</Text>
+          <Text>-</Text>
         </Stack>
 
         <Stack

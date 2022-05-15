@@ -4,13 +4,11 @@ export default {
   expo: {
     name: "wrkr",
     slug: "wrkr",
-    version: "1.5.1",
+    version: "1.5.2",
     orientation: "portrait",
     icon: "./assets/icon.png",
-    // icon: "./assets/icon.jpg",
     splash: {
       image: "./assets/splash.png",
-      // image: "./assets/splash.jpg",
       // resizeMode: "contain",
       resizeMode: "cover",
       // backgroundColor: "#ffffff"
@@ -25,7 +23,7 @@ export default {
     ios: {
       bundleIdentifier: "com.wrkr",
       supportsTablet: true,
-      buildNumber: "1.5.1",
+      buildNumber: "1.5.2",
       infoPlist: {
         NSLocationWhenInUseUsageDescription: "The user's location is used to set their address in their profile. Their information is used in no other way. It is set once at startup so that they won't have to enter in an address for each job they want to create."
       }
@@ -45,7 +43,7 @@ export default {
         backgroundColor: "#289d15"
       },
       softwareKeyboardLayoutMode: "pan",
-      versionCode: 7
+      versionCode: 8
     },
     web: {
       "favicon": "./assets/favicon.png"
